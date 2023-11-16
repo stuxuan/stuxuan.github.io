@@ -17,20 +17,22 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>Hello World | Hexo</title>
-  <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+  <title>unity协程（IEnumerator）开始和结束 | Hexo</title>
+  <meta name="description" content="快速阅览： 一、结束协程无效：协程方法需要单独存一份地址，在开始和结束不直接传入方法名，而是使用这份保存的地址进行开始和结束。 二、再次开启协程时少跑了几行代码：再次开始同一个方法名的协程时，不是从第一句代码开始执行，而是从上次结束的位置执行，所以如果需要初始化状态，应该单独调用该方法。 详细说明：启动协程使用StartCoroutine();传入需要使用的协程的方法名，具体代码段如下，假设使用协">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://example.com/2023/11/16/hello-world/index.html">
+<meta property="og:title" content="unity协程（IEnumerator）开始和结束">
+<meta property="og:url" content="http://example.com/2023/11/16/unity%E5%8D%8F%E7%A8%8B%EF%BC%88IEnumerator%EF%BC%89%E5%BC%80%E5%A7%8B%E5%92%8C%E7%BB%93%E6%9D%9F/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="快速阅览： 一、结束协程无效：协程方法需要单独存一份地址，在开始和结束不直接传入方法名，而是使用这份保存的地址进行开始和结束。 二、再次开启协程时少跑了几行代码：再次开始同一个方法名的协程时，不是从第一句代码开始执行，而是从上次结束的位置执行，所以如果需要初始化状态，应该单独调用该方法。 详细说明：启动协程使用StartCoroutine();传入需要使用的协程的方法名，具体代码段如下，假设使用协">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-11-16T08:05:14.985Z">
-<meta property="article:modified_time" content="2023-11-16T08:05:14.985Z">
+<meta property="og:image" content="http://example.com/images/3219843-20230704150157236-1683194742.png">
+<meta property="article:published_time" content="2023-11-16T09:27:47.000Z">
+<meta property="article:modified_time" content="2023-11-16T09:49:15.966Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/3219843-20230704150157236-1683194742.png">
   <!-- Canonical links -->
-  <link rel="canonical" href="http://example.com/2023/11/16/hello-world/index.html">
+  <link rel="canonical" href="http://example.com/2023/11/16/unity%E5%8D%8F%E7%A8%8B%EF%BC%88IEnumerator%EF%BC%89%E5%BC%80%E5%A7%8B%E5%92%8C%E7%BB%93%E6%9D%9F/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -180,15 +182,29 @@
 
     
       
+  <div class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/unity/" rel="tag">unity</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
 
     
       
+  <div class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/unity/" style="font-size: 13px;">unity</a>
+    </div>
+  </div>
+
     
       
   <div class="widget">
     <h3 class="widget-title">Archive</h3>
     <div class="widget-body">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a><span class="archive-list-count">1</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">November 2023</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">July 2023</a><span class="archive-list-count">1</span></li></ul>
     </div>
   </div>
 
@@ -207,10 +223,25 @@
                 
               </p>
               <p class="item-title">
-                <a href="/2023/11/16/hello-world/" class="title">Hello World</a>
+                <a href="/2023/11/16/unity%E5%8D%8F%E7%A8%8B%EF%BC%88IEnumerator%EF%BC%89%E5%BC%80%E5%A7%8B%E5%92%8C%E7%BB%93%E6%9D%9F/" class="title">unity协程（IEnumerator）开始和结束</a>
               </p>
               <p class="item-date">
-                <time datetime="2023-11-16T08:05:14.985Z" itemprop="datePublished">2023-11-16</time>
+                <time datetime="2023-11-16T09:27:47.000Z" itemprop="datePublished">2023-11-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                
+              </p>
+              <p class="item-title">
+                <a href="/2023/07/04/unity-http-json%E5%89%8D%E5%90%8E%E7%AB%AF%E9%80%9A%E4%BF%A1/" class="title">unity http json前后端通信</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2023-07-04T03:58:30.000Z" itemprop="datePublished">2023-07-04</time>
               </p>
             </div>
           </li>
@@ -228,14 +259,14 @@
   
 <main class="main" role="main">
   <div class="content">
-  <article id="post-hello-world" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+  <article id="post-unity协程（IEnumerator）开始和结束" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
     
     <div class="article-header">
       
         
   
     <h1 class="article-title" itemprop="name">
-      Hello World
+      unity协程（IEnumerator）开始和结束
     </h1>
   
 
@@ -243,8 +274,8 @@
       <div class="article-meta">
         <span class="article-date">
     <i class="icon icon-calendar-check"></i>
-	<a href="/2023/11/16/hello-world/" class="article-date">
-	  <time datetime="2023-11-16T08:05:14.985Z" itemprop="datePublished">2023-11-16</time>
+	<a href="/2023/11/16/unity%E5%8D%8F%E7%A8%8B%EF%BC%88IEnumerator%EF%BC%89%E5%BC%80%E5%A7%8B%E5%92%8C%E7%BB%93%E6%9D%9F/" class="article-date">
+	  <time datetime="2023-11-16T09:27:47.000Z" itemprop="datePublished">2023-11-16</time>
 	</a>
 </span>
         
@@ -252,25 +283,27 @@
 
         
 
-        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/11/16/hello-world/#comments" class="article-comment-link">Comments</a></span>
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2023/11/16/unity%E5%8D%8F%E7%A8%8B%EF%BC%88IEnumerator%EF%BC%89%E5%BC%80%E5%A7%8B%E5%92%8C%E7%BB%93%E6%9D%9F/#comments" class="article-comment-link">Comments</a></span>
         
       </div>
     </div>
     <div class="article-entry marked-body" itemprop="articleBody">
       
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+        <p>快速阅览：</p>
+<p><strong>一、结束协程无效：</strong>协程方法需要单独存一份地址，在开始和结束不直接传入方法名，而是使用这份保存的地址进行开始和结束。</p>
+<p><strong>二、再次开启协程时少跑了几行代码：</strong>再次开始同一个方法名的协程时，不是从第一句代码开始执行，而是从上次结束的位置执行，所以如果需要初始化状态，应该单独调用该方法。</p>
+<h1 id="详细说明："><a href="#详细说明：" class="headerlink" title="详细说明："></a><strong>详细说明：</strong></h1><h2 id="启动协程使用StartCoroutine"><a href="#启动协程使用StartCoroutine" class="headerlink" title="启动协程使用StartCoroutine();"></a>启动协程使用StartCoroutine();</h2><p>传入需要使用的协程的方法名，具体代码段如下，假设使用协程时需要先初始化部分游戏状态。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Controller</span>: <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">start</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">    	StartCoroutine(Test());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">IEnumerator <span class="title">Test</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">    	InitState();</span><br><span class="line">    	<span class="keyword">while</span>(<span class="literal">true</span>)</span><br><span class="line">    	&#123;</span><br><span class="line">    		DoSomething();</span><br><span class="line">    		<span class="function"><span class="keyword">yield</span> <span class="keyword">return</span> <span class="keyword">new</span> <span class="title">WaitForSeconds</span>(<span class="params"><span class="number">1</span></span>)</span>;</span><br><span class="line">    	&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InitState</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">    	DoSomething();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+<h2 id="结束协程StopCoroutine"><a href="#结束协程StopCoroutine" class="headerlink" title="结束协程StopCoroutine();"></a>结束协程StopCoroutine();</h2><p>直接传入方法名是不可以结束协程的，需要按如下操作记录协程地址，然后再传入Stop方法中。</p>
+<figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> IEnumerator myTest;</span><br><span class="line">myTest = Test();</span><br><span class="line">StartCoroutine(myTest);</span><br><span class="line">StopCoroutine(myTest);</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+
+<p>最后如果还需要再启动协程，会发现这次代码段没有执行初始化游戏状态InitState()的代码，他会接着上次被停止的地方执行，所以初始化状态不应该写在协程内部，而是写在协程外。</p>
+<p>完整代码如下</p>
+<p>[<img src="/images/3219843-20230704150157236-1683194742.png" alt="img"></p>
 
       
     </div>
@@ -280,7 +313,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="http://example.com/2023/11/16/hello-world/" title="Hello World" target="_blank" rel="external">http://example.com/2023/11/16/hello-world/</a>
+      <a href="http://example.com/2023/11/16/unity%E5%8D%8F%E7%A8%8B%EF%BC%88IEnumerator%EF%BC%89%E5%BC%80%E5%A7%8B%E5%92%8C%E7%BB%93%E6%9D%9F/" title="unity协程（IEnumerator）开始和结束" target="_blank" rel="external">http://example.com/2023/11/16/unity协程（IEnumerator）开始和结束/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -323,6 +356,16 @@
 
   <nav class="bar bar-footer clearfix" data-stick-bottom>
   <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2023/07/04/unity-http-json%E5%89%8D%E5%90%8E%E7%AB%AF%E9%80%9A%E4%BF%A1/" title="unity http json前后端通信"><span>Older&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+  </ul>
   
   
   <!-- Button trigger modal -->
