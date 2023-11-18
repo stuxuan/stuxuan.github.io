@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>about | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.0.0"><link rel="alternate" href="/atom.xml" title="xuan's Blogs" type="application/atom+xml">
+</head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    <article class="post-wrap page">
+        
+        <h2 class="post-title">about</h2>
+        
+        <section class="post-content">
+            <h1 id="学习内容"><a href="#学习内容" class="headerlink" title="学习内容"></a>学习内容</h1><ul>
+<li>研究方向：数字孪生</li>
+<li>数据结构 <a href="https://mxwu.me/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">Tag: 数据结构 | xuan’s Blogs (mxwu.me)</a></li>
+<li>Linux <a href="https://mxwu.me/tags/linux/">Tag: linux | xuan’s Blogs (mxwu.me)</a></li>
+<li>深入理解计算机系统 <a href="https://mxwu.me/tags/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/">Tag: 深入理解计算机系统 | xuan’s Blogs (mxwu.me)</a></li>
+<li>操作系统 <a href="https://mxwu.me/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">Tag: 操作系统 | xuan’s Blogs (mxwu.me)</a></li>
+<li>unity问题记录 <a href="https://mxwu.me/tags/unity/">Tag: unity | xuan’s Blogs (mxwu.me)</a></li>
+</ul>
+<h1 id="项目经历"><a href="#项目经历" class="headerlink" title="项目经历"></a>项目经历</h1><h2 id="中电2所-太一2GW高效太阳能电池片整线"><a href="#中电2所-太一2GW高效太阳能电池片整线" class="headerlink" title="中电2所 太一2GW高效太阳能电池片整线"></a>中电2所 太一2GW高效太阳能电池片整线</h2><p>使用unity &#x2F; c# 开发</p>
+<ul>
+<li><p>涉及 redis 订阅数据，根据数据生成和同步 80+辆AGV 小车的位置信息，并根据散点位置插值平滑动画；</p>
+</li>
+<li><p>http主动获取 json 数据，同步机械臂动画和料车上的数据信息；</p>
+</li>
+<li><p>点击设备显示相关运行数据。</p>
+</li>
+</ul>
+<div align=center><img src="/images/about/太原二所1.png" width="80%"></img></div>
+
+<h2 id="航天五院-感知可视化软件开发"><a href="#航天五院-感知可视化软件开发" class="headerlink" title="航天五院 ***感知可视化软件开发"></a>航天五院 ***感知可视化软件开发</h2><p>使用unity &#x2F; c# 开发</p>
+<ul>
+<li><p>涉及虚拟场景坐标转换，雷达监测模拟（程序模拟数据，通信工程学院提供dll文件计算并返回仿真结果），实时显示雷达照射光束和反射光束，显示真实敌机经纬度和模拟探测到的敌机经纬度，在二维地图上有敌机真实轨迹和探测到的散点图，可以显示打击过程，可以切换敌机、卫星、地球视角等。</p>
+</li>
+<li><p>模拟过程可以通过全局倍速控制，敌机飞行轨迹可在程序运行前通过一组经纬高配置，支持设置多个敌机位置，支持设置雷达详细参数。</p>
+</li>
+<li><p>下图已经略UI面板等信息，只显示地球模型。</p>
+</li>
+</ul>
+<div align=center><img src="/images/about/态势感知.png" width="80%"></img></div>
+
+<h2 id="中电38所-人机交互感知与智能辅助装配及运维开发软件"><a href="#中电38所-人机交互感知与智能辅助装配及运维开发软件" class="headerlink" title="中电38所 人机交互感知与智能辅助装配及运维开发软件"></a>中电38所 人机交互感知与智能辅助装配及运维开发软件</h2><p>使用unity &#x2F; c# &#x2F; hololens 开发</p>
+<ul>
+<li><p>视频通话：程序支持远程视频通话，可以同步眼镜内虚拟场景和现实场景及语音，远程指导操作工人进行装配作业</p>
+</li>
+<li><p>装配引导：在虚拟场景内装配点有蓝色光圈特效，装配点与需要装配的物体间有射线连接，允许操作工人学习装配流程</p>
+</li>
+<li><p>多人协同：允许通过网络连接多人操作协同装配，自动获取和释放网络物体的权限</p>
+</li>
+<li><p>二维码识别：通过扫描二维码显示该装配零件的文字或视频信息</p>
+</li>
+<li><p>电子手册：场景右侧有完整的装配物体电子手册可以阅览</p>
+</li>
+</ul>
+<div align=center><img src="/images/about/Hololens.png" width="80%"></img></div>
+
+<h2 id="中电20所-人机工效自动评估与优化软件"><a href="#中电20所-人机工效自动评估与优化软件" class="headerlink" title="中电20所 人机工效自动评估与优化软件"></a>中电20所 人机工效自动评估与优化软件</h2><p>使用CATIA &#x2F; vb.net 二次开发</p>
+<ul>
+<li><p>winform界面设计</p>
+</li>
+<li><p>允许通过图形化界面输入人体关节角度及环境数据，根据相关算法输出人体舒适度信息以及改进建议，允许通过其他设备实时获取关节数据并读取到软件进行分析。</p>
+</li>
+</ul>
+<div align=center><img src="/images/about/20所.png" width="80%"></img></div>
+
+
+
+<h1 id="工作经历"><a href="#工作经历" class="headerlink" title="工作经历"></a>工作经历</h1><p>上海左木互娱信息科技有限公司（2022.06 - 2022.09，unity 程序开发）</p>
+<ul>
+<li>包括前后端通信、长列表分页获取和显示、协程UI动画等</li>
+<li>国产燧光AR眼镜的程序开发</li>
+</ul>
+<h1 id="奖学金及其他"><a href="#奖学金及其他" class="headerlink" title="奖学金及其他"></a>奖学金及其他</h1><ul>
+<li>GPA 3.98（1&#x2F;113）</li>
+<li>计算机二级，英语四六级</li>
+<li>第七届 “互联网+” 全国金奖</li>
+<li>曾任校学生会主席，获四川省优秀毕业生、校十佳学生干部</li>
+</ul>
+
+        </section>
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
