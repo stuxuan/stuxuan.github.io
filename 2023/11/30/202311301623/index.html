@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【C++ Primer Plus】泛型编程之迭代器和容器 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【C++ Primer Plus】泛型编程之迭代器和容器</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">November 30, 2023&nbsp;&nbsp;16:23:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-使用迭代器的原因"><a href="#1-使用迭代器的原因" class="headerlink" title="1. 使用迭代器的原因"></a>1. 使用迭代器的原因</h1><p> 　　下面用两个遍历函数引出使用迭代器的原因。实现细节上来看，两个 find 函数算法不同，但广义上来看，他们的目的都是匹配值相同的一项。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 给定一个double数组, 返回值相同的一项</span></span><br><span class="line"><span class="function"><span class="type">double</span>* <span class="title">find_ar</span><span class="params">(<span class="type">double</span>* ar, <span class="type">int</span> n, <span class="type">const</span> <span class="type">double</span> &amp; val)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;n; i++)</span><br><span class="line">        <span class="keyword">if</span>(ar[i] == val)</span><br><span class="line">            <span class="keyword">return</span> &amp;ar[i];</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 给定一个链表节点, 返回值相同的一项</span></span><br><span class="line"><span class="function">Node* <span class="title">find_ll</span><span class="params">(Node* head, <span class="type">const</span> <span class="type">double</span>&amp; val)</span></span>&#123;</span><br><span class="line">    Node* start;</span><br><span class="line">    <span class="keyword">for</span>(start = head; start!=<span class="number">0</span>; start = start-&gt;p_next)</span><br><span class="line">        <span class="keyword">if</span>(start-&gt;item == val)</span><br><span class="line">            <span class="keyword">return</span> start;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>迭代器要求：为不同的类设计迭代器，并为迭代器定义p++、++p、p&#x3D;q</li>
+<li>容器要求：让数组和链表拥有超尾元素，迭代器到达超尾元素后结束搜索</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">double</span>* iterator;</span><br><span class="line"><span class="function">iterator <span class="title">find_ar</span><span class="params">(iterator ar, <span class="type">int</span> n, <span class="type">const</span> <span class="type">double</span>&amp; val)</span></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt;n; i++, ar++)</span><br><span class="line">        <span class="keyword">if</span>(*ar == val)</span><br><span class="line">            <span class="keyword">return</span> ar;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">iterator <span class="title">find_ar</span><span class="params">(iterator begin, iterator end, <span class="type">const</span> <span class="type">double</span>&amp; val)</span></span>&#123;</span><br><span class="line">    iterator ar;</span><br><span class="line">    <span class="keyword">for</span>(ar=begin; ar != end; ar++)</span><br><span class="line">        <span class="keyword">if</span>(*ar == val)</span><br><span class="line">            <span class="keyword">return</span> ar;</span><br><span class="line">    <span class="keyword">return</span> end;    <span class="comment">// 未找到</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-迭代器类型"><a href="#2-迭代器类型" class="headerlink" title="2. 迭代器类型"></a>2. 迭代器类型</h1><p>　　不同算法对迭代器的要求不同。查找算法只需要读取数据；而排序算法需要读写数据和随机访问，例如 iter 是一个迭代器，需要重新定义 + 运算符来实现 iter + 10 访问元素</p>
+<ul>
+<li><strong>输入迭代器</strong>：输入是从程序的角度来说的，迭代器向程序输入，因此需要迭代器可以解引用使程序能读取迭代器中的值，但不需要修改迭代器中的值。注意迭代器是单项迭代器，只能递增不能递减，迭代器递增后也不能保证先前的值仍可以被解引用。</li>
+<li><strong>输出迭代器</strong>：输出是从程序输出到迭代器，因此需要迭代器可以被写入。注意输出迭代器只能写入却不能读取，这就类似于 cout 可以向屏幕输出但不能读取屏幕内容。</li>
+<li><strong>正向迭代器</strong>：正向迭代器与输入和输出迭代器相同，只能使用++运算符遍历容器。但正向迭代器递增后，仍然可以对前面迭代器的值解引用，并且支持输入和输出</li>
+<li><strong>双向迭代器</strong>：同时支持++和–</li>
+<li><strong>随机访问迭代器</strong>：允许从一个元素直接跳到另一个元素称为随机访问，它具有双向迭代器的所有特性</li>
+</ul>
+<div align="center"><img src="/images/C++PrimerPlus/迭代器和容器/3219843-20231130114119465-2060589166.png" width="100%"/></div> 
+
+<h1 id="3-迭代器层次结构"><a href="#3-迭代器层次结构" class="headerlink" title="3. 迭代器层次结构"></a>3. 迭代器层次结构</h1><h2 id="3-1-将指针用作迭代器"><a href="#3-1-将指针用作迭代器" class="headerlink" title="3.1 将指针用作迭代器"></a>3.1 将指针用作迭代器</h2><p>　　迭代器是广义指针，而指针满足迭代器的所有要求。迭代器是STL算法的接口，而指针就是迭代器，因此STL算法可以直接使用最普通的指针来进行一些操作，下面给出一个例子</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> SIZE = <span class="number">100</span>;</span><br><span class="line"><span class="type">double</span> Receipts[size];</span><br></pre></td></tr></table></figure>
+
+<p>　　STL sort() 函数接收容器第一个指针和超尾指针作为参数，即&amp;Receipts[0] 和 &amp;Receipts[SIZE]，也可以是下面的写法。因为c++将超尾概念用于数组，所以我们可以将STL算法用于常规数组</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sort</span>(Receipts, Receipts + SIZE);</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-容器类型"><a href="#4-容器类型" class="headerlink" title="4. 容器类型"></a>4. 容器类型</h1><h2 id="4-1-序列容器"><a href="#4-1-序列容器" class="headerlink" title="4.1 序列容器"></a>4.1 序列容器</h2><h3 id="4-1-1-vector"><a href="#4-1-1-vector" class="headerlink" title="4.1.1 vector"></a>4.1.1 vector</h3><p>　　vector 是数组的一种类表示，它提供了自动内存管理功能，容量随着元素添加和删除而增大和缩小。vector 是可翻转容器（reversible container），rbegin() 和 rend() 返回的是反转后的第一个元素的迭代器和反转后的超尾迭代器</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">for_each(dice.<span class="built_in">begin</span>(), dice.<span class="built_in">end</span>(), Show);    <span class="comment">// 顺序显示</span></span><br><span class="line">for_each(dice.<span class="built_in">rbegin</span>(), dice.<span class="built_in">rend</span>(), <span class="built_in">Show</span>();    <span class="comment">// 逆序显示</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-1-2-deque"><a href="#4-1-2-deque" class="headerlink" title="4.1.2 deque"></a>4.1.2 deque</h3><p>　　deque 是双端队列，实现类似于 vector 容器，支持随机访问。与 vector 的主要区别是它在队列开始位置的插入和删除时间是固定的，而非线性</p>
+<h3 id="4-1-3-list和forward-list-C-11"><a href="#4-1-3-list和forward-list-C-11" class="headerlink" title="4.1.3 list和forward_list(C++11)"></a>4.1.3 list和forward_list(C++11)</h3><p>　　list 是双向链表，C++11 中实现了单链表 forward_list</p>
+<h3 id="4-1-4-queue和priority-queue"><a href="#4-1-4-queue和priority-queue" class="headerlink" title="4.1.4 queue和priority_queue"></a>4.1.4 queue和priority_queue</h3><p>　　queue 是一个适配器类，实现了队列的功能（先进先出），底层实现默认为 deque</p>
+<p>　　priority_queue是另一个适配器类，支持的操作与queue相同，但它自动将最大的元素移动到队首，默认底层类为 vector</p>
+<h3 id="4-1-5-stack"><a href="#4-1-5-stack" class="headerlink" title="4.1.5 stack"></a>4.1.5 stack</h3><p>　　stack 是一个适配器类，默认底层类为vector，实现了栈的功能（后进先出）</p>
+<h3 id="4-1-6-array-C-11"><a href="#4-1-6-array-C-11" class="headerlink" title="4.1.6 array(C++11)"></a>4.1.6 array(C++11)</h3><p>　　array不是STL容器，因为它的长度是固定的，但它定义了 operator[] () 和 at()，许多STL算法适用于array</p>
+<h2 id="4-2-关联容器"><a href="#4-2-关联容器" class="headerlink" title="4.2 关联容器"></a>4.2 关联容器</h2><h3 id="4-2-1-set和multiset"><a href="#4-2-1-set和multiset" class="headerlink" title="4.2.1 set和multiset"></a>4.2.1 set和multiset</h3><p>　　set 是关联集合，可以反转和自动排序，且键是唯一的，默认情况下使用模板less&lt;&gt;来对键进行排序</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">set&lt;string&gt; A;</span><br><span class="line">set&lt;string, less&lt;string&gt;&gt; A;    <span class="comment">// 这是完整写法</span></span><br></pre></td></tr></table></figure>
+
+<p>　　排序方法决定了插入的位置，所以只需要提供插入的信息即可</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> N = <span class="number">6</span>;</span><br><span class="line">    string s1[N] = &#123; <span class="string">&quot;buffoon&quot;</span>, <span class="string">&quot;thinkers&quot;</span>, <span class="string">&quot;for&quot;</span>, <span class="string">&quot;heavy&quot;</span>, <span class="string">&quot;can&quot;</span>, <span class="string">&quot;for&quot;</span> &#125;;</span><br><span class="line">    <span class="function">set&lt;string&gt; <span class="title">A</span><span class="params">(s1, s1 + N)</span></span>;    <span class="comment">// 利用容器的构造方法, 给定了第一个元素的指针和超尾指针</span></span><br><span class="line">    <span class="function">ostream_iterator&lt;string, <span class="type">char</span>&gt; <span class="title">out</span><span class="params">(cout, <span class="string">&quot; &quot;</span>)</span></span>;</span><br><span class="line">    <span class="built_in">copy</span>(A.<span class="built_in">begin</span>(), A.<span class="built_in">end</span>(), out);    <span class="comment">// buffoon can for heavy thinkers</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-2-map和mutimap"><a href="#4-2-2-map和mutimap" class="headerlink" title="4.2.2 map和mutimap"></a>4.2.2 map和mutimap</h3><p>　　map和set最大的区别是，map的键和值类型不同，默认情况下也使用less进行排序</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">map&lt;<span class="type">int</span>, string&gt; code;</span><br><span class="line">map&lt;<span class="type">int</span>, string, less&lt;<span class="type">int</span>&gt;&gt; code;</span><br></pre></td></tr></table></figure>
+
+<p>　　下面是一个mutimap的例子，codes.equal_range(213) 返回一个键值对，包含两个迭代器，包含了键为213的所有值的信息，可以通过遍历这个迭代器得到</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    multimap&lt;<span class="type">int</span>, string&gt; codes;</span><br><span class="line">    <span class="function">pair&lt;<span class="type">const</span> <span class="type">int</span>, string&gt; <span class="title">item</span><span class="params">(<span class="number">213</span>, <span class="string">&quot;Los Angeles&quot;</span>)</span></span>;          　　  <span class="comment">// 创建一个键值对</span></span><br><span class="line">    codes.<span class="built_in">insert</span>(item);                                          　  <span class="comment">// 插入元素</span></span><br><span class="line">    codes.<span class="built_in">insert</span>(<span class="built_in">pair</span>&lt;<span class="type">const</span> <span class="type">int</span>, string&gt;(<span class="number">213</span>, <span class="string">&quot;Los Angeles&quot;</span>));   　　<span class="comment">// 插入元素</span></span><br><span class="line">    codes.<span class="built_in">insert</span>(<span class="built_in">pair</span>&lt;<span class="type">const</span> <span class="type">int</span>, string&gt;(<span class="number">213</span>, <span class="string">&quot;Los Angeles 2&quot;</span>));    <span class="comment">// 插入元素</span></span><br><span class="line">    codes.<span class="built_in">insert</span>(<span class="built_in">pair</span>&lt;<span class="type">const</span> <span class="type">int</span>, string&gt;(<span class="number">213</span>, <span class="string">&quot;Los Angeles 3&quot;</span>));    <span class="comment">// 插入元素</span></span><br><span class="line">    pair&lt;multimap&lt;<span class="type">int</span>, string&gt;::iterator, multimap&lt;<span class="type">int</span>, string&gt;::iterator&gt; range</span><br><span class="line">        = codes.<span class="built_in">equal_range</span>(<span class="number">213</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it = range.first; it != range.second; ++it)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; (*it).second &lt;&lt; endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-3-无序关联容器"><a href="#4-3-无序关联容器" class="headerlink" title="4.3 无序关联容器"></a>4.3 无序关联容器</h2><p>无序关联容器与关联容器相同，将值和键关联起来，但关联容器底层通过树实现，无序关联容器通过哈希表实现，目的是提高添加和删除元素的速度以及查找算法的效率，它们是unordered_set、unordered_multiset、unordered_map、unordered_multimap</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/11/30/202311301623/">https://mingxuanwu.com/2023/11/30/202311301623/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/C-Primer-Plus/"># C++ Primer Plus</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/12/02/202312021427/">【C++ Primer Plus】C++11 深入理解右值、右值引用和完美转发</a>
+            
+            
+            <a class="next" rel="next" href="/2023/11/28/202311281432/">【unity】鼠标拖拽实现摄像机围绕物体视角旋转（物体不动、摄像机旋转）</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

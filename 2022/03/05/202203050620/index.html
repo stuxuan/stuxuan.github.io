@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【计算机图形学】UnityShader入门 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【计算机图形学】UnityShader入门</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">March 5, 2022&nbsp;&nbsp;14:27:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-Unity渲染管线综述"><a href="#1-Unity渲染管线综述" class="headerlink" title="1.Unity渲染管线综述"></a>1.Unity渲染管线综述</h1><div align="center"><img src="/images/其他/UnityShader/14ed17929f2fb6d69a20b2b867b4a7bd.png" width="70%"/></div> 
+
+<h2 id="1-1CPU“应用程序阶段”"><a href="#1-1CPU“应用程序阶段”" class="headerlink" title="1.1CPU“应用程序阶段”"></a>1.1CPU“应用程序阶段”</h2><div align="center"><img src="/images/其他/UnityShader/7c827c7f65f02013da541b69dc6b38ce.png" width="40%"/></div>
+
+<ul>
+<li><strong>剔除（Culling）：</strong></li>
+</ul>
+<p>视锥体剔除（Frustum Culling）</p>
+<p>层级剔除（Layer Culling Mask），遮挡剔除（Occlusion Culling）等</p>
+<ul>
+<li><strong>排序（Sort）：</strong></li>
+</ul>
+<p>渲染队列（RenderQueue）</p>
+<p>不透明队列（RenderQueue&lt;2500）按摄像机从前向后渲染</p>
+<p>半透明队列（RenderQueue&gt;2500）按摄像机从后向前渲染</p>
+<p>（RenderQueue在shader里，前靠近摄像头，后原理摄像头）</p>
+<ul>
+<li><strong>打包数据（Batch）</strong></li>
+</ul>
+<p>模型信息、变换矩阵、灯光、材质参数 ，加载到现存</p>
+<ul>
+<li><strong>绘制调用（DrawCall、SetPass）</strong></li>
+</ul>
+<h2 id="1-2GPU渲染管线"><a href="#1-2GPU渲染管线" class="headerlink" title="1.2GPU渲染管线"></a>1.2GPU渲染管线</h2><div align="center"><img src="/images/其他/UnityShader/57ccc9ffb32f7837e2496b36f4b2adb2.png" width="100%"/></div>
+
+<p><strong>CPU输入顶点数据后，进入GPU工作流程</strong></p>
+<table>
+<thead>
+<tr>
+<th><strong>阶段</strong></th>
+<th><strong>操作名称</strong></th>
+<th><strong>作用</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>几</strong> <strong>何</strong> <strong>阶</strong> <strong>段</strong></td>
+<td>顶点着色器（Vertex Shader）</td>
+<td>完全可编程，顶点空间变换、顶点着色</td>
+</tr>
+<tr>
+<td></td>
+<td>曲面细分着色器（Tessellation Shader）</td>
+<td>可选，细分图元</td>
+</tr>
+<tr>
+<td></td>
+<td>几何着色器（Geometry Shader）</td>
+<td>可选，逐行执行图片着色操作，或产生更多图元</td>
+</tr>
+<tr>
+<td></td>
+<td>裁剪（Clipping）</td>
+<td>将不在摄像机视野的三角面顶点裁剪</td>
+</tr>
+<tr>
+<td></td>
+<td>屏幕映射（Screen Mapping）</td>
+<td>不可配置和编程，将图元坐标转换到屏幕坐标</td>
+</tr>
+<tr>
+<td><strong>光</strong> <strong>栅</strong> <strong>化</strong> <strong>阶</strong> <strong>段</strong></td>
+<td>三角形设置（Triangle Setup）</td>
+<td>光栅化一个三角网格所需的信息，使顶点生成网格</td>
+</tr>
+<tr>
+<td></td>
+<td>三角形遍历（Triangle Traversal）</td>
+<td>检测每个像素是否被三角形网格覆盖，如果覆盖则生成一个片元（fragment）</td>
+</tr>
+<tr>
+<td></td>
+<td>片元着色器（Fragment Shader）</td>
+<td>重要技术之一是纹理采样</td>
+</tr>
+<tr>
+<td></td>
+<td>逐片元操作（Per-Fragment Operations）</td>
+<td>模板测试→深度测试。通过后将颜色值和颜色缓冲区中的颜色混合</td>
+</tr>
+</tbody></table>
+<p><strong>经过GPU流水线后，图象被输出到屏幕上</strong></p>
+<h3 id="1-1-1-光栅化"><a href="#1-1-1-光栅化" class="headerlink" title="1.1.1 光栅化"></a>1.1.1 光栅化</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="type">int</span> x = <span class="number">0</span>; x \&lt; xmax ; x++)</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> y = <span class="number">0</span>; y \&lt; ymax ; y++)</span><br><span class="line">inside(try, x+<span class="number">0.5</span>, y+<span class="number">0.5</span>) <span class="comment">//是inside自己定义的函数，判断像素是否在连线内</span></span><br><span class="line"><span class="comment">//P0P2 × P0Q、P2P1 × P2Q、P1P0×P1Q 叉乘结果应该符号相同</span></span><br></pre></td></tr></table></figure>
+
+<div align="center"><img src="/images/其他/UnityShader/Snipaste_2023-12-14_21-17-00.jpg" width="80%"/></div>
+
+<p>由于光栅化的过程会出现走样的情况，锯齿很明显，提出了模糊的方法来解决锯齿问题，先把信号的高频信号拿掉，再进行采样。</p>
+<div align="center"><img src="/images/其他/UnityShader/e3d1e8599d6f3af994f2c71f6fc0dcc3.png" width="60%"/></div>
+
+<h3 id="1-1-2-滤波"><a href="#1-1-2-滤波" class="headerlink" title="1.1.2 滤波"></a>1.1.2 滤波</h3><div align="center"><img src="/images/其他/UnityShader/43c2aff47388e3884addaaf996f79891.png" width="40%"/></div>
+
+<p>高通滤波，只显示高通信息，即对比度信息较高的信息；低通滤波与之相反，保留对比度较低的信息</p>
+<div align="center"><img src="/images/其他/UnityShader/Snipaste_2023-12-14_21-18-41.jpg" width="60%"/></div>
+
+<p>可以理解为对该像素的信号做一个加权的平均值，取附近的信号和该像素的信号。比如右图3×3</p>
+<div align="center"><img src="/images/其他/UnityShader/Snipaste_2023-12-14_21-19-06.jpg" width="80%"/></div>
+
+<p><strong>MSAA，把1个像素当成4个像素进行处理来抗锯齿。还有FXAA、TAA、DLSS方法抗锯齿</strong></p>
+<div align="center"><img src="/images/其他/UnityShader/8d79f6a061002da7a81880236dce4d47.png" width="60%"/></div>
+
+<h3 id="1-1-3-深度缓存"><a href="#1-1-3-深度缓存" class="headerlink" title="1.1.3 深度缓存"></a>1.1.3 深度缓存</h3><p>&#x2F;&#x2F;注，图形学中摄像机z轴正方向为从屏幕指向屏幕外，这里为了方便理解，将z轴指向屏幕内，所以数字越大深度越深</p>
+<div align="center"><img src="/images/其他/UnityShader/b334b8022db8ef55a801d9eba01c7018.png" width="60%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/7a0b0ccfcd0bf55e1e8b4980f86f2c5c.png" width="40%"/></div>
+
+<h3 id="1-1-4-兰伯特定律和光线能量衰减"><a href="#1-1-4-兰伯特定律和光线能量衰减" class="headerlink" title="1.1.4 兰伯特定律和光线能量衰减"></a>1.1.4 兰伯特定律和光线能量衰减</h3><div align="center"><img src="/images/其他/UnityShader/2697c943878ab8c3baaf24a1d0a5574e.png" width="30%"/></div>
+
+<p>我们认为光的能量</p>
+<p>在每一个球壳上是完全相等的</p>
+<p>也就是说光的能量与半径的平方成反比</p>
+<p>能量&#x3D;<strong>I&#x2F;r2</strong></p>
+<div align="center"><img src="/images/其他/UnityShader/2548b0bb437b47610bf581bbc96ef06d.png" width="50%"/></div>
+
+<p>我们获得了光的能量计算方法</p>
+<p>所以可以获得光能量影响下的兰伯特公式</p>
+<p><strong>Ld&#x3D;kd(I&#x2F;r2)max(0, n·l)</strong></p>
+<h3 id="1-1-5-Blnn-Phong高光模型"><a href="#1-1-5-Blnn-Phong高光模型" class="headerlink" title="1.1.5 Blnn-Phong高光模型"></a>1.1.5 Blnn-Phong高光模型</h3><div align="center"><img src="/images/其他/UnityShader/06cc2cf175226a3190165cdab4ca77c5.png" width="50%"/></div>
+
+<p>高光处p的指数主要用于缩小高光的范围，高光应该是人眼观测角度很小时才有的现象</p>
+<div align="center"><img src="/images/其他/UnityShader/e00940350d58dd718ba306db5e407d08.png" width="50%"/></div>
+
+<h3 id="1-1-6-Ambient环境光"><a href="#1-1-6-Ambient环境光" class="headerlink" title="1.1.6 Ambient环境光"></a>1.1.6 Ambient环境光</h3><p>环境光可以理解为是一个均匀的光，整体完全提亮</p>
+<div align="center"><img src="/images/其他/UnityShader/98b95a22183f98e796e5f02ee47c690a.png" width="50%"/></div>
+
+<h3 id="1-1-7-Blnn-Phong-Reflection-Model"><a href="#1-1-7-Blnn-Phong-Reflection-Model" class="headerlink" title="1.1.7 Blnn-Phong Reflection Model"></a>1.1.7 Blnn-Phong Reflection Model</h3><div align="center"><img src="/images/其他/UnityShader/24bbc4dfdd1f3d252f25a8ab14965564.png" width="50%"/></div>
+
+<h3 id="1-1-8-渲染的三种形式"><a href="#1-1-8-渲染的三种形式" class="headerlink" title="1.1.8 渲染的三种形式"></a>1.1.8 渲染的三种形式</h3><p><strong>三种渲染模式：每个面的法线、每个顶点的法线、每个像素的法线</strong></p>
+<div align="center"><img src="/images/其他/UnityShader/d99dd9e10435210ac4a8e7baf4700d00.png" width="50%"/></div>
+
+<p><strong>每个顶点法线的计算就是通过每个面的法线，经过加权平均以后获得顶点的法线</strong></p>
+<div align="center"><img src="/images/其他/UnityShader/3066aa6ff26d9f4af09ec747aa7b7ce7.png" width="50%"/></div>
+
+<p><strong>每个像素的法线通过插值顶点法线来获得</strong></p>
+<div align="center"><img src="/images/其他/UnityShader/47ac2a77f9482ed69762ce8e69789b0b.png" width="50%"/></div>
+
+<h3 id="1-1-9-Texture纹理映射"><a href="#1-1-9-Texture纹理映射" class="headerlink" title="1.1.9 Texture纹理映射"></a>1.1.9 Texture纹理映射</h3><p>任何一个三维物体都可以展开成一个二维的图，也就是可以用二维图片映射到三维物体上</p>
+<div align="center"><img src="/images/其他/UnityShader/9148e603b3bba6aad923739b4c1c4bd6.png)
+
+<h1 id="Unity-Shader"><a href="#Unity-Shader" class="headerlink" title="Unity Shader"></a>Unity Shader</h1><h2 id="2-1基础知识"><a href="#2-1基础知识" class="headerlink" title="2.1基础知识"></a>2.1基础知识</h2><p>（Properties）ShaderLab属性类型和CG变量类型的匹配关系</p>
+<div align="center"><img src="/images/其他/UnityShader/a42a54a14441a78880bd9be58cbf781d.png" width="50%"/></div>
+
+<p>（头文件）Unity中一些常用的包含文件</p>
+<div align="center"><img src="/images/其他/UnityShader/93a43a16286ae95255619fae80da2862.png" width="50%"/></div>
+
+<p>UnityCG.cginc中一些常用的结构体</p>
+<div align="center"><img src="/images/其他/UnityShader/27e68639c7b05c7d09954638fc1d4eda.png" width="50%"/></div>
+
+<p>UnityCG.cginc中一些常用的帮助函数</p>
+<div align="center"><img src="/images/其他/UnityShader/159a6bdf89f948e03bb482c2816f1656.png" width="50%"/></div>
+
+<p>从应用阶段传递模型数据给顶点着色器时Unity支持的常用语义</p>
+<div align="center"><img src="/images/其他/UnityShader/83ace44a877e05a96b267cf225291103.png" width="50%"/></div>
+
+<p>从顶点着色器传递数据给片元着色器时Unity使用的常用语义</p>
+<div align="center"><img src="/images/其他/UnityShader/8614f8e3d1710847be637d6d86a3f20f.png" width="50%"/></div>
+
+<p>从片元着色器输出时Unity支持的常用语义</p>
+<div align="center"><img src="/images/其他/UnityShader/4a01687670d77eea373a471651dfe688.png" width="50%"/></div>
+
+<p>CG&#x2F;HLSL中3中精度的数值类型</p>
+<div align="center"><img src="/images/其他/UnityShader/44ede2def7eaca41fa1b118ea5185346.png" width="50%"/></div>
+
+<p><a target="_blank" rel="noopener" href="https://docs.unity3d.com/cn/current/Manual/SL-ShaderCompileTargets.html">着色器编译目标级别 - Unity 手册 (unity3d.com)</a> Unity支持的Shader Target</p>
+<div align="center"><img src="/images/其他/UnityShader/2eaa72454fa7fda3033767ae957198d1.png" width="50%"/></div>
+
+<p>UnityCG.cginc中一些常用的帮助函数</p>
+<div align="center"><img src="/images/其他/UnityShader/08b41cd114a93db39124926c10b27300.png" width="50%"/></div>
+
+<h3 id="2-1-1-Properties"><a href="#2-1-1-Properties" class="headerlink" title="2.1.1 Properties"></a>2.1.1 Properties</h3><p>开放在材质面板的参数</p>
+<table>
+<thead>
+<tr>
+<th><strong>属性类型</strong></th>
+<th><strong>默认值的定义语法</strong></th>
+<th><strong>例子</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Int</td>
+<td>number</td>
+<td>_Int(“整数”, Int) &#x3D; 2</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>number</td>
+<td>_Float(“浮点数”, Float) &#x3D; 1.5</td>
+</tr>
+<tr>
+<td>Range(min, max)</td>
+<td>number</td>
+<td>_Range(“范围”, Range(0.0, 5.0) &#x3D; 3.0</td>
+</tr>
+<tr>
+<td>Color</td>
+<td>(n,n,n,n)</td>
+<td>_Color(“颜色”, Color) &#x3D; (1, 1, 1, 1)</td>
+</tr>
+<tr>
+<td>Vector</td>
+<td>(n,n,n,n)</td>
+<td>_Vector(“向量”, Vector) &#x3D; (2, 3, 6, 1)</td>
+</tr>
+<tr>
+<td>2D</td>
+<td>“defaulttexture” {}</td>
+<td>_Tex2D(“漫射图”, 2D) &#x3D; “” {}</td>
+</tr>
+<tr>
+<td>Cube</td>
+<td>“defaulttexture” {}</td>
+<td>_Cube(“Cube”, Cube) &#x3D; “White” {}</td>
+</tr>
+<tr>
+<td>3D</td>
+<td>“defaulttexture” {}</td>
+<td>_Tex3D(“3D”, 3D) &#x3D; “black” {}</td>
+</tr>
+</tbody></table>
+<h3 id="2-1-2-SubShader"><a href="#2-1-2-SubShader" class="headerlink" title="2.1.2 SubShader"></a>2.1.2 SubShader</h3><ul>
+<li>[RenderSetup] 渲染状态的设定</li>
+</ul>
+<p>常见的渲染设置选项</p>
+<table>
+<thead>
+<tr>
+<th>状态名称</th>
+<th>设置指令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cull</td>
+<td>Cull Back | Front | Off</td>
+<td>设置剔除模式，剔除背面&#x2F;正面&#x2F;关闭剔除</td>
+</tr>
+<tr>
+<td>ZTest</td>
+<td>ZTest Less Greater | LEqual | GEqual | Equal NotEqual | Always</td>
+<td>设置深度测试时使用的函数</td>
+</tr>
+<tr>
+<td>ZWrite</td>
+<td>ZWrite On | Off</td>
+<td>开启&#x2F;关闭深度写入</td>
+</tr>
+<tr>
+<td>Blend</td>
+<td>Blend SrcFactor DstFactor</td>
+<td>开启并设置混合模式</td>
+</tr>
+</tbody></table>
+<ul>
+<li>[Tags] 渲染标签的设定</li>
+</ul>
+<p>Tags是一个键值对（Key&#x2F;Value Pair），键和值都是字符串类型，标签结构如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Tags&#123; <span class="string">&quot;TagName1&quot;</span> = <span class="string">&quot;Value1&quot;</span> <span class="string">&quot;TagName2&quot;</span> = <span class="string">&quot;Value2&quot;</span> &#125;</span><br><span class="line">SubShader&#123;</span><br><span class="line">Pass&#123;</span><br><span class="line"><span class="comment">//定义该Pass的光照模式为</span></span><br><span class="line">Tags&#123; <span class="string">&quot;LightMode&quot;</span> = <span class="string">&quot;ForwardBase&quot;</span> &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<div align="center"><img src="/images/其他/UnityShader/69b21fb86b5e31251a0f8243a6401729.png" width="50%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/72a5ccc5d32bab78fa614e61a1548b8e.png" width="50%"/></div>
+
+<h3 id="2-1-3点积和叉积"><a href="#2-1-3点积和叉积" class="headerlink" title="2.1.3点积和叉积"></a>2.1.3点积和叉积</h3><ul>
+<li><strong>点积dot计算公式一：</strong>对应分量相乘后相加</li>
+</ul>
+<p>向量a点积<strong>单位向量b</strong>，得到的是a在单位向量b上的<strong>投影长度</strong></p>
+<div align="center"><img src="/images/其他/UnityShader/1c54a8cc4c5c101794660211a0aa030c.png" width="50%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/329ef2e280f73b5557a812979919aa37.png" width="50%"/></div>
+
+<ul>
+<li><strong>点积计算公式二：模*模*cosθ</strong></li>
+</ul>
+<p>结果 &gt; 0则表示两向量夹角&lt;90°（同向），结果 &lt; 0表示两向量夹角&gt;90°（逆向）</p>
+<ul>
+<li><strong>叉积corss计算公式 a×b &#x3D; (ax,ay,az)×(bx,by,bz)&#x3D;(aybz-azby,azbx-axbz,axby-aybx)</strong></li>
+</ul>
+<p>叉积不满足交换律和结合律<strong>a</strong>×<strong>b</strong>≠<strong>b</strong>×<strong>a</strong>，(<strong>a</strong>×<strong>b</strong>)×<strong>c</strong>≠<strong>a</strong>×(<strong>b</strong>×<strong>c</strong>)</p>
+<p>实际上<strong>a</strong>×<strong>b</strong>&#x3D;-(<strong>b</strong>×<strong>a</strong>)</p>
+<p>|<strong>a</strong>×<strong>b</strong>|&#x3D;|<strong>a</strong>||<strong>b</strong>|sinθ</p>
+<div align="center"><img src="/images/其他/UnityShader/19800a718746e5788d47d7865f3f231c.png" width="30%"/></div>
+
+<h3 id="2-1-4矩阵"><a href="#2-1-4矩阵" class="headerlink" title="2.1.4矩阵"></a>2.1.4矩阵</h3><p><strong>矩阵乘法：</strong>第<strong>i</strong>行*第<strong>j</strong>列就是第<strong>i j</strong>个元素，可以把第一个矩阵放在左侧，第二个矩阵放在上侧。</p>
+<p>矩阵乘法不满足交换律。</p>
+<div align="center"><img src="/images/其他/UnityShader/f853435622b6363d70b9b64508f3bf38.png" width="20%"/></div>
+
+<p><strong>对角矩阵：</strong>除了m11、m22、m33都为0的矩阵</p>
+<div align="center"><img src="/images/其他/UnityShader/55d900bec390ca083dea089db08bf5c3.png" width="20%"/></div>
+
+<p><strong>单位矩阵：</strong>对角矩阵的数值为1，用<strong>I</strong>n来表示（<strong>MI&#x3D;IM&#x3D;M</strong>）</p>
+<div align="center"><img src="/images/其他/UnityShader/4583a0b09030018bf934fcd6059b82ea.png" width="20%"/></div>
+
+<p><strong>转置矩阵：</strong>将行列互换</p>
+<div align="center"><img src="/images/其他/UnityShader/77434c1552f0171fc56292f77b276404.png" width="20%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/0266b0d957713488d707945fda163fec.png" width="20%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/62648ab17b507a3ec997fbbf89b05269.png" width="20%"/></div>
+
+<p><strong>逆矩阵：</strong>只有方阵存在逆矩阵。如果一个矩阵的行列式不为0，则该矩阵存在可逆矩阵。</p>
+<div align="center"><img src="/images/其他/UnityShader/9d27aa4fffb83b6f689f383ffdc01324.png" width="20%"/></div>
+
+<p>如果一个函数存在可逆矩阵，则存在如下性质。（例如可以对v矩阵经过M变换后再乘逆矩阵返回v）</p>
+<div align="center"><img src="/images/其他/UnityShader/f8a7cbb0bb572feafda86c1cd97db235.png" width="15%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/7b18c83c0809f11d7d894f4ce9c13910.png" width="15%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/d0ae4a4398265f3a3521e482805d8d20.png" width="20%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/23ab1a31eb5c12e9f5c13657aef147b3.png" width="20%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/e1049a6433b6af81c41c950191fbfae0.png" width="25%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/00741a8d34463918d18077c72c10b3cc.png" width="40%"/></div>
+
+<p><strong>正交矩阵：特殊的方阵</strong> 如果方阵和它的转置方阵乘积为单位矩阵的话，称这个矩阵正交</p>
+<div align="center"><img src="/images/其他/UnityShader/62acb360d3a45cd8c9edbb5c11975fba.png" width="30%"/></div> 
+
+<p>等价于 </p>
+<div align="center"><img src="/images/其他/UnityShader/37a3123622ee5278dae2b40444ae4869.png" width="20%"/></div> 
+
+<div align="center"><img src="/images/其他/UnityShader/7654849c33414fc49641a986b9482c5b.png" width="50%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/2720849d236ba1f0d38071393011ed33.png" width="50%"/></div>
+
+<p>矢量（unity中为列矩阵）放在左侧和右侧乘以一个矩阵变换结果不同，unity中会放在矩阵右侧。</p>
+<div align="center"><img src="/images/其他/UnityShader/d30b5a10d4bb60c87ebd248952a35e77.png" width="80%"/></div>
+
+<div align="center"><img src="/images/其他/UnityShader/fbdcfa3919bca26605bbeffeba1f1c7e.png" width="30%"/></div>
+
+<h3 id="2-1-5矩阵的几何意义：变换"><a href="#2-1-5矩阵的几何意义：变换" class="headerlink" title="2.1.5矩阵的几何意义：变换"></a>2.1.5矩阵的几何意义：变换</h3><ul>
+<li><strong>线性变换：</strong>可以保留矢量加、标量乘的变换，用数学公式表示为</li>
+<li><strong>齐次坐标：</strong>为了解决3×3的矩阵不能表示平移操作，所以将其扩充到4×4的矩阵</li>
+</ul>
+<p>对于<strong>坐标</strong>，在齐次坐标中将<strong>w分量</strong>设置为<strong>1</strong>；对于<strong>矢量</strong>，将<strong>w坐标</strong>设置为<strong>0</strong></p>
+<p>平移矩阵：</p>
+<div align="center"><img src="/images/其他/UnityShader/71958ab415d49e9ee28c56fad5d962d0.png" width="40%"/></div> <div align="center"><img src="/images/其他/UnityShader/f0839297c82d02e79454a41cadb82fa5.png" width="40%"/><div align="center"></div>
+
+<p>变换矩阵×坐标矩阵，得到坐标平移 平移矩阵×适量矩阵 矢量不变，平移不影响矢量</p>
+<p>缩放矩阵：</p>
+<div align="center"><img src="/images/其他/UnityShader/8951ad7fdab953081b6812c37a720ab8.png" width="40%"/></div> <div align="center"><img src="/images/其他/UnityShader/2503e964dddbfc6aef54626284f65be1.png" width="40%"/></div>
+
+<p>缩放对坐标和向量都起作用</p>
+<p>复合变换：在绝大多数情况下，我们约定变换的顺序就是先缩放，再旋转，最后平移</p>
+<div align="center"><img src="/images/其他/UnityShader/281f258af02a130fddafeed36e11cd6e.png" width="50%"/></div>
+
+<h3 id="2-1-6常用向量和所在空间表示"><a href="#2-1-6常用向量和所在空间表示" class="headerlink" title="2.1.6常用向量和所在空间表示"></a>2.1.6常用向量和所在空间表示</h3><p><strong>常用向量：</strong></p>
+<p>nDir： 法线方向 tDir： 切线方向 bDir： 副切线方向</p>
+<p>lDir： 光照方向（的反方向） vDIr： 观察方向（的反方向） rDir： 光反射方向</p>
+<p>hDIr： 半角方向</p>
+<p><strong>所在空间：</strong></p>
+<p>OS： ObjectSpace物体空间 WS： WorldSpace世界空间</p>
+<p>VS： ViewSpace观察空间 CS： HomogenousClipSpace齐次剪切空间</p>
+<p>TS： TangentSpace切线空间 TXS： TextureSpace纹理空间</p>
+<p><strong>举例：</strong></p>
+<p>nDirWS：世界空间下的法线方向</p>
+<h3 id="2-1-7单双面显示"><a href="#2-1-7单双面显示" class="headerlink" title="2.1.7单双面显示"></a>2.1.7单双面显示</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">    Properties&#123;</span><br><span class="line">        [Enum(UnityEngine.Rendering.CullMode)]_CullMode(<span class="string">&quot;CullMode&quot;</span>, <span class="type">float</span>) = <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">      SubShader&#123;</span><br><span class="line">        Pass&#123;</span><br><span class="line">        Cull [_CullMode]</span><br><span class="line">&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2漫反射-Lambert"><a href="#2-2漫反射-Lambert" class="headerlink" title="2.2漫反射-Lambert"></a>2.2漫反射-Lambert</h2><p>输入结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">float4 vertex : POSITION;       <span class="comment">//模型顶点信息</span></span><br><span class="line">float3 normal : NORMAL;         <span class="comment">//模型法线信息</span></span><br></pre></td></tr></table></figure>
+
+<p>输出结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">float4 pos : SV_POSITION;       <span class="comment">//屏幕空间顶点信息</span></span><br><span class="line">float3 nDirWS : TEXCOORD0;      <span class="comment">//世界空间法线信息</span></span><br></pre></td></tr></table></figure>
+
+<p>像素Shader：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">VertexOutput o = (VertexOutput)<span class="number">0</span>;                   <span class="comment">//新建一个输出结构</span></span><br><span class="line">o.pos = UnityObjectToClipPos(v.vertex);            <span class="comment">//OS&gt;&gt;&gt;CS</span></span><br><span class="line">o.nDirWS = UnityObjectToWorldNormal(v.normal);    <span class="comment">//OS&gt;&gt;&gt;WS</span></span><br><span class="line"><span class="keyword">return</span> o;                                             <span class="comment">//将输出结构输出</span></span><br></pre></td></tr></table></figure>
+
+<p>顶点Shader</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> nDotl = dot(i.nDirWS,ldir);                   <span class="comment">//nDir点积IDir</span></span><br><span class="line"><span class="type">float</span> lambert = max(<span class="number">0.0</span>,nDot1);</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3镜面反射-Specular-Phong"><a href="#2-3镜面反射-Specular-Phong" class="headerlink" title="2.3镜面反射-Specular-Phong"></a>2.3镜面反射-Specular-Phong</h2><p>反射有明显的方向性，观察者视角决定了反射光线的有无。</p>
+<p><strong>Phong（r dot v）：</strong>即光反射方向和视角方向约重合，反射越强；</p>
+<p><strong>Blinn-Phone（n dot h）：</strong>即法线方向和半角方向越重合，反射越强；</p>
+<p><strong>power节点：</strong>类似于正片叠底，会让高光保存，其他地方变黑，取0到90。</p>
+<h2 id="2-4通过nDir表达顶底关系"><a href="#2-4通过nDir表达顶底关系" class="headerlink" title="2.4通过nDir表达顶底关系"></a>2.4通过nDir表达顶底关系</h2><p>nDir的RGB分别表示左右，顶底，前后三个方向。</p>
+<p>通过Vector Operations里的Component Mask将nDir分解成RGB方向。</p>
+<p>通过Color来表示环境光的颜色Occlusion</p>
+<h2 id="2-5-unity内置投影代码调用方法"><a href="#2-5-unity内置投影代码调用方法" class="headerlink" title="2.5 unity内置投影代码调用方法"></a>2.5 unity内置投影代码调用方法</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;AutoLight.cginc&quot;</span>          <span class="comment">//使用unity投影必须包含这两个库文件</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;Lighting.cginc&quot;</span>           <span class="comment">//使用unity投影必须包含这两个库文件</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> multi_compile_fwdbase_fullshadows</span></span><br><span class="line">LIGHTING_COORDS(<span class="number">3</span>,<span class="number">4</span>)					<span class="comment">//输出结构</span></span><br><span class="line">TRANSFER_VERTEX_TO_FRAGMENT(o)		<span class="comment">//顶点Shader	</span></span><br><span class="line"><span class="type">float</span> shadow = LIGHT_ATTENUATION(i);	<span class="comment">//像素Shader</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-6-normal法线信息"><a href="#2-6-normal法线信息" class="headerlink" title="2.6 normal法线信息"></a>2.6 normal法线信息</h2><p><strong>normal：</strong>法线信息是<strong>切线空间</strong>的<strong>法线信息。</strong></p>
+<p><strong>切线空间：</strong>切线空间由<strong>法线</strong>、<strong>切线</strong>和<strong>副切线</strong>共同构成，每个点都有一个切线空间。</p>
+<p><strong>顶点Shader：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">o.nDirWS = UnityObjectToWorldNormal(v.normal);                   <span class="comment">//OS&gt;&gt;&gt;WS </span></span><br><span class="line">o.tDirWS = normalize(mul( unity_ObjectToWorld, </span><br><span class="line">                           float4(v.tangent.xyz, <span class="number">0.0</span>)).xzy);      <span class="comment">//OS&gt;&gt;&gt;WS</span></span><br><span class="line">o.bDirWS = normalize(cross(o.nDirWS, o.tDirWS) * v.tangent.w); <span class="comment">//OS&gt;&gt;&gt;WS</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>像素Shader：</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">float3 nDirTS = UnpackNormal(tex2D(_NormalMap, i.uv0));     <span class="comment">//切线空间的法线方向</span></span><br><span class="line">float3x3 TBN = float3x3(i.tDirWS, i.bDirWS, i.nDirWS);      <span class="comment">//TBN矩阵</span></span><br><span class="line">float3 nDirWS = normalize(mul(nDirTS, TBN));                <span class="comment">//转换为世界空间方向</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>此时的nDirWS就是通过法线贴图定义的模型法线方向了</strong></p>
+<h2 id="2-7-Fresnel菲尼尔效果"><a href="#2-7-Fresnel菲尼尔效果" class="headerlink" title="2.7 Fresnel菲尼尔效果"></a>2.7 Fresnel菲尼尔效果</h2><p>通过vDotn获取视角向量和法向量的点积值</p>
+<p>使用1-vDotn就可以获得Fresnel效果，再使用Pow控制强度即可。</p>
+<h2 id="2-8-Matcap模拟环境效果（TBN矩阵-法线向量）"><a href="#2-8-Matcap模拟环境效果（TBN矩阵-法线向量）" class="headerlink" title="2.8 Matcap模拟环境效果（TBN矩阵 &#x2F; 法线向量）"></a>2.8 Matcap模拟环境效果（TBN矩阵 &#x2F; 法线向量）</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//TBN矩阵（切线空间法线贴图转换为世界空间法向量）（Matcap）</span></span><br><span class="line"><span class="comment">//输入结构</span></span><br><span class="line">float3 normal : NORMAL;</span><br><span class="line">float4 tangent : TANGENT;</span><br><span class="line"><span class="comment">//输出结构</span></span><br><span class="line">float3 nDirWS : TEXCOORD1;      <span class="comment">//n WS</span></span><br><span class="line">float3 tDirWS : TEXCOORD2;      <span class="comment">//t WS</span></span><br><span class="line">float3 bDirWS : TEXCOORD3;      <span class="comment">//b WS</span></span><br><span class="line"><span class="comment">//顶点Shader</span></span><br><span class="line">o.nDirWS = UnityObjectToWorldNormal(v.normal);</span><br><span class="line">o.tDirWS = normalize(mul( unity_ObjectToWorld, float4(v.tangent.xyz, <span class="number">0.0</span>)).xzy);</span><br><span class="line">o.bDirWS = normalize(cross(o.nDirWS, o.tDirWS) * v.tangent.w);</span><br><span class="line"><span class="comment">//像素Shader</span></span><br><span class="line">float3 nDirTS = UnpackNormal(tex2D(_NormalMap, i.uv0));</span><br><span class="line">float3x3 TBN = float3x3(i.tDirWS, i.bDirWS, i.nDirWS);</span><br><span class="line">float3 nDirWS = normalize(mul(nDirTS, TBN));</span><br><span class="line">float3 nDirVS = mul(UNITY_MATRIX_V, float4(nDirWS, <span class="number">0.0</span>));</span><br><span class="line">float2 matcapUV = nDirVS.rg * <span class="number">0.5</span> + <span class="number">0.5</span>;</span><br><span class="line">float3 matcap = tex2D(_Matcap,matcapUV);</span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="Shader进阶"><a href="#Shader进阶" class="headerlink" title="Shader进阶"></a>Shader进阶</h1><h2 id="模型外扩溶解动画（02-Tube）"><a href="#模型外扩溶解动画（02-Tube）" class="headerlink" title="模型外扩溶解动画（02_Tube）"></a>模型外扩溶解动画（02_Tube）</h2><p>设置好模型UV后，通过黑白贴图和黑白噪波贴图采样模型UV，获取其中r&#x2F;g&#x2F;b某一个值，然后通过clip函数进行裁剪，就可以获得溶解的效果</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">float4 <span class="title function_">frag</span><span class="params">( vertexOutput i)</span> :SV_Target&#123;</span><br><span class="line">       <span class="type">float</span> flow = tex2D(_FlowTex, i.uv0 + _Time.y * _FlowSpeed.xy).r;</span><br><span class="line">       <span class="type">float</span> noise = tex2D(_NoiseTex, i.uv0 + _Time.y * _FlowSpeed.zw).r;</span><br><span class="line">       clip(flow - _Cutoff - noise);</span><br><span class="line">       <span class="type">float</span> flowAplha = flow * _DiffuseCor.a;</span><br><span class="line">       <span class="keyword">return</span> _DiffuseCor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="半透明模型扫光动画（03-Scan）"><a href="#半透明模型扫光动画（03-Scan）" class="headerlink" title="半透明模型扫光动画（03_Scan）"></a>半透明模型扫光动画（03_Scan）</h2><p>半透明物体所需标签和Pass（该ZWrite方法会完全消除透明物体内部可见的轮廓）见<strong>附录2</strong></p>
+<p><strong>半透明效果：</strong>利用菲尼尔原理计算出的(0,1)值来控制透明通道，可以得到菲尼尔的透明效果。</p>
+<p><strong>扫光效果：</strong>通过世界坐标的xy作为uv值，将扫光的贴图以该uv进行计算。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">float3 vDirWS = normalize(_WorldSpaceCameraPos - i.posWS);</span><br><span class="line">float3 nDirWS = i.nDirWS;</span><br><span class="line"><span class="comment">//flow uv采样 这里使用世界坐标的xy作为uv，可以让整个动画看起来像从上到下播放。获取轴点的世界坐标，与模型世界坐标相减，可以得到一个固定差值</span></span><br><span class="line">float2 piovtWS = mul(unity_ObjectToWorld,float4(<span class="number">0.0</span>,<span class="number">0.0</span>,<span class="number">0.0</span>,<span class="number">1.0</span>));</span><br><span class="line">float2 posWS = i.posWS.xy;</span><br><span class="line">float2 uv1 = (posWS - piovtWS) * _FlowTex_ST.xy + _FlowTex_ST.zw;</span><br><span class="line"><span class="type">float</span> flowUValpha = max(<span class="number">0</span>,tex2D(_FlowTex, uv1 + _Time.y * _Speed).r - <span class="number">0.7</span>);</span><br><span class="line"><span class="comment">//贴图增加Fresnel细节</span></span><br><span class="line"><span class="type">float</span> fresnelTexAlpha = tex2D(_FresnelTex, i.uv0).x;</span><br><span class="line"><span class="comment">//Fresnel控制中间不透明边缘透明</span></span><br><span class="line"><span class="type">float</span> vdotn = max(<span class="number">0</span>,dot(vDirWS,nDirWS));</span><br><span class="line"><span class="type">float</span> fresnelAlpha = min(mul(<span class="built_in">pow</span>(<span class="number">1</span> - vdotn, _FresnelPow),_FresnelInt) + _FresnelAll,<span class="number">1</span>);</span><br><span class="line">float4 fresnelColor = lerp(_InnerColor,_MipColor,fresnelAlpha);</span><br><span class="line"><span class="type">float</span> finallAlpha = min(<span class="number">1</span>,fresnelAlpha+flowUValpha+fresnelTexAlpha);</span><br><span class="line"><span class="keyword">return</span> float4(fresnelColor.xyz,finallAlpha);</span><br></pre></td></tr></table></figure>
+
+<h2 id="生长动画（05-Grow）"><a href="#生长动画（05-Grow）" class="headerlink" title="生长动画（05_Grow）"></a>生长动画（05_Grow）</h2><p><strong>控制模型生长：</strong>通过clip函数和uv值(0,1)来控制像素Shader显示的范围。</p>
+<p><strong>控制模型整体缩放：</strong>在顶点Shader中，通过控制顶点 ± 法线 * 数值来控制顶点的偏移量。</p>
+<p><strong>控制模型部分缩放：</strong>通过模型uv值(0,1)和smoothstep函数可以获取一段范围，再将模型缩放与这段范围 相乘就可以控制该部分的缩放。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">vertexOutput <span class="title function_">vert</span> <span class="params">(vertexInput v)</span></span><br><span class="line">&#123;</span><br><span class="line">    vertexOutput o;</span><br><span class="line">    <span class="comment">//模型整体缩放控制</span></span><br><span class="line">    float4 vertexZhengti =float4(v.normal.xyz * _Expand,<span class="number">0</span>);</span><br><span class="line">    <span class="comment">//模型尖尖缩放控制，控制缩放的范围</span></span><br><span class="line">    <span class="type">float</span> jianQuyu = smoothstep(_Cutoffmin,_Cutoffmax,(v.uv0.y - _Cutoff));</span><br><span class="line">    float4 vertexJian =float4(v.normal.xyz * _Expand2,<span class="number">0</span>) * jianQuyu;</span><br><span class="line">    <span class="comment">//模型顶点移动和</span></span><br><span class="line">    float4 newVertex = v.vertex + vertexZhengti - vertexJian;</span><br><span class="line">    o.vertex = UnityObjectToClipPos(newVertex);</span><br><span class="line">    o.uv0 = v.uv0;</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line">float4 <span class="title function_">frag</span> <span class="params">(vertexOutput i)</span> : SV_Target</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//通过像素Shader进行模型裁切</span></span><br><span class="line">    clip(_Cutoff - i.uv0.y);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="魔镜效果（06-Mirror）"><a href="#魔镜效果（06-Mirror）" class="headerlink" title="魔镜效果（06_Mirror）"></a>魔镜效果（06_Mirror）</h2><p><strong>魔镜区域：</strong>Queue为2460，将“魔镜”的ColorMask设置为0，表示不渲染颜色。</p>
+<div align="center"><img src="/images/其他/UnityShader/2e3283cf1352d72d65ef242809ec3d1f.png" width="25%"/></div> 
+
+<p>设置它的模板缓冲区参考值为1（默认为0）；通过模板缓冲测试规则的比较方式为always；通过后模板缓冲测试的值默认为不变，这里设置为replace替换，此时模板缓冲区该魔镜的范围都为1。</p>
+<p>我们不需要写入深度，否则会遮挡后面的物体，所以ZWrite off。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">        Tags &#123; <span class="string">&quot;Queue&quot;</span>=<span class="string">&quot;AlphaTest+10&quot;</span> &#125;</span><br><span class="line">        Pass&#123;</span><br><span class="line">            ColorMask <span class="number">0</span></span><br><span class="line">            Stencil&#123;</span><br><span class="line">                Ref <span class="number">1</span></span><br><span class="line">                Comp always</span><br><span class="line">                Pass replace</span><br><span class="line">            &#125;</span><br><span class="line">            ZWrite off</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<div align="center"><img src="/images/其他/UnityShader/715aeebe7df280b7bf9b6897308cbd47.png" width="30%"/></div> 
+
+<p><strong>魔镜内物体：</strong>Queue为2470，设置模板缓冲参考值为1，只有该部分数值等于1时，才会显示。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">        Tags &#123; <span class="string">&quot;Queue&quot;</span>=<span class="string">&quot;AlphaTest+20&quot;</span> &#125;</span><br><span class="line">        Pass&#123;</span><br><span class="line">            Stencil&#123;</span><br><span class="line">                Ref <span class="number">1</span></span><br><span class="line">                Comp equal</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>遮挡边缘物体：</strong>此时从魔镜内还可以看到其他已经渲染（Queue2000）的物体，创建一个球体，放大几百倍。设置它的Queue为2465，比<strong>魔镜内物体</strong>提前渲染，将<strong>深度测试</strong>设置为<strong>Always</strong>永远可以通过。此时他将<strong>首先</strong>在魔镜内<strong>遮挡其他所有物体</strong>，因为无限远，所以后面再生成的魔镜内物体可以正常显示。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">        Tags &#123; <span class="string">&quot;Queue&quot;</span>=<span class="string">&quot;AlphaTest+15&quot;</span> &#125;</span><br><span class="line">        Pass&#123;</span><br><span class="line">            Stencil&#123;</span><br><span class="line">                Ref <span class="number">1</span></span><br><span class="line">                Comp equal</span><br><span class="line">            &#125;</span><br><span class="line">            Ztest Always</span><br><span class="line">            Cull front</span><br></pre></td></tr></table></figure>
+
+<h2 id="火焰效果（Step-SmoothStep）（10）"><a href="#火焰效果（Step-SmoothStep）（10）" class="headerlink" title="火焰效果（Step &#x2F; SmoothStep）（10）"></a>火焰效果（Step &#x2F; SmoothStep）（10）</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//x和A进行比较，x较大则返回1，否则返回0</span></span><br><span class="line">Step(A,x);</span><br><span class="line"><span class="comment">//x和A、B进行比较，x大于B则返回1，x小于A则返回0，x介于A和B之间进行插值计算</span></span><br><span class="line">SmoothStep(A,B,x);</span><br></pre></td></tr></table></figure>
+
+<h2 id="边缘燃烧消失效果（Distence）（11）"><a href="#边缘燃烧消失效果（Distence）（11）" class="headerlink" title="边缘燃烧消失效果（Distence）（11）"></a>边缘燃烧消失效果（Distence）（11）</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//返回A到B的距离</span></span><br><span class="line">Distence(A,B);</span><br><span class="line"><span class="comment">//通过Step函数限制小于0.5的为0，大于0.5的为1</span></span><br><span class="line"><span class="comment">//将数值输出到clip就可以获得像素裁剪的效果</span></span><br><span class="line"><span class="comment">//通过Distence函数获取该点到0.5的距离就可以获得一个限制边缘的效果</span></span><br></pre></td></tr></table></figure>
+
+<div align="center"><img src="/images/其他/UnityShader/355474bbd14a6b12ee28b5255e65f8df.png" width="70%"/></div>
+
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="常用向量"><a href="#常用向量" class="headerlink" title="常用向量"></a>常用向量</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//常用向量</span></span><br><span class="line">float3 posCS = UnityObjectToClipPos(v.vertex);</span><br><span class="line">float3 posWS = mul(unity_ObjectToWorld, v.vertex);</span><br><span class="line">float3 nDirWS = UnityObjectToWorldNormal( v.normal );</span><br><span class="line">float3 vDirWS = normalize(_WorldSpaceCameraPos.xyz - i.posWS.xyz);</span><br><span class="line"><span class="type">float</span> distance = distanceAtoB(pointofOrign.xyz, posWS.xyz);</span><br></pre></td></tr></table></figure>
+
+<h2 id="透明物体所需标签和Pass"><a href="#透明物体所需标签和Pass" class="headerlink" title="透明物体所需标签和Pass"></a>透明物体所需标签和Pass</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">        Tags &#123; </span><br><span class="line">            <span class="string">&quot;RenderType&quot;</span>=<span class="string">&quot;TransparentCutout&quot;</span></span><br><span class="line">            <span class="string">&quot;Queue&quot;</span> = <span class="string">&quot;Transparent&quot;</span></span><br><span class="line">            <span class="string">&quot;IgnoreProjector&quot;</span> = <span class="string">&quot;True&quot;</span> </span><br><span class="line">        &#125;</span><br><span class="line">        Pass&#123;</span><br><span class="line">            ZWrite On</span><br><span class="line">            ColorMask <span class="number">0</span></span><br><span class="line">        &#125;</span><br><span class="line">        Pass&#123;</span><br><span class="line">            ZWrite Off</span><br><span class="line">            <span class="comment">//Scr是source color源颜色，Dst是destination color目标颜色</span></span><br><span class="line">            <span class="comment">//源颜色是片元Shader产生的颜色，目标颜色是颜色缓冲区读取的颜色</span></span><br><span class="line">            <span class="comment">//Scr * Aplha + Dst * (1-Alpha)</span></span><br><span class="line">            Blend SrcAlpha OneMinusSrcAlpha</span><br><span class="line">            <span class="comment">//Scr * Alpha + Dst * 1 这种模式无论物体透明度如何都会结合Dst颜色，更柔和</span></span><br><span class="line">            Blend SrcAlpha One</span><br></pre></td></tr></table></figure>
+
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2022/03/05/202203050620/">https://mingxuanwu.com/2022/03/05/202203050620/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/unity/"># unity</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/07/04/202307041158/">unity http json前后端通信</a>
+            
+            
+            <a class="next" rel="next" href="/2022/02/01/202202011010/">现代计算机图形学入门</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【数据结构】2.栈和队列 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【数据结构】2.栈和队列</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 2, 2023&nbsp;&nbsp;17:32:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-栈"><a href="#1-栈" class="headerlink" title="1.栈"></a>1.栈</h1><h2 id="1-1栈的抽象父类"><a href="#1-1栈的抽象父类" class="headerlink" title="1.1栈的抽象父类"></a>1.1栈的抽象父类</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Stack</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 析构函数</span></span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Stack</span>() &#123;&#125;</span><br><span class="line">    <span class="comment">// 栈是否为空</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="type">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 栈的大小</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">int</span> <span class="title">size</span><span class="params">()</span> <span class="type">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 栈顶元素</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> T&amp; <span class="title">top</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 出栈</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">pop</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 入栈</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">push</span><span class="params">(<span class="type">const</span> T&amp; theElement)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-2栈的数组实现"><a href="#1-2栈的数组实现" class="headerlink" title="1.2栈的数组实现"></a>1.2栈的数组实现</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/stux/p/17737631.html">【数据结构】1.线性表的数组描述和链式描述 - imXuan - 博客园 (cnblogs.com)</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&quot;stack.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&quot;arrayList.hpp&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DerivedArrayStack</span> :<span class="keyword">private</span> ArrayList&lt;T&gt;, <span class="keyword">public</span> Stack&lt;T&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">DerivedArrayStack</span>(<span class="type">int</span> initialCapacity = <span class="number">10</span>) :<span class="built_in">ArrayList</span>&lt;T&gt;(initialCapacity) &#123;&#125;</span><br><span class="line">    <span class="comment">// 栈是否为空</span></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> ArrayList&lt;T&gt;::<span class="built_in">empty</span>(); &#125;</span><br><span class="line">    <span class="comment">// 栈的大小</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">size</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> ArrayList&lt;T&gt;::<span class="built_in">size</span>(); &#125;</span><br><span class="line">    <span class="comment">// 栈顶元素</span></span><br><span class="line">    <span class="function">T&amp; <span class="title">top</span><span class="params">()</span> </span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (ArrayList&lt;T&gt;::<span class="built_in">empty</span>())</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;栈为空&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">else</span> </span><br><span class="line">            <span class="keyword">return</span> ArrayList&lt;T&gt;::<span class="built_in">get</span>(ArrayList&lt;T&gt;::<span class="built_in">size</span>() - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 出栈</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">pop</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (ArrayList&lt;T&gt;::<span class="built_in">empty</span>())</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;栈为空&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;出栈元素为：&quot;</span> &lt;&lt; ArrayList&lt;T&gt;::<span class="built_in">get</span>(ArrayList&lt;T&gt;::<span class="built_in">size</span>() - <span class="number">1</span>) &lt;&lt; endl;</span><br><span class="line">            ArrayList&lt;T&gt;::<span class="built_in">erase</span>(ArrayList&lt;T&gt;::<span class="built_in">size</span>() - <span class="number">1</span>);</span><br><span class="line">        &#125;            </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 入栈</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">push</span><span class="params">(<span class="type">const</span> T&amp; theElement)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        ArrayList&lt;T&gt;::<span class="built_in">insert</span>(ArrayList&lt;T&gt;::<span class="built_in">size</span>(), theElement);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-3栈的链式实现"><a href="#1-3栈的链式实现" class="headerlink" title="1.3栈的链式实现"></a>1.3栈的链式实现</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/stux/p/17737631.html">【数据结构】1.线性表的数组描述和链式描述 - imXuan - 博客园 (cnblogs.com)</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&quot;chain.hpp&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&quot;stack.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DerivedLinkedStack</span> :<span class="keyword">private</span> Chain&lt;T&gt;, <span class="keyword">public</span> Stack&lt;T&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">DerivedLinkedStack</span>(<span class="type">int</span> initialCapacity = <span class="number">10</span>) :<span class="built_in">Chain</span>&lt;T&gt;(initialCapacity) &#123;&#125;</span><br><span class="line">    <span class="comment">// 栈是否为空</span></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> Chain&lt;T&gt;::<span class="built_in">empty</span>(); &#125;</span><br><span class="line">    <span class="comment">// 栈的大小</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">size</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> Chain&lt;T&gt;::<span class="built_in">size</span>(); &#125;</span><br><span class="line">    <span class="comment">// 栈顶元素</span></span><br><span class="line">    <span class="function">T&amp; <span class="title">top</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (Chain&lt;T&gt;::<span class="built_in">empty</span>())</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;栈为空&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> Chain&lt;T&gt;::<span class="built_in">get</span>(Chain&lt;T&gt;::listSize - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 出栈</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">pop</span><span class="params">()</span> </span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (Chain&lt;T&gt;::<span class="built_in">empty</span>())</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;栈为空&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123; </span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;出栈元素为：&quot;</span> &lt;&lt; Chain&lt;T&gt;::<span class="built_in">get</span>(Chain&lt;T&gt;::listSize - <span class="number">1</span>) &lt;&lt; endl;</span><br><span class="line">            Chain&lt;T&gt;::<span class="built_in">erase</span>(Chain&lt;T&gt;::listSize - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 入栈</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">push</span><span class="params">(<span class="type">const</span> T&amp; theElement)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        Chain&lt;T&gt;::<span class="built_in">insert</span>(Chain&lt;T&gt;::<span class="built_in">size</span>(), theElement);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-队列"><a href="#2-队列" class="headerlink" title="2.队列"></a>2.队列</h1><h2 id="2-1队列的抽象父类"><a href="#2-1队列的抽象父类" class="headerlink" title="2.1队列的抽象父类"></a>2.1队列的抽象父类</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">queue</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">queue</span>() &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="type">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">int</span> <span class="title">size</span><span class="params">()</span> <span class="type">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> T&amp; <span class="title">front</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> T&amp; <span class="title">back</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">pop</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">push</span><span class="params">(<span class="type">const</span> T&amp; theElement)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2队列的数组实现"><a href="#2-2队列的数组实现" class="headerlink" title="2.2队列的数组实现"></a>2.2队列的数组实现</h2><p>队列由一个数组来描述，队首指针是队首的前一个元素，队尾指针是队尾所在元素，当队首和队尾指针重叠时表示队列为空；当 (队尾指针+1)%数组长度 等于队首指针时队列为满</p>
+<p><img src="/images/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/3219843-20231001113524127-1525142698.png" alt="img"></p>
+<p>假设push数据时队列已满，需要为存储队列的数组进行扩充，我们将AB首先移动到起始位置，然后将C~G移动到AB之后，具体代码参见 push()</p>
+<p>  <img src="/images/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/3219843-20231001113916709-1142855938.png" alt="img"></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&quot;queue.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&quot;arrayList.hpp&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">arrayQueue</span> :<span class="keyword">public</span> queue&lt;T&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">int</span> theFront;       <span class="comment">// 第一个元素的前一个</span></span><br><span class="line">    <span class="type">int</span> theBack;        <span class="comment">// 最后一个元素</span></span><br><span class="line">    <span class="type">int</span> arrayLength;    <span class="comment">// 队列长度</span></span><br><span class="line">    T* queue;           <span class="comment">// 队列本体</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">arrayQueue</span>(<span class="type">int</span> initialCapacity = <span class="number">10</span>);</span><br><span class="line">    ~<span class="built_in">arrayQueue</span>() &#123; <span class="keyword">delete</span>[] queue; &#125;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> theFront == theBack; &#125;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">size</span><span class="params">()</span> <span class="type">const</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (theBack - theFront + arrayLength) % arrayLength;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">T&amp; <span class="title">front</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (theFront == theBack)</span><br><span class="line">        &#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;队列为空&quot;</span> &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> queue[(theFront + <span class="number">1</span>) % arrayLength];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">T&amp; <span class="title">back</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (theFront == theBack)</span><br><span class="line">        &#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;队列为空&quot;</span> &lt;&lt; endl;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> queue[theBack];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">pop</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (theFront == theBack)</span><br><span class="line">        &#123;</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;队列为空&quot;</span> &lt;&lt; endl;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        cout &lt;&lt; queue[(theFront + <span class="number">1</span>) % arrayLength];</span><br><span class="line">        theFront = (theFront + <span class="number">1</span>) % arrayLength;</span><br><span class="line">        queue[theFront].~<span class="built_in">T</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">push</span><span class="params">(<span class="type">const</span> T&amp; theElement)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line">arrayQueue&lt;T&gt;::<span class="built_in">arrayQueue</span>(<span class="type">int</span> initialCapacity)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (initialCapacity &lt; <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;initialCapacity 必须为正整数&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    arrayLength = initialCapacity;</span><br><span class="line">    queue = <span class="keyword">new</span> T[arrayLength];</span><br><span class="line">    theFront = <span class="number">0</span>;</span><br><span class="line">    theBack = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="type">void</span> arrayQueue&lt;T&gt;::<span class="built_in">push</span>(<span class="type">const</span> T&amp; theElement)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> ((theBack + <span class="number">1</span>) % arrayLength == theFront)</span><br><span class="line">    &#123;</span><br><span class="line">        T* newQueue = <span class="keyword">new</span> T[<span class="number">2</span> * arrayLength];</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> start = (theFront + <span class="number">1</span>) % arrayLength;</span><br><span class="line">        <span class="keyword">if</span> (start &lt; <span class="number">2</span>)</span><br><span class="line">            <span class="built_in">copy</span>(queue + start, queue + start + arrayLength - <span class="number">1</span>, newQueue);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">copy</span>(queue + start, queue + arrayLength, newQueue);</span><br><span class="line">            <span class="built_in">copy</span>(queue, queue + theBack + <span class="number">1</span>, newQueue + arrayLength - start);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        theFront = <span class="number">2</span> * arrayLength - <span class="number">1</span>;</span><br><span class="line">        theBack = arrayLength - <span class="number">2</span>;</span><br><span class="line">        arrayLength *= <span class="number">2</span>;</span><br><span class="line">        queue = newQueue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    theBack = (theBack + <span class="number">1</span>) % arrayLength;</span><br><span class="line">    queue[theBack] = theElement;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3队列的链式实现"><a href="#2-3队列的链式实现" class="headerlink" title="2.3队列的链式实现"></a>2.3队列的链式实现</h2><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/stux/p/17737631.html">【数据结构】1.线性表的数组描述和链式描述 - imXuan - 博客园 (cnblogs.com)</a></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;queue.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;chainNode.hpp&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">linkedQueue</span> : <span class="keyword">public</span> queue&lt;T&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    chainNode&lt;T&gt;* queueFront;  <span class="comment">// 头指针</span></span><br><span class="line">    chainNode&lt;T&gt;* queueBack;   <span class="comment">// 尾指针</span></span><br><span class="line">    <span class="type">int</span> queueSize;             <span class="comment">// 队列大小</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">linkedQueue</span>(<span class="type">int</span> initialCapacity = <span class="number">10</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        queueFront = <span class="literal">NULL</span>; queueSize = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ~<span class="built_in">linkedQueue</span>();</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="type">const</span> </span>&#123;<span class="keyword">return</span> queueSize == <span class="number">0</span>；&#125;</span><br><span class="line">    <span class="type">int</span> <span class="built_in">size</span>() <span class="type">const</span> &#123; <span class="keyword">return</span> queueSize；&#125;</span><br><span class="line">    T&amp; <span class="built_in">front</span>()</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (queueSize == <span class="number">0</span>)</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;队列为空&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">return</span> queueFront-&gt;element;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function">T&amp; <span class="title">back</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (queueSize == <span class="number">0</span>)</span><br><span class="line">            cout &lt;&lt; <span class="string">&quot;队列为空&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">return</span> queueBack-&gt;element;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">pop</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">push</span><span class="params">(<span class="type">const</span> T&amp;)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line">linkedQueue&lt;T&gt;::~<span class="built_in">linkedQueue</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span> (queueFront != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        chainNode&lt;T&gt;* nextNode = queueFront-&gt;next;</span><br><span class="line">        <span class="keyword">delete</span> queueFront;</span><br><span class="line">        queueFront = nextNode;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="type">void</span> linkedQueue&lt;T&gt;::<span class="built_in">pop</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (queueFront == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;队列为空&quot;</span> &lt;&lt; endl;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    chainNode&lt;T&gt;* nextNode = queueFront-&gt;next;</span><br><span class="line">    <span class="keyword">delete</span> queueFront;</span><br><span class="line">    queueFront = nextNode;</span><br><span class="line">    queueSize--;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="type">void</span> linkedQueue&lt;T&gt;::<span class="built_in">push</span>(<span class="type">const</span> T&amp; theElement)</span><br><span class="line">&#123;</span><br><span class="line">    chainNode&lt;T&gt;* newNode = <span class="keyword">new</span> <span class="built_in">chainNode</span>&lt;T&gt;(theElement, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (queueSize == <span class="number">0</span>)</span><br><span class="line">        queueFront = newNode;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        queueBack-&gt;next = newNode;</span><br><span class="line">    queueBack = newNode;</span><br><span class="line"></span><br><span class="line">    queueSize++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/10/02/202310021732/">https://mingxuanwu.com/2023/10/02/202310021732/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"># 数据结构</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/10/03/202310031302/">【数据结构】3.跳表和散列</a>
+            
+            
+            <a class="next" rel="next" href="/2023/09/30/202309300943/">【数据结构】1.线性表的数组描述和链式描述</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>4.mutex 锁 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">4.mutex 锁</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 12, 2024&nbsp;&nbsp;10:29:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-ScopedLockImpl三个规范接口"><a href="#1-ScopedLockImpl三个规范接口" class="headerlink" title="1. ScopedLockImpl三个规范接口"></a>1. ScopedLockImpl三个规范接口</h1><p>用于规范结构，内部保存锁引用对象，该规范可以自动完成作用域内的加锁和解锁，构造函数自动完成加锁，在作用域内实例化<code>ScopedLockImpl</code>并传入一个已经实例化的锁对象，在构造函数完成加锁，在作用域结束后，被自动销毁，并调用析构函数完成解锁。全过程自动，非常好用👍</p>
+<ul>
+<li>成员变量<code>T&amp; m_mutex</code>：保存锁引用对象</li>
+<li>成员变量<code>bool m_locked</code>：记录是否上锁</li>
+<li>成员函数全部为<code>lock()</code>和<code>unlock()</code>，但读写类型的锁在内部调用的是锁引用对象的<code>rdlock()</code>、<code>wrlock()</code>、<code>unlock()</code></li>
+</ul>
+<h2 id="1-1-ScopedLockImpl"><a href="#1-1-ScopedLockImpl" class="headerlink" title="1.1 ScopedLockImpl"></a>1.1 ScopedLockImpl</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">ScopedLockImpl</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">ScopedLockImpl</span>(T&amp; mutex)</span><br><span class="line">		:<span class="built_in">m_mutex</span>(mutex) &#123;</span><br><span class="line">		m_mutex.<span class="built_in">lock</span>();</span><br><span class="line">		m_locked = <span class="literal">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	~<span class="built_in">ScopedLockImpl</span>() &#123;</span><br><span class="line">		<span class="built_in">unlock</span>();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (!m_locked) &#123;</span><br><span class="line">			m_mutex.<span class="built_in">lock</span>();</span><br><span class="line">			m_locked = <span class="literal">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (m_locked) &#123;</span><br><span class="line">			m_mutex.<span class="built_in">unlock</span>();</span><br><span class="line">			m_locked = <span class="literal">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	T&amp; m_mutex;</span><br><span class="line">	<span class="type">bool</span> m_locked;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-2-ReadScopedLockImpl"><a href="#1-2-ReadScopedLockImpl" class="headerlink" title="1.2 ReadScopedLockImpl"></a>1.2 ReadScopedLockImpl</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">ReadScopedLockImpl</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">ReadScopedLockImpl</span>(T&amp; mutex)</span><br><span class="line">		:<span class="built_in">m_mutex</span>(mutex) &#123;</span><br><span class="line">		m_mutex.<span class="built_in">rdlock</span>();</span><br><span class="line">		m_locked = <span class="literal">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	~<span class="built_in">ReadScopedLockImpl</span>() &#123;</span><br><span class="line">		<span class="built_in">unlock</span>();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (!m_locked) &#123;</span><br><span class="line">			m_mutex.<span class="built_in">rdlock</span>();</span><br><span class="line">			m_locked = <span class="literal">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (m_locked) &#123;</span><br><span class="line">			m_mutex.<span class="built_in">unlock</span>();</span><br><span class="line">			m_locked = <span class="literal">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	T&amp; m_mutex;</span><br><span class="line">	<span class="type">bool</span> m_locked;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-3-ScopedLockImpl"><a href="#1-3-ScopedLockImpl" class="headerlink" title="1.3 ScopedLockImpl"></a>1.3 ScopedLockImpl</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">WriteScopedLockImpl</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">WriteScopedLockImpl</span>(T&amp; mutex)</span><br><span class="line">		:<span class="built_in">m_mutex</span>(mutex) &#123;</span><br><span class="line">		m_mutex.<span class="built_in">wrlock</span>();</span><br><span class="line">		m_locked = <span class="literal">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	~<span class="built_in">WriteScopedLockImpl</span>() &#123;</span><br><span class="line">		<span class="built_in">unlock</span>();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (!m_locked) &#123;</span><br><span class="line">			m_mutex.<span class="built_in">wrlock</span>();</span><br><span class="line">			m_locked = <span class="literal">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (m_locked) &#123;</span><br><span class="line">			m_mutex.<span class="built_in">unlock</span>();</span><br><span class="line">			m_locked = <span class="literal">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	T&amp; m_mutex;</span><br><span class="line">	<span class="type">bool</span> m_locked;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h1 id="2-锁"><a href="#2-锁" class="headerlink" title="2. 锁"></a>2. 锁</h1><h2 id="2-1-Semaphore"><a href="#2-1-Semaphore" class="headerlink" title="2.1 Semaphore"></a>2.1 Semaphore</h2><p>信号量，保存一个非负整数</p>
+<ul>
+<li>成员变量<code>sem_t</code>：记录信号量的值</li>
+<li>成员函数<code>wait()</code>：使信号量增加</li>
+<li>成员函数<code>notify()</code>：使信号量减少</li>
+<li>构造函数完成信号量的初始化，析构函数完成信号量的销毁</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Semaphore</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Semaphore</span>(<span class="type">uint32_t</span> count = <span class="number">0</span>);</span><br><span class="line">    ~<span class="built_in">Semaphore</span>();</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">wait</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">notify</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Semaphore</span>(<span class="type">const</span> Semaphore&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    <span class="built_in">Semaphore</span>(<span class="type">const</span> Semaphore&amp;&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    Semaphore&amp; <span class="keyword">operator</span>=(<span class="type">const</span> Semaphore&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">sem_t</span> m_semaphore;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-Mutex"><a href="#2-2-Mutex" class="headerlink" title="2.2 Mutex"></a>2.2 Mutex</h2><p>最简单的互斥锁</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Mutex</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">typedef</span> ScopedLockImpl&lt;Mutex&gt; Lock;</span><br><span class="line">	<span class="built_in">Mutex</span>() &#123;</span><br><span class="line">		<span class="built_in">pthread_mutex_init</span>(&amp;m_mutex, <span class="literal">nullptr</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	~<span class="built_in">Mutex</span>() &#123;</span><br><span class="line">		<span class="built_in">pthread_mutex_destroy</span>(&amp;m_mutex);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">pthread_mutex_lock</span>(&amp;m_mutex);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">pthread_mutex_unlock</span>(&amp;m_mutex);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="type">pthread_mutex_t</span> m_mutex;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-rwlock"><a href="#2-3-rwlock" class="headerlink" title="2.3 rwlock"></a>2.3 rwlock</h2><p>读写锁内部有两个<code>typedef</code>关键字，定义了<code>ReadLock</code>和<code>WriteLock</code>两个类型，提供了简单的读写锁作用域自动加锁解锁的功能</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">RWMutex</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">typedef</span> ReadScopedLockImpl&lt;RWMutex&gt; ReadLock;</span><br><span class="line">	<span class="keyword">typedef</span> WriteScopedLockImpl&lt;RWMutex&gt; WriteLock;</span><br><span class="line">	<span class="built_in">RWMutex</span>() &#123;</span><br><span class="line">		<span class="built_in">pthread_rwlock_init</span>(&amp;m_lock, <span class="literal">nullptr</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	~<span class="built_in">RWMutex</span>() &#123;</span><br><span class="line">		<span class="built_in">pthread_rwlock_destroy</span>(&amp;m_lock);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">rdlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">pthread_rwlock_rdlock</span>(&amp;m_lock);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">wrlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">pthread_rwlock_wrlock</span>(&amp;m_lock);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">pthread_rwlock_unlock</span>(&amp;m_lock);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="type">pthread_rwlock_t</span> m_lock;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4-Spinlock"><a href="#2-4-Spinlock" class="headerlink" title="2.4 Spinlock"></a>2.4 Spinlock</h2><p>自旋锁，如果自旋锁已经被别的执行单元保持，调用者就一直循环在那里看是否该自旋锁的保持者已经释放了锁，避免一睡眠就被调度，降低性能。对于IO等待很长的适合用互斥，但是就等一瞬间的还是自旋效率高</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Spinlock</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">typedef</span> ScopedLockImpl&lt;Spinlock&gt; Lock;</span><br><span class="line">	<span class="built_in">Spinlock</span>() &#123;</span><br><span class="line">		<span class="built_in">pthread_spin_init</span>(&amp;m_mutex, <span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	~<span class="built_in">Spinlock</span>() &#123;</span><br><span class="line">		<span class="built_in">pthread_spin_destroy</span>(&amp;m_mutex);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">pthread_spin_lock</span>(&amp;m_mutex);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="built_in">pthread_spin_unlock</span>(&amp;m_mutex);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="type">pthread_spinlock_t</span> m_mutex;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-5-CASLock"><a href="#2-5-CASLock" class="headerlink" title="2.5 CASLock"></a>2.5 CASLock</h2><p>原子操作改变<code>atomic_flag m_mutex</code>，同样获得锁的时候自旋</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CASLock</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="keyword">typedef</span> ScopedLockImpl&lt;CASLock&gt; Lock;</span><br><span class="line">	<span class="built_in">CASLock</span>() &#123;</span><br><span class="line">		m_mutex.<span class="built_in">clear</span>();</span><br><span class="line">	&#125;</span><br><span class="line">	~<span class="built_in">CASLock</span>() &#123;</span><br><span class="line">	&#125; </span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">while</span> (std::<span class="built_in">atomic_flag_test_and_set_explicit</span>(&amp;m_mutex, std::memory_order_acquire));</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		std::<span class="built_in">atomic_flag_clear_explicit</span>(&amp;m_mutex, std::memory_order_release);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="keyword">volatile</span> std::atomic_flag m_mutex;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-使用方法"><a href="#3-使用方法" class="headerlink" title="3. 使用方法"></a>3. 使用方法</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">sylar::RWMutex s_mutex;</span><br><span class="line"><span class="type">int</span> pthread = <span class="number">0</span>;</span><br><span class="line"><span class="comment">// 多线程调用该函数时，pthread大概率小于线程数量*10000，通过加锁可以保证得到正确结果</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">thread_fun</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1000000</span>; ++i) &#123;</span><br><span class="line">        <span class="comment">// 创建一个WriteScopedLockImpl&lt;RWMutex&gt;对象，传入s_mutex锁</span></span><br><span class="line">        <span class="comment">// 构造函数自动加锁</span></span><br><span class="line">        sylar::<span class="function">RWMutex::WriteLock <span class="title">lock</span><span class="params">(s_mutex)</span></span>;</span><br><span class="line">        ++pthread;</span><br><span class="line">        <span class="comment">// 离开作用域调用析构函数自动解锁</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">thread1</span><span class="params">(thread_fun)</span></span>;</span><br><span class="line">    <span class="function">std::thread <span class="title">thread2</span><span class="params">(thread_fun)</span></span>;</span><br><span class="line">    thread<span class="number">1.</span><span class="built_in">join</span>();</span><br><span class="line">    thread<span class="number">2.</span><span class="built_in">join</span>();</span><br><span class="line">    std::cout&lt;&lt;pthread&lt;&lt;std::endl;	<span class="comment">// 加锁后应该得到正确结果2000000</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/07/12/202407122005/">https://mingxuanwu.com/2024/07/12/202407122005/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CPP%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/"># CPP高性能服务器</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/07/14/202407141855/">【shared_ptr】计数智能指针</a>
+            
+            
+            <a class="next" rel="next" href="/2024/07/03/202407031905/">3.Thread 线程</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

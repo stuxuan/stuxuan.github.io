@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>现代计算机图形学入门 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">现代计算机图形学入门</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">February 1, 2022&nbsp;&nbsp;10:10:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-Transformation（转换）"><a href="#1-Transformation（转换）" class="headerlink" title="1. Transformation（转换）"></a>1. Transformation（转换）</h1><p>线性变换：一个坐标，可以通过一个矩阵乘法获得到新的坐标</p>
+<h2 id="1-1-2D-Rotate"><a href="#1-1-2D-Rotate" class="headerlink" title="1.1 2D Rotate"></a>1.1 2D Rotate</h2><p>我们知道这个图形上每一个点都满足这个矩阵变换，所以旋转矩阵可以通过某两个个特殊点带入计算获得。下图为一个点的例子。</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/1.png" width="50%"/></div>
+
+<p>如果要旋转-θ角，把-θ带入①式可以得到，此时R-θ恰好是Rθ的<strong>转置</strong>，而且旋转θ角和旋转-θ角本身是一个<strong>互逆</strong>的操作。如果一个矩阵的逆恰好等于这个矩阵的转置，则称这种矩阵为<strong>正交矩阵</strong>。</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/2.png" width="50%"/></div>
+
+<h2 id="1-2-2D-Translate"><a href="#1-2-2D-Translate" class="headerlink" title="1.2 2D Translate"></a>1.2 2D Translate</h2><p>平移不满足线性变换，为了方便计算引入了齐次坐标。向量后加一个0，坐标后增加一个1，向量有平移不变性，而坐标平移后会变更。</p>
+<p>而且根据下图还可以看出，齐次坐标相减会变为向量，向量相加还是向量，恰好正确</p>
+<div><table>
+<tr>
+<td><img src=/images/其他/现代计算机图形学/3.png border=0 align=center></td>
+<td><img src=/images/其他/现代计算机图形学/4.png border=0 align=center></td>
+</tr></table></div>
+
+<h2 id="1-3-2D-Composite-Transformations"><a href="#1-3-2D-Composite-Transformations" class="headerlink" title="1.3 2D Composite Transformations"></a>1.3 2D Composite Transformations</h2><p>Order：Scale → Rotation → Translation，这里规定矩阵是从右向左乘的。</p>
+<p>（顺序必须是上述顺序，例如沿y轴缩放，如果先旋转45°再缩放，会导致他发生形变）</p>
+<div><table>
+<tr>
+<td><img src=/images/其他/现代计算机图形学/5.png border=0 align=center></td>
+<td><img src=/images/其他/现代计算机图形学/6.png border=0 align=center></td>
+</tr></table></div>
+
+<p>如果想要旋转一个非原点的图形，需要先将他平移回原点，然后进行旋转，之后再平移回之前的位置。</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/7.png" width="50%"/></div>
+
+<h2 id="1-4-3D-Transformations"><a href="#1-4-3D-Transformations" class="headerlink" title="1.4 3D Transformations"></a>1.4 3D Transformations</h2><p>这里x和z都是与2D相同的，y不同与叉乘方向有关。</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/8.png" width="50%"/></div>
+
+<p>3D Rotations：组合RxRyRz三个轴的旋转</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/9.png" width="50%"/></div>
+
+<div align="center"><img src="/images/其他/现代计算机图形学/10.png" width="50%"/></div>
+
+<h2 id="1-5-View-Camera-Transformation"><a href="#1-5-View-Camera-Transformation" class="headerlink" title="1.5 View&#x2F;Camera Transformation"></a>1.5 View&#x2F;Camera Transformation</h2><p>将摄像机转换到原点</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/11.png" width="50%"/></div>
+
+<h1 id="2-Rasterization（光栅化）"><a href="#2-Rasterization（光栅化）" class="headerlink" title="2.  Rasterization（光栅化）"></a>2.  Rasterization（光栅化）</h1><h2 id="2-1-Triangles（三角形）"><a href="#2-1-Triangles（三角形）" class="headerlink" title="2.1 Triangles（三角形）"></a>2.1 Triangles（三角形）</h2><p>for(int x &#x3D; 0; x &lt; xmax ; x++)</p>
+<p>for(int y &#x3D; 0; y &lt; ymax ; y++)</p>
+<p>inside(try, x+0.5, y+0.5) &#x2F;&#x2F;是inside自己定义的函数，判断像素是否在连线内</p>
+<p>如果像素在三角形内，则P0P2 × P0Q、P2P1 × P2Q、P1P0×P1Q 叉乘结果应该符号相同</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/12.png" width="60%"/></div> 
+
+<h2 id="2-2-Antialiasing（抗锯齿）"><a href="#2-2-Antialiasing（抗锯齿）" class="headerlink" title="2.2 Antialiasing（抗锯齿）"></a>2.2 Antialiasing（抗锯齿）</h2><p>由于光栅化的过程会出现走样的情况，锯齿很明显，提出了模糊的方法来解决锯齿问题，先进行模糊，再进行采样。</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/13.png" width="60%"/></div>
+
+<h2 id="2-3-Fourier-Transform（傅里叶变换）"><a href="#2-3-Fourier-Transform（傅里叶变换）" class="headerlink" title="2.3 Fourier Transform（傅里叶变换）"></a>2.3 Fourier Transform（傅里叶变换）</h2><div align="center"><img src="/images/其他/现代计算机图形学/14.png" width="50%"/></div>
+
+<p>任何一个函数都可以分解成sin和cos组成的函数，也就是分解成了不同的频率（周期）函数的和。</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/15.png" width="50%"/></div>
+
+<p>如果一个函数频率很高，必须用很高的采样频率才能正确的恢复出这个函数。</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/16.png" width="50%"/></div>
+
+<p>同样的采样方法，采样两个完全不同的函数，但得到的结果是完全相同的，就会产生走样。</p>
+<h2 id="2-4-Filtering（滤波）"><a href="#2-4-Filtering（滤波）" class="headerlink" title="2.4 Filtering（滤波）"></a>2.4 Filtering（滤波）</h2><p>通过傅里叶变换将图片转换为频率（中心为低频信息，边缘为高频信息）</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/17.png" width="50%"/></div>
+
+<p>高通滤波，只显示高通信息，即对比度信息较高的信息；低通滤波与之相反，保留对比度较低的信息</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/18.png" width="70%"/></div>
+
+<h2 id="2-5-Convolution（卷积）"><a href="#2-5-Convolution（卷积）" class="headerlink" title="2.5 Convolution（卷积）"></a>2.5 Convolution（卷积）</h2><p>可以理解为对该像素的信号做一个加权的平均值，取附近的信号和该像素的信号。比如右图3×3</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/19.png" width="100%"/></div>
+
+<p><strong>MSAA，把1个像素当成4个像素进行处理来抗锯齿。还有FXAA、TAA、DLSS方法抗锯齿</strong></p>
+<div align="center"><img src="/images/其他/现代计算机图形学/20.png" width="50%"/></div>
+
+<h2 id="2-6-Z-Buffer（深度缓冲）"><a href="#2-6-Z-Buffer（深度缓冲）" class="headerlink" title="2.6 Z-Buffer（深度缓冲）"></a>2.6 Z-Buffer（深度缓冲）</h2><p>&#x2F;&#x2F;注，图形学中摄像机z轴正方向为从屏幕指向屏幕外，这里为了方便理解，将z轴指向屏幕内，所以数字越大深度越深</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/21.png" width="50%"/></div>
+
+<h1 id="3-Shader（着色器）"><a href="#3-Shader（着色器）" class="headerlink" title="3.  Shader（着色器）"></a>3.  Shader（着色器）</h1><h2 id="3-1-Lambert-Diffuse-Shading"><a href="#3-1-Lambert-Diffuse-Shading" class="headerlink" title="3.1 Lambert Diffuse Shading"></a>3.1 Lambert Diffuse Shading</h2><div align="center"><img src="/images/其他/现代计算机图形学/22.png" width="50%"/></div>
+
+<p>我们认为光的能量，在每一个球壳上是完全相等的，也就是说光的能量与半径的平方成反比</p>
+<div align='center'><p><b>能量 = I/r<sup>2</sup></b></p></div>
+
+<div align="center"><img src="/images/其他/现代计算机图形学/23.png" width="60%"/></div>
+
+<p>我们获得了光的能量计算方法，所以可以获得光能量影响下的兰伯特公式</p>
+<div align='center'><p><b>h<sub>d</sub> = K<sub>d</sub>(I/r<sup>2</sup>) max(0,n·l)</b></p></div>
+
+<div align="center"><img src="/images/其他/现代计算机图形学/24.png" width="70%"/></div>
+
+<h2 id="3-2-Blinn-Phong"><a href="#3-2-Blinn-Phong" class="headerlink" title="3.2 Blinn-Phong"></a>3.2 Blinn-Phong</h2><div align="center"><img src="/images/其他/现代计算机图形学/25.png" width="60%"/></div>
+
+<p>高光处p的指数主要用于缩小高光的范围，高光应该是人眼观测角度很小时才有的现象，下图为高光次幂</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/26.png" width="60%"/></div>
+
+<h2 id="3-3-Ambient"><a href="#3-3-Ambient" class="headerlink" title="3.3 Ambient"></a>3.3 Ambient</h2><p>环境光可以理解为是一个均匀的光，整体完全提亮</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/27.png" width="50%"/></div>
+
+<h2 id="3-4-Blnn-Phong-Reflection-Model"><a href="#3-4-Blnn-Phong-Reflection-Model" class="headerlink" title="3.4 Blnn-Phong Reflection Model"></a>3.4 Blnn-Phong Reflection Model</h2><div align="center"><img src="/images/其他/现代计算机图形学/28.png" width="50%"/></div>
+
+<h2 id="3-5-Shading-Frequencies"><a href="#3-5-Shading-Frequencies" class="headerlink" title="3.5 Shading Frequencies"></a>3.5 Shading Frequencies</h2><p><strong>三种渲染模式：每个面的法线、每个顶点的法线、每个像素的法线</strong></p>
+<div align="center"><img src="/images/其他/现代计算机图形学/29.png" width="50%"/></div>
+
+<p><strong>每个顶点法线的计算就是通过每个面的法线，经过加权平均以后获得顶点的法线</strong></p>
+<div align="center"><img src="/images/其他/现代计算机图形学/30.png" width="50%"/></div>
+
+<p><strong>每个像素的法线通过插值顶点法线来获得</strong></p>
+<div align="center"><img src="/images/其他/现代计算机图形学/31.png" width="50%"/></div>
+
+<h2 id="3-6-Texture-mapping"><a href="#3-6-Texture-mapping" class="headerlink" title="3.6 Texture mapping"></a>3.6 Texture mapping</h2><p>任何一个三维物体都可以展开成一个二维的图，也就是可以用二维图片映射到三维物体上（0,1）之间</p>
+<div align="center"><img src="/images/其他/现代计算机图形学/32.png" width="50%"/></div>
+
+<h2 id="3-7-Barycentric-Coordinates（重心坐标）"><a href="#3-7-Barycentric-Coordinates（重心坐标）" class="headerlink" title="3.7 Barycentric Coordinates（重心坐标）"></a>3.7 Barycentric Coordinates（重心坐标）</h2><p><strong>三角形所在平面内任意一点都可以表示为三角形三个顶点的线性组合，记为（****α,β,γ)</strong></p>
+<p>三角形ABC所在平面上任意一点**(x,y)<strong>，且</strong>α+β+γ&#x3D;1<strong>，都可以用</strong>(x,y)&#x3D;αA+βB+γC**来表示，</p>
+<p>如果满足**(α≥0,β≥0,γ≥0)<strong>，则</strong>(x,y)**一定在三角形内。</p>
+<p>这种表示的好处是，只要有3个点，不论在什么坐标系里，都可以用<strong>αβγ来表示坐标。</strong></p>
+<div align="center"><img src="/images/其他/现代计算机图形学/33.png" width="50%"/></div>
+
+<p>举例：A点的重心坐标是(1,0,0)，B点的重心坐标为(0,1,0)，C点的重心坐标(0,0,1)</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2022/02/01/202202011010/">https://mingxuanwu.com/2022/02/01/202202011010/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/unity/"># unity</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/03/05/202203050620/">【计算机图形学】UnityShader入门</a>
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>Linux 文件和目录操作函数 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Linux 文件和目录操作函数</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 28, 2023&nbsp;&nbsp;9:16:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-文件系统"><a href="#1-文件系统" class="headerlink" title="1.文件系统"></a>1.文件系统</h1><h2 id="1-1-文件存储"><a href="#1-1-文件存储" class="headerlink" title="1.1 文件存储"></a>1.1 文件存储</h2><h3 id="1-1-1-inode"><a href="#1-1-1-inode" class="headerlink" title="1.1.1 inode"></a>1.1.1 inode</h3><p>　　本质：struct 结构体。存储文件的属性信息。如：权限、类型、大小、时间、用户、盘块位置</p>
+<p>　　大多数的 inode 保存在磁盘中，少量常用、近期使用的 inode 保存在内存中</p>
+<h3 id="1-1-2-dentry-目录项"><a href="#1-1-2-dentry-目录项" class="headerlink" title="1.1.2 dentry 目录项"></a>1.1.2 dentry 目录项</h3><p>　　本质：struct 结构体 {文件名、inode 号 …} 文件内容保存在盘块中</p>
+<h3 id="1-1-3-文件系统"><a href="#1-1-3-文件系统" class="headerlink" title="1.1.3 文件系统"></a>1.1.3 文件系统</h3><p>　　一组规则，规定对文件的存储及读取的方式、方法。在磁盘格式化时指定。如：fat32、ntfs、ext2&#x2F;3&#x2F;4</p>
+<h1 id="2-文件操作"><a href="#2-文件操作" class="headerlink" title="2.文件操作"></a>2.文件操作</h1><h2 id="2-1-stat-和-lstat"><a href="#2-1-stat-和-lstat" class="headerlink" title="2.1 stat 和 lstat"></a>2.1 stat 和 lstat</h2><p>　　<strong>功能：查看文件信息</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stst.h&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">statbuf</span>;</span>    <span class="comment">// 传入&amp;statbuf用于接收文件属性信息</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">stat</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* pathname, <span class="keyword">struct</span> stat* statbuf)</span>;    <span class="comment">// 会穿透符号链接（软连接）</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">lstat</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* pathname, <span class="keyword">struct</span> stat* statbuf)</span>;    <span class="comment">// 不会穿透符号链接（软连接）</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    pathname: 文件名</span></span><br><span class="line"><span class="comment">    statbuf: 传出参数，充当返回值，保存文件属性信息</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    return: 成功0, 失败-1 errno</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>文件大小：statbuf.st_size</li>
+<li>文件类型：statbuf.st_mode</li>
+</ul>
+<h2 id="2-2-access"><a href="#2-2-access" class="headerlink" title="2.2 access"></a>2.2 access</h2><p>　　<strong>功能：测试指定文件是否具有某种属性</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">access</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> mode)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    pathname：文件名</span></span><br><span class="line"><span class="comment">    mode：文件权限，4种权限</span></span><br><span class="line"><span class="comment">        R_OK：   是否有读权限</span></span><br><span class="line"><span class="comment">        W_OK：   是否有写权限</span></span><br><span class="line"><span class="comment">        X_OK：   是否有执行权限</span></span><br><span class="line"><span class="comment">        F_OK：   测试文件是否存在</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    return：</span></span><br><span class="line"><span class="comment">    0：有某种权限，或者文件存在</span></span><br><span class="line"><span class="comment">    -1：没有，或文件不存在</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-chmod"><a href="#2-3-chmod" class="headerlink" title="2.3 chmod"></a>2.3 chmod</h2><p>　　<strong>功能：修改文件权限</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">chmod</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    参数：</span></span><br><span class="line"><span class="comment">        filename：文件名</span></span><br><span class="line"><span class="comment">        mode：权限(8进制数)</span></span><br><span class="line"><span class="comment">    返回值：</span></span><br><span class="line"><span class="comment">        成功：0</span></span><br><span class="line"><span class="comment">        失败：-1</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4-chown"><a href="#2-4-chown" class="headerlink" title="2.4 chown"></a>2.4 chown</h2><p>　　<strong>功能：修改文件所有者和所属组</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">chown</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">uid_t</span> owner, <span class="type">gid_t</span> group)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    参数：</span></span><br><span class="line"><span class="comment">        pathname：文件或目录名</span></span><br><span class="line"><span class="comment">        owner：文件所有者id，通过查看 /etc/passwd 得到所有者id</span></span><br><span class="line"><span class="comment">        group：文件所属组id，通过查看 /etc/group 得到用户组id</span></span><br><span class="line"><span class="comment">    返回值：</span></span><br><span class="line"><span class="comment">        成功：0</span></span><br><span class="line"><span class="comment">        失败：-1</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-5-truncate"><a href="#2-5-truncate" class="headerlink" title="2.5 truncate"></a>2.5 truncate</h2><p>　　<strong>功能：修改文件大小</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">truncate</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">off_t</span> length)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    参数：</span></span><br><span class="line"><span class="comment">        path：文件文件名字</span></span><br><span class="line"><span class="comment">        length：指定的文件大小</span></span><br><span class="line"><span class="comment">            a)比原来小, 删掉后边的部分</span></span><br><span class="line"><span class="comment">            b)比原来大, 向后拓展</span></span><br><span class="line"><span class="comment">    返回值：</span></span><br><span class="line"><span class="comment">        成功：0</span></span><br><span class="line"><span class="comment">        失败：-1</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-6-symlink"><a href="#2-6-symlink" class="headerlink" title="2.6 symlink"></a>2.6 symlink</h2><p>　　<strong>功能：创建一个软链接</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">symlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *target, <span class="type">const</span> <span class="type">char</span> *linkpath)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    参数：</span></span><br><span class="line"><span class="comment">        target：源文件名字</span></span><br><span class="line"><span class="comment">        linkpath：软链接名字</span></span><br><span class="line"><span class="comment">    返回值：</span></span><br><span class="line"><span class="comment">        成功：0</span></span><br><span class="line"><span class="comment">        失败：-1</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-7-link"><a href="#2-7-link" class="headerlink" title="2.7 link"></a>2.7 link</h2><p>　　<strong>功能：创建一个硬链接</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">link</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *oldpath, <span class="type">const</span> <span class="type">char</span> *newpath)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    参数：</span></span><br><span class="line"><span class="comment">        oldpath：源文件名字</span></span><br><span class="line"><span class="comment">        newpath：硬链接名字</span></span><br><span class="line"><span class="comment">    返回值：</span></span><br><span class="line"><span class="comment">        成功：0</span></span><br><span class="line"><span class="comment">        失败：-1</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-8-unlink"><a href="#2-8-unlink" class="headerlink" title="2.8 unlink"></a>2.8 unlink</h2><p>　　<strong>功能：删除一个文件(软硬链接文件)</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    参数：</span></span><br><span class="line"><span class="comment">        pathname：删除的文件名字</span></span><br><span class="line"><span class="comment">    返回值：</span></span><br><span class="line"><span class="comment">        成功：0</span></span><br><span class="line"><span class="comment">        失败：-1</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>调用unlink，只是让文件具备了被释放的条件，但不一定被立即释放</li>
+<li>硬链接计数为0（没有dentry对应）的文件仍然不会被立刻释放，只有所有打开该文件的进程都结束后，系统才会择机释放该文件</li>
+</ul>
+<h1 id="3-目录操作"><a href="#3-目录操作" class="headerlink" title="3. 目录操作"></a>3. 目录操作</h1><h2 id="3-1-opendir"><a href="#3-1-opendir" class="headerlink" title="3.1 opendir"></a>3.1 opendir</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;dirent.h&gt;</span></span></span><br><span class="line">DIR* <span class="title function_">opendir</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* name)</span>;</span><br><span class="line"><span class="comment">// 根据相对或绝对路径得到目录指针</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-2-closedir"><a href="#3-2-closedir" class="headerlink" title="3.2 closedir"></a>3.2 closedir</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;dirent.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">closedir</span><span class="params">(DIR* dirp)</span>;</span><br><span class="line"><span class="comment">// 根据给定的目录关闭</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-3-readdir"><a href="#3-3-readdir" class="headerlink" title="3.3 readdir"></a>3.3 readdir</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;dirent.h&gt;</span></span></span><br><span class="line"><span class="keyword">struct</span> dirent* <span class="title function_">readdir</span><span class="params">(DIR* dirp)</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dirent</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">ino_t</span> d_ino;                  <span class="comment">// 此目录进入点的inode</span></span><br><span class="line">    <span class="type">off_t</span> d_off;                    <span class="comment">// 目录文件开头至此目录进入点的位移</span></span><br><span class="line">    <span class="type">signed</span> <span class="type">short</span> <span class="type">int</span> d_reclen;      <span class="comment">// d_name 的长度, 不包含NULL 字符</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> d_type;           <span class="comment">// d_type 所指的文件类型 </span></span><br><span class="line">    <span class="type">char</span> d_name[<span class="number">256</span>];               <span class="comment">// 文件名</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-文件描述符复制"><a href="#4-文件描述符复制" class="headerlink" title="4.文件描述符复制"></a>4.文件描述符复制</h1><h2 id="4-1-dup"><a href="#4-1-dup" class="headerlink" title="4.1 dup"></a>4.1 dup</h2><p>功能：通过 oldfd 复制出一个新的文件描述符，新的文件描述符是调用进程文件描述符表中最小可用的文件描述符，最终 oldfd 和新的文件描述符都指向同一个文件。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">dup</span><span class="params">(<span class="type">int</span> oldfd)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    参数：</span></span><br><span class="line"><span class="comment">        oldfd : 需要复制的文件描述符 oldfd</span></span><br><span class="line"><span class="comment">    返回值：</span></span><br><span class="line"><span class="comment">            成功：新文件描述符</span></span><br><span class="line"><span class="comment">            失败： -1</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>应用举例</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">save_fd = dup(STDOUT_FILENO);    <span class="comment">// 拿到标准输出的文件描述符</span></span><br><span class="line">write(save_fd, msg, <span class="built_in">strlen</span>(msg));    <span class="comment">// 数据会被写到屏幕</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-2-dup2"><a href="#4-2-dup2" class="headerlink" title="4.2 dup2"></a>4.2 dup2</h2><p>功能：把 参数1 的文件描述符覆盖到 参数2 的文件描述符，效果是 参数1 和 参数2 的文件描述符变成相同的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">dup2</span><span class="params">(<span class="type">int</span> oldfd, <span class="type">int</span> newfd)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    参数：</span></span><br><span class="line"><span class="comment">        oldfd : 需要复制的文件描述符</span></span><br><span class="line"><span class="comment">        newfd : 新的文件描述符，这个描述符可以人为指定一个合法数字（0 - 1023），如果指定的数字已经被占用（和某个文件有关联），此函数会自动关闭 close() 断开这个数字和某个文件的关联，再来使用这个合法数字。</span></span><br><span class="line"><span class="comment">    返回值：</span></span><br><span class="line"><span class="comment">        成功：返回 newfd</span></span><br><span class="line"><span class="comment">        失败：返回 -1</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/linux/Linux%E6%96%87%E4%BB%B6%E5%92%8C%E7%9B%AE%E5%BD%95%E6%93%8D%E4%BD%9C%E5%87%BD%E6%95%B0/3219843-20231028091024414-1260159467.png" alt="img"></p>
+<h2 id="4-3-fcntl"><a href="#4-3-fcntl" class="headerlink" title="4.3 fcntl"></a>4.3 fcntl</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> n = fcntl(fd, F_DUPFD, <span class="number">18</span>)</span><br></pre></td></tr></table></figure>
+
+<p> 给定一个原先的文件描述符，然后给定一个新的文件描述符，复制进去。如果文件描述符的位置为空可以复制，不为空则分配一个可以分配的最小文件描述符</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/10/28/202310280916/">https://mingxuanwu.com/2023/10/28/202310280916/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/linux/"># linux</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/10/28/202310281942/">Linux 进程、进程间通信和信号</a>
+            
+            
+            <a class="next" rel="next" href="/2023/10/27/202310271715/">Linux 文件IO操作</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

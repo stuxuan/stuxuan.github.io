@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>7.timer&amp;TimerManager 计时器和计时器管理器 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">7.timer&amp;TimerManager 计时器和计时器管理器</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 29, 2024&nbsp;&nbsp;13:29:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="Timer"><a href="#Timer" class="headerlink" title="Timer"></a>Timer</h1><p>计时器类，其内部维护了循环周期和回调函数，以及下一次应该被执行的时间节点</p>
+<h2 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Timer</span> : <span class="keyword">public</span> std::enable_shared_from_this&lt;Timer&gt; &#123;</span><br><span class="line"><span class="keyword">friend</span> <span class="keyword">class</span> <span class="title class_">TimerManager</span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">bool</span> m_recurring = <span class="literal">false</span>;       <span class="comment">// 是否循环定时器</span></span><br><span class="line">    <span class="type">uint64_t</span> m_ms = <span class="number">0</span>;              <span class="comment">// 执行周期</span></span><br><span class="line">    <span class="type">uint64_t</span> m_next = <span class="number">0</span>;            <span class="comment">// 精确的执行时间</span></span><br><span class="line">    std::function&lt;<span class="type">void</span>()&gt; m_cb;     <span class="comment">// 回调函数</span></span><br><span class="line">    TimerManager* m_manager = <span class="literal">nullptr</span>;  <span class="comment">// 定时器管理器</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">Comparator</span> &#123;</span><br><span class="line">        <span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> Timer::ptr&amp; lhs, <span class="type">const</span> Timer::ptr&amp; rhs)</span> <span class="type">const</span></span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h2><p>两个构造函数都是私有的构造函数，只能被<code>TimeManager</code>调用</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Timer::<span class="built_in">Timer</span>(<span class="type">uint64_t</span> ms, std::function&lt;<span class="built_in">void</span>()&gt; cb,</span><br><span class="line">             <span class="type">bool</span> recurring, TimerManager* manager)</span><br><span class="line">    :<span class="built_in">m_recurring</span>(recurring)</span><br><span class="line">    , <span class="built_in">m_ms</span>(ms)</span><br><span class="line">    , <span class="built_in">m_cb</span>(cb)</span><br><span class="line">    , <span class="built_in">m_manager</span>(manager) &#123;</span><br><span class="line">        m_next = sylar::<span class="built_in">GetCurrentMS</span>() + m_ms;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Timer::<span class="built_in">Timer</span>(<span class="type">uint64_t</span> next)</span><br><span class="line">    :<span class="built_in">m_next</span>(next) &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="成员函数"><a href="#成员函数" class="headerlink" title="成员函数"></a>成员函数</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Timer</span> : <span class="keyword">public</span> std::enable_shared_from_this&lt;Timer&gt; &#123;</span><br><span class="line"><span class="keyword">friend</span> <span class="keyword">class</span> <span class="title class_">TimerManager</span>;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">typedef</span> std::shared_ptr&lt;Timer&gt; ptr;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">cancel</span><span class="params">()</span></span>;      <span class="comment">// 取消定时器</span></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">refresh</span><span class="params">()</span></span>;     <span class="comment">// 刷新设置定时器的执行时间</span></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">reset</span><span class="params">(<span class="type">uint64_t</span> ms, <span class="type">bool</span> from_now)</span></span>;		<span class="comment">// 重置定时器时间</span></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="built_in">Timer</span>(<span class="type">uint64_t</span> ms, std::function&lt;<span class="built_in">void</span>()&gt; cb,</span><br><span class="line">                    <span class="type">bool</span> recurring, TimerManager* manager);</span><br><span class="line">    <span class="built_in">Timer</span>(<span class="type">uint64_t</span> next);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="cancel"><a href="#cancel" class="headerlink" title="cancel"></a>cancel</h3><p>从<code>TimerManager</code>管理的队列中删除<code>Timer</code>，并且将该<code>Timer</code>的回调设置为空</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Timer::cancel</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 因为操作队列，所以加锁</span></span><br><span class="line">    TimerManager::<span class="function">RWMutexType::WriteLock <span class="title">lock</span><span class="params">(m_manager-&gt;m_mutex)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (m_cb) &#123;</span><br><span class="line">        <span class="comment">// 设置timer的回调函数为空, 并且从队列中删除该timer</span></span><br><span class="line">        m_cb = <span class="literal">nullptr</span>;</span><br><span class="line">        <span class="keyword">auto</span> it = m_manager-&gt;m_timers.<span class="built_in">find</span>(<span class="built_in">shared_from_this</span>());</span><br><span class="line">        m_manager-&gt;m_timers.<span class="built_in">erase</span>(it);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="refresh"><a href="#refresh" class="headerlink" title="refresh"></a>refresh</h3><p>刷新计时器的计时时间</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Timer::refresh</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    TimerManager::<span class="function">RWMutexType::WriteLock <span class="title">lock</span><span class="params">(m_manager-&gt;m_mutex)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (!m_cb) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">auto</span> it = m_manager-&gt;m_timers.<span class="built_in">find</span>(<span class="built_in">shared_from_this</span>());</span><br><span class="line">    <span class="keyword">if</span> (it == m_manager-&gt;m_timers.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    m_manager-&gt;m_timers.<span class="built_in">erase</span>(it);</span><br><span class="line">    m_next = sylar::<span class="built_in">GetCurrentMS</span>() + m_ms;</span><br><span class="line">    m_manager-&gt;m_timers.<span class="built_in">insert</span>(<span class="built_in">shared_from_this</span>());</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="reset"><a href="#reset" class="headerlink" title="reset"></a>reset</h3><p>重置定时器的执行时间间隔</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">Timer::reset</span><span class="params">(<span class="type">uint64_t</span> ms, <span class="type">bool</span> from_now)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (ms == m_ms &amp;&amp; !from_now) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    TimerManager::<span class="function">RWMutexType::WriteLock <span class="title">lock</span><span class="params">(m_manager-&gt;m_mutex)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (!m_cb) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">auto</span> it = m_manager-&gt;m_timers.<span class="built_in">find</span>(<span class="built_in">shared_from_this</span>());</span><br><span class="line">    <span class="keyword">if</span> (it == m_manager-&gt;m_timers.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    m_manager-&gt;m_timers.<span class="built_in">erase</span>(it);</span><br><span class="line">    <span class="type">uint64_t</span> start = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (from_now) &#123;</span><br><span class="line">        start = sylar::<span class="built_in">GetCurrentMS</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        start = m_next - m_ms;</span><br><span class="line">    &#125;</span><br><span class="line">    m_ms = ms;</span><br><span class="line">    m_next = start + m_ms;</span><br><span class="line">    m_manager-&gt;<span class="built_in">addTimer</span>(<span class="built_in">shared_from_this</span>(), lock);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="TimerManager"><a href="#TimerManager" class="headerlink" title="TimerManager"></a>TimerManager</h1><p>内部维护了一个<code>m_timers</code>定时器集合，用于管理这些定时器，其中<code>listExpiredCb</code>是核心函数，该函数检测当前时间是否已经到达定时器设定的时间，并通过传入传出参数使调用者获取定时器中的回调函数<code>cb</code></p>
+<h2 id="成员变量-1"><a href="#成员变量-1" class="headerlink" title="成员变量"></a>成员变量</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TimerManager</span> &#123;</span><br><span class="line">    <span class="keyword">friend</span> <span class="keyword">class</span> <span class="title class_">Timer</span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    RWMutexType m_mutex;</span><br><span class="line">    std::set&lt;Timer::ptr, Timer::Comparator&gt; m_timers;	<span class="comment">// 定时器集合</span></span><br><span class="line">    <span class="type">bool</span> m_tickled = <span class="literal">false</span>;		<span class="comment">// 是否触发onTimerInsertedAtFront</span></span><br><span class="line">    <span class="type">uint64_t</span> m_previouseTime = <span class="number">0</span>;	<span class="comment">// 上次执行时间</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="构造函数-1"><a href="#构造函数-1" class="headerlink" title="构造函数"></a>构造函数</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">TimerManager::<span class="built_in">TimerManager</span>() &#123;</span><br><span class="line">    m_previouseTime = sylar::<span class="built_in">GetCurrentMS</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">TimerManager::~<span class="built_in">TimerManager</span>() &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="仅该文件可见的static静态函数"><a href="#仅该文件可见的static静态函数" class="headerlink" title="仅该文件可见的static静态函数"></a>仅该文件可见的static静态函数</h2><p>用于满足条件回调函数，只有传入的指针还存在时，才执行对应的回调函数</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">OnTimer</span><span class="params">(std::weak_ptr&lt;<span class="type">void</span>&gt; weak_cond, std::function&lt;<span class="type">void</span>()&gt; cb)</span> </span>&#123;</span><br><span class="line">    std::shared_ptr&lt;<span class="type">void</span>&gt; tmp = weak_cond.<span class="built_in">lock</span>();</span><br><span class="line">    <span class="keyword">if</span> (tmp) &#123;</span><br><span class="line">        <span class="built_in">cb</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="成员函数-1"><a href="#成员函数-1" class="headerlink" title="成员函数"></a>成员函数</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TimerManager</span> &#123;</span><br><span class="line"><span class="keyword">friend</span> <span class="keyword">class</span> <span class="title class_">Timer</span>;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">Timer::ptr <span class="title">addTimer</span><span class="params">(<span class="type">uint64_t</span> ms, std::function&lt;<span class="type">void</span>()&gt; cb</span></span></span><br><span class="line"><span class="params"><span class="function">                        , <span class="type">bool</span> recurring = <span class="literal">false</span>)</span></span>;</span><br><span class="line">    <span class="function">Timer::ptr <span class="title">addConditionTimer</span><span class="params">(<span class="type">uint64_t</span> ms, std::function&lt;<span class="type">void</span>()&gt; cb</span></span></span><br><span class="line"><span class="params"><span class="function">                                , std::weak_ptr&lt;<span class="type">void</span>&gt; weak_cond</span></span></span><br><span class="line"><span class="params"><span class="function">                                , <span class="type">bool</span> recurring = <span class="literal">false</span>)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">uint64_t</span> <span class="title">getNextTimer</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">listExpiredCb</span><span class="params">(std::vector&lt;std::function&lt;<span class="type">void</span>()&gt; &gt;&amp; cbs)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">hasTimer</span><span class="params">()</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">onTimerInsertedAtFront</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">addTimer</span><span class="params">(Timer::ptr val, RWMutexType::WriteLock&amp; lock)</span></span>;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">detectClockRollover</span><span class="params">(<span class="type">uint64_t</span> now_ms)</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="addTimer"><a href="#addTimer" class="headerlink" title="addTimer"></a>addTimer</h3><p>public方法：向内部维护的<code>set</code>中添加一个<code>Timer</code>对象，并给外部返回这个<code>Timer</code>指针</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Timer::ptr <span class="title">TimerManager::addTimer</span><span class="params">(<span class="type">uint64_t</span> ms, std::function&lt;<span class="type">void</span>()&gt; cb</span></span></span><br><span class="line"><span class="params"><span class="function">    , <span class="type">bool</span> recurring)</span> </span>&#123;</span><br><span class="line">    <span class="function">Timer::ptr <span class="title">timer</span><span class="params">(<span class="keyword">new</span> Timer(ms, cb, recurring, <span class="keyword">this</span>))</span></span>;</span><br><span class="line">    <span class="function">RWMutexType::WriteLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">    <span class="built_in">addTimer</span>(timer, lock);</span><br><span class="line">    <span class="keyword">return</span> timer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>protected方法：直接传入<code>Timer</code>对象，并将其添加到<code>set</code>中，需要额外判断是否在队列最前端，并调用<code>onTimerInsertedAtFront()</code>方法</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">TimerManager::addTimer</span><span class="params">(Timer::ptr val, RWMutexType::WriteLock&amp; lock)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">auto</span> it = m_timers.<span class="built_in">insert</span>(val).first;</span><br><span class="line">    <span class="type">bool</span> at_front = (it == m_timers.<span class="built_in">begin</span>()) &amp;&amp; !m_tickled;</span><br><span class="line">    <span class="keyword">if</span> (at_front) &#123;</span><br><span class="line">        m_tickled = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    lock.<span class="built_in">unlock</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (at_front) &#123;</span><br><span class="line">        <span class="built_in">onTimerInsertedAtFront</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="addConditionTimer"><a href="#addConditionTimer" class="headerlink" title="addConditionTimer"></a>addConditionTimer</h3><p>添加条件计时器，内部实际上还是调用<code>addTimer</code>方法，但调用时会检查<code>weak_cond</code>指针是否存在，如果存在才调用回调<code>cb</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Timer::ptr <span class="title">TimerManager::addConditionTimer</span><span class="params">(<span class="type">uint64_t</span> ms, std::function&lt;<span class="type">void</span>()&gt; cb</span></span></span><br><span class="line"><span class="params"><span class="function">    , std::weak_ptr&lt;<span class="type">void</span>&gt; weak_cond</span></span></span><br><span class="line"><span class="params"><span class="function">    , <span class="type">bool</span> recurring)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">addTimer</span>(ms, std::<span class="built_in">bind</span>(&amp;OnTimer, weak_cond, cb), recurring);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="getNextTimer"><a href="#getNextTimer" class="headerlink" title="getNextTimer"></a>getNextTimer</h3><p>获取到最近一个定时器执行的时间间隔</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">uint64_t</span> <span class="title">TimerManager::getNextTimer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">RWMutexType::ReadLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">    m_tickled = <span class="literal">false</span>;</span><br><span class="line">    <span class="comment">// set为空返回0</span></span><br><span class="line">    <span class="keyword">if</span> (m_timers.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">        <span class="keyword">return</span> ~<span class="number">0ull</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 否则返回set首个对象执行的时间差</span></span><br><span class="line">    <span class="type">const</span> Timer::ptr&amp; next = *m_timers.<span class="built_in">begin</span>();</span><br><span class="line">    <span class="type">uint64_t</span> now_ms = sylar::<span class="built_in">GetCurrentMS</span>();</span><br><span class="line">    <span class="keyword">if</span> (now_ms &gt;= next-&gt;m_next) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> next-&gt;m_next - now_ms;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="detectClockRollover"><a href="#detectClockRollover" class="headerlink" title="detectClockRollover"></a>detectClockRollover</h3><p>检查是否发生时间会绕，即时间突然从很大的值变成很小的值，在重启或手动调整时间时可能发生<br>检查当前时间 <code>now_ms</code> 是否小于上一次记录的时间 <code>m_previouseTime</code>，并且 <code>now_ms</code> 是否小于 <code>m_previouseTime</code> 减去一小时（即 <code>60 * 60 * 1000</code> 毫秒），如果上述两个条件同时成立，则认为发生了时间回绕，将 <code>rollover</code> 设置为 <code>true</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">bool</span> <span class="title">TimerManager::detectClockRollover</span><span class="params">(<span class="type">uint64_t</span> now_ms)</span> </span>&#123;</span><br><span class="line">    <span class="type">bool</span> rollover = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">if</span> (now_ms &lt; m_previouseTime &amp;&amp;</span><br><span class="line">        now_ms &lt; (m_previouseTime - <span class="number">60</span> * <span class="number">60</span> * <span class="number">1000</span>)) &#123;</span><br><span class="line">        rollover = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    m_previouseTime = now_ms;</span><br><span class="line">    <span class="keyword">return</span> rollover;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="listExpiredCb"><a href="#listExpiredCb" class="headerlink" title="listExpiredCb"></a>listExpiredCb</h3><ul>
+<li>获取当前执行器该时间需要执行的回调函数列表，如果是一次性的计时器，则从<code>set</code>中摘除，如果是循环计时器，则重新放回<code>set</code>中</li>
+<li><code>cbs</code>是传入传出参数<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">TimerManager::listExpiredCb</span><span class="params">(std::vector&lt;std::function&lt;<span class="type">void</span>()&gt; &gt;&amp; cbs)</span> </span>&#123;</span><br><span class="line">    <span class="type">uint64_t</span> now_ms = sylar::<span class="built_in">GetCurrentMS</span>();</span><br><span class="line">    std::vector&lt;Timer::ptr&gt; expired;	<span class="comment">// 用于传出</span></span><br><span class="line">    <span class="comment">// set为空 结束</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">RWMutexType::ReadLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">        <span class="keyword">if</span> (m_timers.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 解锁后，加写锁，中间解锁的过程可能有操作，所以再次判断，如果空则返回</span></span><br><span class="line">    <span class="function">RWMutexType::WriteLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (m_timers.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">bool</span> rollover = <span class="built_in">detectClockRollover</span>(now_ms);</span><br><span class="line">    <span class="comment">// 如果没有发生时间回绕，并且第一个计时器的时间比当前时间大，则返回</span></span><br><span class="line">    <span class="keyword">if</span> (!rollover &amp;&amp; ((*m_timers.<span class="built_in">begin</span>())-&gt;m_next &gt; now_ms)) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 找到需要执行的计时器，将其从set移除，并加入到expired中，最后将回调函数放入cbs</span></span><br><span class="line">    <span class="function">Timer::ptr <span class="title">now_timer</span><span class="params">(<span class="keyword">new</span> Timer(now_ms))</span></span>;</span><br><span class="line">    <span class="comment">// 如果发生时间回绕, 则it为最后一项，否则it为比当前时间大的第一项</span></span><br><span class="line">    <span class="keyword">auto</span> it = rollover ? m_timers.<span class="built_in">end</span>() : m_timers.<span class="built_in">lower_bound</span>(now_timer);</span><br><span class="line">    <span class="keyword">while</span> (it != m_timers.<span class="built_in">end</span>() &amp;&amp; (*it)-&gt;m_next == now_ms) &#123;</span><br><span class="line">        ++it;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 将begin()到it的部分插入到expired, 并从m_timers删除</span></span><br><span class="line">    expired.<span class="built_in">insert</span>(expired.<span class="built_in">begin</span>(), m_timers.<span class="built_in">begin</span>(), it);</span><br><span class="line">    m_timers.<span class="built_in">erase</span>(m_timers.<span class="built_in">begin</span>(), it);</span><br><span class="line">    cbs.<span class="built_in">reserve</span>(expired.<span class="built_in">size</span>());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; timer : expired) &#123;</span><br><span class="line">        cbs.<span class="built_in">push_back</span>(timer-&gt;m_cb);</span><br><span class="line">        <span class="keyword">if</span> (timer-&gt;m_recurring) &#123;</span><br><span class="line">            timer-&gt;m_next = now_ms + timer-&gt;m_ms;</span><br><span class="line">            m_timers.<span class="built_in">insert</span>(timer);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            timer-&gt;m_cb = <span class="literal">nullptr</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/07/29/202407291329/">https://mingxuanwu.com/2024/07/29/202407291329/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CPP%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/"># CPP高性能服务器</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2024/07/27/202407271733/">6.Scheduler 协程调度器</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

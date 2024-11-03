@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【深入理解计算机系统】2.信息的表示和处理 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【深入理解计算机系统】2.信息的表示和处理</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 12, 2023&nbsp;&nbsp;8:44:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="2-1-信息存储"><a href="#2-1-信息存储" class="headerlink" title="2.1 信息存储"></a>2.1 信息存储</h1><p>机器级的程序将<strong>存储器</strong>视为一个字节数组，称为<strong>虚拟存储器</strong>（virtual memory）。存储器的每个字节都由一个唯一数字标识，称为该字节的<strong>地址</strong>（address），所有地址的集合称为<strong>虚拟地址空间</strong>（virtual address space）。</p>
+<h2 id="2-1-1-字"><a href="#2-1-1-字" class="headerlink" title="2.1.1 字"></a>2.1.1 字</h2><p>每台计算机都有一个<strong>字长</strong>（word size），指明整数和指针数据的标称大小（norminal size）。虚拟地址就是这么编码的，对于32位字长的计算机，限制了他的虚拟地址空间位232-1位4GB，对于64位字长的计算机，内存最大支持128G。</p>
+<h2 id="2-1-2-寻址和字节顺序"><a href="#2-1-2-寻址和字节顺序" class="headerlink" title="2.1.2 寻址和字节顺序"></a>2.1.2 寻址和字节顺序</h2><p>一个对象存储有大端法和小端法，最低有效位在最前面的方式被称为小端法，另一种称为大端法。许多芯片在加电启动时确定字节顺序规则。假设有一个0x1234567在地址范围0x100~0x103存储，顺序如下</p>
+<table>
+<thead>
+<tr>
+<th>大端法</th>
+<th>0x100</th>
+<th>0x101</th>
+<th>0x102</th>
+<th>0x103</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>…</td>
+<td>01</td>
+<td>23</td>
+<td>45</td>
+<td>67</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>小端法</th>
+<th>0x100</th>
+<th>0x101</th>
+<th>0x102</th>
+<th>0x103</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>…</td>
+<td>67</td>
+<td>45</td>
+<td>23</td>
+<td>01</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<h2 id="2-1-3-布尔代数和环"><a href="#2-1-3-布尔代数和环" class="headerlink" title="2.1.3 布尔代数和环"></a>2.1.3 布尔代数和环</h2><p>“~”：逻辑运算NOT</p>
+<p>“&amp;”：逻辑运算AND</p>
+<p>“ | “：逻辑运算OR</p>
+<p>“ ^ “：异或运算EXCLUSIVE-OR，PQ为真但不全为真时成立</p>
+<table>
+<thead>
+<tr>
+<th><strong>~</strong></th>
+<th></th>
+<th></th>
+<th><strong>&amp;</strong></th>
+<th>0</th>
+<th>1</th>
+<th></th>
+<th><strong>|</strong></th>
+<th>0</th>
+<th>1</th>
+<th></th>
+<th><strong>^</strong></th>
+<th>0</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="2-1-4-位级运算"><a href="#2-1-4-位级运算" class="headerlink" title="2.1.4 位级运算"></a>2.1.4 位级运算</h2><table>
+<thead>
+<tr>
+<th>C的表达式</th>
+<th>二进制表达式</th>
+<th>二进制结果</th>
+<th>C的结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>~0x41</td>
+<td>~[01000001]</td>
+<td>[10111110]</td>
+<td>0xBE</td>
+</tr>
+<tr>
+<td>~0x00</td>
+<td>~[00000000]</td>
+<td>[11111111]</td>
+<td>0xFF</td>
+</tr>
+<tr>
+<td>0x69&amp;0x55</td>
+<td>[01101001]&amp;[01010101]</td>
+<td>[0100001]</td>
+<td>0x41</td>
+</tr>
+<tr>
+<td>0x69 | 0x55</td>
+<td>[01101001] | [01010101]</td>
+<td>[01111101]</td>
+<td>0x7D</td>
+</tr>
+<tr>
+<td>x &lt;&lt; k</td>
+<td>将x向左移动k位，丢掉k个最高位，右端补k个0</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h1 id="2-2-整数表示"><a href="#2-2-整数表示" class="headerlink" title="2.2 整数表示"></a>2.2 整数表示</h1><p>一个整数数据类型有 w 位，可以写成[xw-1, xw-2, …, x0]，可以得到无符号数的二进制表示形式<strong>（式1）</strong></p>
+<img src="/images/深入理解计算机系统/3219843-20230711193336500-837863142.png" width="20%" height="20%" />
+
+<p>在计算机中希望使用<strong>二进制补码</strong>形式表现有符号数（负数），其中最高位解释为负权或符号位，正数的原码、反码、补码都相等，负数的反码是除符号位外取反，补码等于反码加1<strong>（式2）</strong></p>
+<img src="/images/深入理解计算机系统/3219843-20230711193508133-520651275.png" width="35%"/>
+
+<table>
+<thead>
+<tr>
+<th>数字</th>
+<th>原码</th>
+<th>反码</th>
+<th>补码</th>
+<th>直接计算</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-128</td>
+<td>无</td>
+<td>无</td>
+<td>1000 0000</td>
+<td>-27&#x3D; - 128</td>
+</tr>
+<tr>
+<td>-127</td>
+<td>1111 1111</td>
+<td>1000 0000</td>
+<td>1000 0001</td>
+<td>-27+1&#x3D;-127</td>
+</tr>
+<tr>
+<td>-10</td>
+<td>1000 1010</td>
+<td>1111 0101</td>
+<td>1111 0110</td>
+<td>-27+26+25+24+22+21&#x3D;-10</td>
+</tr>
+<tr>
+<td>10</td>
+<td>0000 1010</td>
+<td>0000 1010</td>
+<td>0000 1010</td>
+<td>23+21&#x3D;10</td>
+</tr>
+<tr>
+<td>127</td>
+<td>0111 1111</td>
+<td>0111 1111</td>
+<td>0111 1111</td>
+<td>26+25+24+23+22+21+20&#x3D;127</td>
+</tr>
+</tbody></table>
+<p> 从这里理解有符号数和无符号数的映射，有符号数的正数部分对应了无符号数相同大小的正数部分，而有符号数负数的部分对应了更大的无符号数部分，反过来无符号数较大的部分会对应有符号数的负数</p>
+<img src="/images/深入理解计算机系统/3219843-20230711194559232-1328026871.png" width="40%" height="40%" />
+
+<p>对于数字的截断，如果将一个32位整数截断到16位，会截断32位前面的16位，保留后面的16位</p>
+<h1 id="2-3-整数运算"><a href="#2-3-整数运算" class="headerlink" title="2.3 整数运算"></a>2.3 整数运算</h1><h2 id="2-3-1-无符号加法"><a href="#2-3-1-无符号加法" class="headerlink" title="2.3.1 无符号加法"></a>2.3.1 无符号加法</h2><p>无符号运算可以被视为一种模的运算。例如考虑一个四位数表示，x&#x3D;9和y&#x3D;12，[1001]和[1100]。它们的和是21，五位表示为[10101]，但如果截断最高位会得到[0101]，也就是5，这和 21 mod 16 &#x3D; 5一致</p>
+<h2 id="2-3-2-二进制补码加法"><a href="#2-3-2-二进制补码加法" class="headerlink" title="2.3.2 二进制补码加法"></a>2.3.2 二进制补码加法</h2><p>二进制补码运算中存在移除情况，根据式2可以很好理解，0111 1111是正数最大值，而1000 0000是负数最小值，所以正数向上溢出后会是最小的负数，而负数向下溢出后是最大的正数</p>
+<h2 id="2-3-3-二进制补码的非"><a href="#2-3-3-二进制补码的非" class="headerlink" title="2.3.3 二进制补码的非"></a>2.3.3 二进制补码的非</h2><p>以8位举例说明，范围-128≤x&lt;128中的每个数字都有一个逆元，对于x≠-128的时候，他的逆元就是-x（因为-128的逆元128没办法用这8位来表示）。</p>
+<p>求逆元的方式是按位取反再加1，即-x &#x3D; ~x+1。</p>
+<h2 id="2-3-4-乘法-除法和移位操作"><a href="#2-3-4-乘法-除法和移位操作" class="headerlink" title="2.3.4 乘法&#x2F;除法和移位操作"></a>2.3.4 乘法&#x2F;除法和移位操作</h2><p>以7位举例说明无符号数，对于范围0≤x,y≤127内的整数，x和y的乘积在取值范围0到127<em>127之间，但是最后只会保留后7位，所以实际上形成了一个环，计算实际上保留的是(x</em>y) mod 127</p>
+<p>计算机中乘法指令一般需要12或更多的时钟周期，而加法减法只需要1个时钟周期，因此编译器一般会对常数乘法修改为移位运算</p>
+<p>例如2<em>x就相当于x&lt;&lt;1，将x左移一位，而3</em>x就相当于(x&lt;&lt;1) + x，将x左移一位并在末尾+1，同理除法会做右移</p>
+<table>
+<thead>
+<tr>
+<th>数</th>
+<th>计算</th>
+<th>二进制表示</th>
+<th>操作</th>
+<th>新的二进制表示</th>
+<th>最终得到</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>无符号</td>
+<td>5 * 3</td>
+<td>0101（补）</td>
+<td>左移 1 位并加他本身</td>
+<td>1111（补） -&gt; 1111（原）</td>
+<td>15</td>
+</tr>
+<tr>
+<td>有符号</td>
+<td>5 &#x2F; 2</td>
+<td>0101（补）</td>
+<td>右移 1 位（符号位不变，高位补0）</td>
+<td>0010（补）-&gt; 0010（原）</td>
+<td>2</td>
+</tr>
+<tr>
+<td>有符号</td>
+<td>-5 &#x2F; 2</td>
+<td>1011（补）</td>
+<td>右移 1 位（符号位不变，高位补1）</td>
+<td>1101（补）-&gt; 1011（原）</td>
+<td>-3</td>
+</tr>
+</tbody></table>
+<h1 id="2-4-浮点数"><a href="#2-4-浮点数" class="headerlink" title="2.4 浮点数"></a>2.4 浮点数</h1><h2 id="2-4-1-二进制小数"><a href="#2-4-1-二进制小数" class="headerlink" title="2.4.1 二进制小数"></a>2.4.1 二进制小数</h2><p>12.3410表示数字1×101+2×100+3×10-1+4×10-2&#x3D;12又(34&#x2F;100)</p>
+<p>10.1112表示数字21+0+2-1+2-2+2-3&#x3D;2又(7&#x2F;8)</p>
+<p>注意二进制实际上只能准确表示可以写成x × 2y的数，比如准确表示21, 22, 2-1, 3*2-4, 对于1&#x2F;5因为没有办法准确描述成前面的形式，所以没办法准确表示0.2</p>
+<h2 id="2-4-2-IEEE-浮点表示"><a href="#2-4-2-IEEE-浮点表示" class="headerlink" title="2.4.2 IEEE 浮点表示"></a>2.4.2 IEEE 浮点表示</h2><p>IEEE 浮点标准用 <em>V &#x3D; (-1)s × 2E × M</em>的形式来表示一个数，其中s表示正数或负数，M是一个二进制小数，范围在1<del>2-ε或0</del>1-ε之间，E表示对浮点数的加权</p>
+<p>在C语言32位精度浮点数中，符号位1位，加权8位，小数域23位；64位浮点数的加权有11位，小数域有52位。</p>
+<ul>
+<li><strong>规格化值</strong>：对于指数位不全为0或全为1的情况，指数的值为 E &#x3D; e - Bias（e为指数位的值，偏置Bias是2k-1），此时小数域定义位1,x,x,x,x，首位默认有一个1</li>
+<li><strong>非规格化值</strong>：对于指数全0的情况，指数值E &#x3D; 1 - Bias，有效值M &#x3D; f</li>
+<li><strong>特殊值</strong>：对于指数全1的情况，若小数域全0，表示无穷，s&#x3D;0是正无穷，s&#x3D;1是负无穷；如果小数域非全0表示NaN，比如√-1就是NaN</li>
+</ul>
+<p>下面假设有一个8位浮点数，其中有k&#x3D;4的指数位和n&#x3D;3的小数位，Bias &#x3D; 24-1 &#x3D; 7，下表是8位浮点数的非负表示示例，完整读一遍就可以理解该表示了。可以发现定义非规格化的的偏置是1 - Bias，并且在规格化数的首位加1bit可以实现最大非规格化数到最小规格化数的平滑过渡，这7位可以表示的数实际上一共是非规格化数23个，规格化数23×(24-2)个，一共23×(24-1)个，本质上就是没有了指数位全1情况下的表示。而且这种在首位加1的方式实际上是因为全0表示的时候已经进了1位。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><strong>描述</strong></th>
+<th><strong>位表示</strong></th>
+<th><strong>指数值</strong></th>
+<th><strong>偏置后指数值</strong></th>
+<th><strong>小数域</strong></th>
+<th><strong>有效小数值</strong></th>
+<th><strong>实际值</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>非<strong><strong>规</strong></strong>格****化</strong></td>
+<td>0</td>
+<td>0 0000 000</td>
+<td>0</td>
+<td>1 - Bias &#x3D; -6</td>
+<td>0&#x2F;8</td>
+<td>0&#x2F;8</td>
+<td>0</td>
+</tr>
+<tr>
+<td>最小的非规格化数</td>
+<td>0 0000 001</td>
+<td>0</td>
+<td>1 - Bias &#x3D; -6</td>
+<td>1&#x2F;8</td>
+<td>1&#x2F;8</td>
+<td>1&#x2F;8 * 2-6 &#x3D; 1&#x2F;512</td>
+<td></td>
+</tr>
+<tr>
+<td>最大的非规格化数</td>
+<td>0 0000 111</td>
+<td>0</td>
+<td>1 - Bias &#x3D; -6</td>
+<td>7&#x2F;8</td>
+<td>7&#x2F;8</td>
+<td>7&#x2F;8 * 2-6 &#x3D; 7&#x2F;512</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>规<strong><strong>格</strong></strong>化</strong></td>
+<td>最小的规格化数</td>
+<td>0 0001 000</td>
+<td>1</td>
+<td>e - Bias &#x3D; -6</td>
+<td>0&#x2F;8</td>
+<td>8&#x2F;8</td>
+<td>8&#x2F;8 * 2-6 &#x3D; 8&#x2F;512</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0 0111 000</td>
+<td>7</td>
+<td>e - Bias &#x3D; 0</td>
+<td>0&#x2F;8</td>
+<td>8&#x2F;8</td>
+<td>8&#x2F;8 * 20 &#x3D; 8&#x2F;8</td>
+<td></td>
+</tr>
+<tr>
+<td>最大的规格化数</td>
+<td>0 1110 111</td>
+<td>14</td>
+<td>e - Bias &#x3D; 7</td>
+<td>7&#x2F;8</td>
+<td>15&#x2F;8</td>
+<td>15&#x2F;8 * 214 &#x3D; 240</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>特<strong><strong>殊</strong></strong>值</strong></td>
+<td>无穷大</td>
+<td>0 1111 000</td>
+<td>符号位为0，指数位全1，小数位全0表示正无穷</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>NaN</td>
+<td>0 1111 010</td>
+<td>指数位全1，小数位非全0表示NaN</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="2-4-3-浮点运算"><a href="#2-4-3-浮点运算" class="headerlink" title="2.4.3 浮点运算"></a>2.4.3 浮点运算</h2><p>IEEE标准定义+∞-∞&#x3D;NaN，任何数+NaN都是NaN，其他情况就是正常的计算，但要注意大数吃小数的情况</p>
+<p>举例3.14+1e10-1e10得到的将会是0，因为顺序计算第一次的时候3.14已经被精度问题舍入了，而3.14+(1e10-1e10)会得到正确的值，在判断值的大小进入函数体内的方法中需要注意</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p>深入理解计算机系统（第三版）</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/07/12/202307120844/">https://mingxuanwu.com/2023/07/12/202307120844/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"># 操作系统</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/07/22/202307221901/">【深入理解计算机系统】3.程序的机器级表示</a>
+            
+            
+            <a class="next" rel="next" href="/2023/07/04/202307041503/">unity协程（IEnumerator）开始和结束</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

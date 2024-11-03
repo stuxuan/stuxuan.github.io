@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>Linux 守护进程 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Linux 守护进程</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">November 6, 2023&nbsp;&nbsp;14:36:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-进程组"><a href="#1-进程组" class="headerlink" title="1.进程组"></a>1.进程组</h1><ul>
+<li>进程组，也称之为作业。BSD于1980年前后向Unix中增加的一个新特性。<strong>代表一个或多个进程的集合。</strong></li>
+<li>每个进程都属于一个进程组。在 waitpid函数 和 kill函数 的参数中都曾使用到。操作系统设计的进程组的概念，是为了简化对多个进程的管理。</li>
+<li>当父进程，创建子进程的时候，默认子进程与父进程属于同一进程组。进程组ID为第一个进程ID(组长进程)。所以，组长进程标识：其进程组ID为其进程ID</li>
+<li>可以使用<strong>kill -SIGKILL -进程组ID</strong>(负进程组ID)来将整个进程组内的进程全部杀死：</li>
+</ul>
+<p><img src="/images/Linux/Linux%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B/3219843-20231106142550933-1289604505.png" alt="img"></p>
+<ul>
+<li>组长进程可以创建一个进程组，创建该进程组中的进程，然后终止。只要进程组中有一个进程存在，进程组就存在，与组长进程是否终止无关。</li>
+<li>进程组生存期：进程组创建到最后一个进程离开(终止或转移到另一个进程组)。</li>
+<li>一个进程可以为自己或子进程设置进程组ID</li>
+</ul>
+<h1 id="2-会话"><a href="#2-会话" class="headerlink" title="2.会话"></a>2.会话</h1><h2 id="2-1-会话概念"><a href="#2-1-会话概念" class="headerlink" title="2.1 会话概念"></a>2.1 会话概念</h2><ul>
+<li>一个会话可以有一个控制终端。这通常是终端设备或伪终端设备；</li>
+<li>建立与控制终端连接的会话首进程被称为控制进程；</li>
+<li>一个会话中的几个进程组可被分为一个前台进程组以及一个或多个后台进程组；</li>
+<li>如果一个会话有一个控制终端，则它有一个前台进程组，其它进程组为后台进程组；</li>
+<li>如果终端接口检测到断开连接，则将挂断信号发送至控制进程（会话首进程）。</li>
+</ul>
+<h2 id="2-2-创建会话注意事项"><a href="#2-2-创建会话注意事项" class="headerlink" title="2.2 创建会话注意事项"></a>2.2 创建会话注意事项</h2><ol>
+<li><p>调用进程不能是进程组组长，该进程变成新会话首进程(session header)</p>
+</li>
+<li><p>该调用进程是组长进程，则出错返回</p>
+</li>
+<li><p>该进程成为一个新进程组的组长进程</p>
+</li>
+<li><p>需有root权限(ubuntu不需要)</p>
+</li>
+<li><p>新会话丢弃原有的控制终端，该会话没有控制终端</p>
+</li>
+<li><p>建立新会话时，先调用fork, 父进程终止，子进程调用setsid</p>
+</li>
+</ol>
+<h1 id="3-守护进程"><a href="#3-守护进程" class="headerlink" title="3.守护进程"></a>3.守护进程</h1><p>　　守护进程（Daemon Process），也就是通常说的 Daemon 进程（精灵进程），是 Linux 中的后台服务进程。它是一个生存期较长的进程，通常独立于控制终端并且周期性地执行某种任务或等待处理某些发生的事件。一般采用以d结尾的名字。</p>
+<p>　　守护进程是个特殊的孤儿进程，这种进程脱离终端，为什么要脱离终端呢？之所以脱离于终端是为了避免进程被任何终端所产生的信息所打断，其在执行过程中的信息也不在任何终端上显示。由于在 Linux 中，每一个系统与用户进行交流的界面称为终端，每一个从此终端开始运行的进程都会依附于这个终端，这个终端就称为这些进程的控制终端，当控制终端被关闭时，相应的进程都会自动关闭。</p>
+<p>　　Linux 的大多数服务器就是用守护进程实现的。比如，Internet 服务器 inetd，Web 服务器 httpd 等</p>
+<h2 id="3-1-守护进程概念"><a href="#3-1-守护进程概念" class="headerlink" title="3.1 守护进程概念"></a>3.1 守护进程概念</h2><ul>
+<li>守护进程是运行在后台的一种特殊进程，它独立于控制终端并且周期性地执行某种任务或循环等待处理某些事件的发生；它不需要用户输入就能运行而且提供某种服务，不是对整个系统就是对某个用户程序提供服务。Linux系统的大多数服务器就是通过守护进程实现的。</li>
+<li>守护进程一般在系统启动时开始运行，除非强行终止，否则直到系统关机才随之一起停止运行；</li>
+<li>守护进程一般都以root用户权限运行，因为要使用某些特殊的端口（1-1024）或者资源；</li>
+<li>守护进程的父进程一般都是init进程，因为它真正的父进程在fork出守护进程后就直接退出了，所以守护进程都是孤儿进程，由init接管；</li>
+<li>守护进程是非交互式程序，没有控制终端，所以任何输出，无论是向标准输出设备stdout还是标准出错设备stderr的输出都需要特殊处理。</li>
+<li>守护进程的名称通常以d结尾，比如sshd、xinetd、crond等</li>
+</ul>
+<h2 id="3-2-守护进程模型"><a href="#3-2-守护进程模型" class="headerlink" title="3.2 守护进程模型"></a>3.2 守护进程模型</h2><ol>
+<li>创建子进程，父进程退出(必须)</li>
+</ol>
+<ul>
+<li>所有工作在子进程中进行形式上脱离了控制终端</li>
+</ul>
+<ol start="2">
+<li>在子进程中创建新会话(必须)</li>
+</ol>
+<ul>
+<li>setsid()函数</li>
+<li>使子进程完全独立出来，脱离控制</li>
+</ul>
+<ol start="3">
+<li>改变当前目录为根目录(不是必须)</li>
+</ol>
+<ul>
+<li>chdir()函数</li>
+<li>防止占用可卸载的文件系统</li>
+<li>也可以换成其它路径</li>
+</ul>
+<ol start="4">
+<li>重设文件权限掩码(不是必须)</li>
+</ol>
+<ul>
+<li>umask()函数</li>
+<li>防止继承的文件创建屏蔽字拒绝某些权限</li>
+<li>增加守护进程灵活性</li>
+</ul>
+<ol start="5">
+<li>关闭文件描述符(不是必须)</li>
+</ol>
+<ul>
+<li>继承的打开文件不会用到，浪费系统资源，无法卸载</li>
+</ul>
+<ol start="6">
+<li><p>开始执行守护进程核心工作(必须)</p>
+</li>
+<li><p>守护进程退出处理程序模型</p>
+</li>
+</ol>
+<h2 id="3-3-示例代码"><a href="#3-3-示例代码" class="headerlink" title="3.3 示例代码"></a>3.3 示例代码</h2><p>　　每隔2s获取一次系统时间, 将这个时间写入到磁盘文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* time_t rawtime;</span></span><br><span class="line"><span class="comment">* time ( &amp;rawtime  ); --- 获取时间，以秒计，从1970年1月一日起算，存于rawtime</span></span><br><span class="line"><span class="comment">* localtime ( &amp;rawtime  ); //转为当地时间，tm 时间结构</span></span><br><span class="line"><span class="comment">* asctime() // 转为标准ASCII时间格式：</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">write_time</span><span class="params">(<span class="type">int</span> num)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">time_t</span> rawtime;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tm</span> * <span class="title">timeinfo</span>;</span></span><br><span class="line">    <span class="comment">// 获取时间</span></span><br><span class="line">    time(&amp;rawtime);</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> 0</span></span><br><span class="line">    <span class="comment">// 转为本地时间</span></span><br><span class="line">    timeinfo = localtime(&amp;rawtime);</span><br><span class="line">    <span class="comment">// 转为标准ASCII时间格式</span></span><br><span class="line">    <span class="type">char</span> *cur = asctime(timeinfo);</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    <span class="type">char</span>* cur = ctime(&amp;rawtime);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将得到的时间写入文件中</span></span><br><span class="line">    <span class="type">int</span> fd = open(<span class="string">&quot;/home/edu/timelog.txt&quot;</span>, O_RDWR | O_CREAT | O_APPEND, <span class="number">0664</span>);</span><br><span class="line">    <span class="keyword">if</span> (fd == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;open error&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 写文件</span></span><br><span class="line">    <span class="type">int</span> ret = write(fd, cur, <span class="built_in">strlen</span>(cur) + <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">if</span> (ret == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;write error&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 关闭文件</span></span><br><span class="line">    close(fd);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span>* argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pid_t</span> pid = fork();</span><br><span class="line">    <span class="keyword">if</span> (pid == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;fork error&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (pid &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 父进程退出</span></span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (pid == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 子进程</span></span><br><span class="line">        <span class="comment">// 提升为会长，同时也是新进程组的组长</span></span><br><span class="line">        setsid();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 更改进程的执行目录</span></span><br><span class="line">        chdir(<span class="string">&quot;/home/edu&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 更改掩码</span></span><br><span class="line">        umask(<span class="number">0022</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 关闭文件描述符</span></span><br><span class="line">        close(STDIN_FILENO);</span><br><span class="line">        close(STDOUT_FILENO);</span><br><span class="line">        close(STDERR_FILENO);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 注册信号捕捉函数</span></span><br><span class="line">        <span class="comment">//先注册，再定时</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">sigaction</span> <span class="title">sigact</span>;</span></span><br><span class="line">        sigact.sa_flags = <span class="number">0</span>;</span><br><span class="line">        sigemptyset(&amp;sigact.sa_mask);</span><br><span class="line">        sigact.sa_handler = write_time;</span><br><span class="line">        sigaction(SIGALRM, &amp;sigact, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置定时器</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">itimerval</span> <span class="title">act</span>;</span></span><br><span class="line">        <span class="comment">// 定时周期</span></span><br><span class="line">        act.it_interval.tv_sec = <span class="number">2</span>;</span><br><span class="line">        act.it_interval.tv_usec = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 设置第一次触发定时器时间</span></span><br><span class="line">        act.it_value.tv_sec = <span class="number">2</span>;</span><br><span class="line">        act.it_value.tv_usec = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 开始计时</span></span><br><span class="line">        setitimer(ITIMER_REAL, &amp;act, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 防止子进程退出</span></span><br><span class="line">        <span class="keyword">while</span> (<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/11/06/202311061436/">https://mingxuanwu.com/2023/11/06/202311061436/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/linux/"># linux</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/11/06/202311061859/">kicad 开源项目的编译</a>
+            
+            
+            <a class="next" rel="next" href="/2023/10/28/202310281942/">Linux 进程、进程间通信和信号</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

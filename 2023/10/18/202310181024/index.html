@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【数据结构】7.平衡搜索树（AVL树和红黑树） | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【数据结构】7.平衡搜索树（AVL树和红黑树）</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 18, 2023&nbsp;&nbsp;10:24:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="0-概述"><a href="#0-概述" class="headerlink" title="0. 概述"></a>0. 概述</h1><p>　　对于普通的搜索树，如果一直插入比第一个元素小的元素，它会退化成一个无限向左下角眼神的单链表，使得时间复杂度退化为O(n)。如果我们在插入时保持树的结构是平衡的，则可以保证查找、插入和删除的时间复杂度有对数级的时间性能，下面讲到的AVL树和红黑树都是平衡搜索树，通过旋转来保持平衡</p>
+<div align=center> <img src="/images/数据结构/平衡搜索树（AVL树和红黑树）/3219843-20231016093818768-1733932194.png" width="90%"></img></div>
+
+<h1 id="1-AVL树"><a href="#1-AVL树" class="headerlink" title="1. AVL树"></a>1. AVL树</h1><h2 id="1-1-定义"><a href="#1-1-定义" class="headerlink" title="1.1 定义"></a>1.1 定义</h2><p>　　Adelson-Velskii 和 Landis 在 1962年提出的一种平衡树，保证搜索树的高度是O(logn)，这样就可以保证查找、插入和删除的时间为O(logn)</p>
+<h2 id="1-2-AVL树的描述"><a href="#1-2-AVL树的描述" class="headerlink" title="1.2 AVL树的描述"></a>1.2 AVL树的描述</h2><p>　　AVL 树一般用链表描述，为了简化插入和删除操作，为每个节点增加一个<strong>平衡因子 bf</strong> ，平衡因子 bf(x) 的定义为：x 的左子树的高度 - x 的右子树的高度</p>
+<p>　　从 AVL 树的定义可以知道，平衡因子 bf 的取值为 -1、0 和 1</p>
+<div align=center> <img src="/images/数据结构/平衡搜索树（AVL树和红黑树）/3219843-20231016095311937-271936505.png" width="60%"></img></div>
+
+<h2 id="1-3-AVL树的搜索"><a href="#1-3-AVL树的搜索" class="headerlink" title="1.3 AVL树的搜索"></a>1.3 AVL树的搜索</h2><p>　　与普通的搜索树相同，根据 theKey 不断向左孩子或右孩子移动寻找即可，时间复杂度为O(logn)</p>
+<h2 id="1-4-AVL树的插入"><a href="#1-4-AVL树的插入" class="headerlink" title="1.4 AVL树的插入"></a>1.4 AVL树的插入</h2><p>　　首先是区分4种旋转情况的代码，具体在1.4.1-1.4.4部分</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">K</span>, <span class="keyword">class</span> <span class="title class_">V</span>&gt;</span><br><span class="line"><span class="type">bool</span> avlTree&lt;K, V&gt;::<span class="built_in">insert</span>(K key, V val)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 1.根节点为空，直接插入</span></span><br><span class="line">    <span class="keyword">if</span> (_root == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        _root = <span class="keyword">new</span> <span class="built_in">Node</span>&lt;K, V&gt;(key, val);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 2.根节点不为空</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        Node&lt;K, V&gt;* cur = _root;</span><br><span class="line">        Node&lt;K, V&gt;* parent = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 2.1)找到要插入节点的位置</span></span><br><span class="line">        <span class="keyword">while</span> (cur!=<span class="literal">NULL</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            parent = cur;</span><br><span class="line">            <span class="keyword">if</span> (cur-&gt;_key &gt; key)</span><br><span class="line">                cur = cur-&gt;_left;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (cur-&gt;_key &lt; key)</span><br><span class="line">                cur = cur-&gt;_right;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;   <span class="comment">//不允许出现重复元素的节点</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 2.2)插入新节点</span></span><br><span class="line">        cur = <span class="keyword">new</span>  <span class="built_in">Node</span>&lt;K, V&gt;(key, val);</span><br><span class="line">        <span class="keyword">if</span> (parent-&gt;_key &gt; key)</span><br><span class="line">        &#123;</span><br><span class="line">            parent-&gt;_left = cur;</span><br><span class="line">            cur-&gt;_parent = parent;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            parent-&gt;_right = cur;</span><br><span class="line">            cur-&gt;_parent = parent;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 2.3)插入完成后，调整平衡因子</span></span><br><span class="line">        <span class="keyword">while</span> (parent!=<span class="literal">NULL</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (cur == parent-&gt;_left)<span class="comment">//插入节点在左子树父节点bf++，反之--</span></span><br><span class="line">                parent-&gt;_bf++;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                parent-&gt;_bf--;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 2.3.1)插入新节点后，双亲结点高度为0, 说明这个父节点原先已有一个孩子, 这次插入到另一个孩子的位置了, 树整体的高度无变化, 结束</span></span><br><span class="line">            <span class="keyword">if</span> (parent-&gt;_bf == <span class="number">0</span>)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="comment">// 2.3.2)插入节点后双亲节点高度为-1或1, 说明子树高度改变，则继续向上调整</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (parent-&gt;_bf == <span class="number">-1</span> || parent-&gt;_bf == <span class="number">1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                cur = parent;</span><br><span class="line">                parent = parent-&gt;_parent;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 2.3.3)插入节点后parent-&gt;_bf==-2||parent-&gt;_bf==2；说明已经不平衡，需要旋转</span></span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (parent-&gt;_bf == <span class="number">2</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span> (cur-&gt;_bf == <span class="number">1</span>)</span><br><span class="line">                        <span class="built_in">rotateLL</span>(parent);    <span class="comment">// parent(2), child(1)</span></span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                        <span class="built_in">rotateLR</span>(parent);    <span class="comment">// parent(2), child(-1)</span></span><br><span class="line">                    </span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span> (cur-&gt;_bf == <span class="number">-1</span>)</span><br><span class="line">                        <span class="built_in">rotateRR</span>(parent);    <span class="comment">// parent(-2), child(-1)</span></span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                        <span class="built_in">rotateRL</span>(parent);    <span class="comment">// parent(-2), child(1)</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4-1-LL型不平衡（单旋转）"><a href="#1-4-1-LL型不平衡（单旋转）" class="headerlink" title="1.4.1 LL型不平衡（单旋转）"></a>1.4.1 LL型不平衡（单旋转）</h3><p>　　插入前左子树高度比右子树高度高 1，然后在左子树的左侧插入一个新的元素，只需要一次 <strong>右单旋</strong> 就可以转为平衡搜索树。具体操作如下，根节点A的左孩子B转换为新的根节点，B的右孩子转换为A的左孩子</p>
+<div align=center> <img src="/images/数据结构/平衡搜索树（AVL树和红黑树）/3219843-20231016113043447-1946094558.png" width="80%"></img></div>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">K</span>, <span class="keyword">class</span> <span class="title class_">V</span>&gt;</span><br><span class="line"><span class="type">void</span> avlTree&lt;K, V&gt;::<span class="built_in">rotateLL</span>(Node&lt;K, V&gt;* parent)</span><br><span class="line">&#123;</span><br><span class="line">    Node&lt;K, V&gt;* subL = parent-&gt;_left;</span><br><span class="line">    Node&lt;K, V&gt;* subLR = subL-&gt;_right;</span><br><span class="line">    Node&lt;K, V&gt;* ppNode = parent-&gt;_parent;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 一共两步, 重新连接节点即可</span></span><br><span class="line">    parent-&gt;_left = subLR;      <span class="comment">// 1.当前 parent 节点的左孩子 改成 其左孩子的右孩子</span></span><br><span class="line">    <span class="keyword">if</span> (subLR != <span class="literal">NULL</span>)</span><br><span class="line">        subLR-&gt;_parent = parent;</span><br><span class="line"></span><br><span class="line">    subL-&gt;_right = parent;      <span class="comment">// 2.把当前 parent 节点改成 subL 的右孩子</span></span><br><span class="line">    parent-&gt;_parent = subL;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (_root == parent)        <span class="comment">// 判断不平衡的点是不是根节点</span></span><br><span class="line">    &#123;</span><br><span class="line">        _root = subL;</span><br><span class="line">        subL-&gt;_parent = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (ppNode-&gt;_right == parent)</span><br><span class="line">        &#123;</span><br><span class="line">            ppNode-&gt;_right = subL;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            ppNode-&gt;_left = subL;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        subL-&gt;_parent = ppNode;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    subL-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">    parent-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4-2-RR型不平衡（单旋转）"><a href="#1-4-2-RR型不平衡（单旋转）" class="headerlink" title="1.4.2 RR型不平衡（单旋转）"></a>1.4.2 RR型不平衡（单旋转）</h3><p>　　插入前右子树高度比左子树高度高 1，然后在右子树的右侧插入一个新的元素，只需要一次 <strong>左单旋</strong> 就可以转为平衡搜索树。具体操作如下，根节点A的右孩子B转换为新的根节点，B的左孩子转换为A的右孩子</p>
+<div align=center><img src="/images/数据结构/平衡搜索树（AVL树和红黑树）/3219843-20231016113058484-1408959016.png" width="80%"></img></div>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">K</span>, <span class="keyword">class</span> <span class="title class_">V</span>&gt;</span><br><span class="line"><span class="type">void</span> avlTree&lt;K, V&gt;::<span class="built_in">rotateRR</span>(Node&lt;K, V&gt;* parent)</span><br><span class="line">&#123;</span><br><span class="line">    Node&lt;K, V&gt;* subR = parent-&gt;_right;</span><br><span class="line">    Node&lt;K, V&gt;* subRL = subR-&gt;_left;</span><br><span class="line">    Node&lt;K, V&gt;* pParent = parent-&gt;_parent;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 一共两步, 重新连接节点即可</span></span><br><span class="line">    parent-&gt;_right = subRL;      <span class="comment">// 1.当前 parent 节点的右孩子 改成 其右孩子的左孩子</span></span><br><span class="line">    <span class="keyword">if</span> (subRL != <span class="literal">NULL</span>)</span><br><span class="line">        subRL-&gt;_parent = parent;</span><br><span class="line"></span><br><span class="line">    subR-&gt;_left = parent;       <span class="comment">// 2.把当前 parent 节点改成 subR 的左孩子</span></span><br><span class="line">    parent-&gt;_parent = subR;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (parent == _root)        <span class="comment">// 判断不平衡的点是不是根节点</span></span><br><span class="line">    &#123;</span><br><span class="line">        _root = subR;</span><br><span class="line">        _root-&gt;_parent = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (pParent-&gt;_left = parent)</span><br><span class="line">            pParent-&gt;_left = subR;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            pParent-&gt;_right = subR;</span><br><span class="line"></span><br><span class="line">        subR-&gt;_parent = pParent;</span><br><span class="line">    &#125;</span><br><span class="line">    parent-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">    subR-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4-3-LR型不平衡（双旋转）"><a href="#1-4-3-LR型不平衡（双旋转）" class="headerlink" title="1.4.3 LR型不平衡（双旋转）"></a>1.4.3 LR型不平衡（双旋转）</h3><p>　　左子树高度更高的情况下，在左子树的右侧插入一个节点。首先进行一次 <strong>左单旋</strong> ，将它转换为LL型不平衡，然后进行一次 <strong>右单旋</strong> 转换为平衡搜索树</p>
+<div align=center> <img src="/images/数据结构/平衡搜索树（AVL树和红黑树）/3219843-20231016172803837-1932831669.png" width="90%"></img></div>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">K</span>, <span class="keyword">class</span> <span class="title class_">V</span>&gt;</span><br><span class="line"><span class="type">void</span> avlTree&lt;K, V&gt;::<span class="built_in">rotateLR</span>(Node&lt;K, V&gt;* parent)</span><br><span class="line">&#123;</span><br><span class="line">    Node&lt;K, V&gt;* subL = parent-&gt;_left;</span><br><span class="line">    Node&lt;K, V&gt;* subLR = subL-&gt;_right;</span><br><span class="line">    <span class="type">int</span> bf = subLR-&gt;_bf;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">rotateRR</span>(parent-&gt;_left);</span><br><span class="line">    <span class="built_in">rotateLL</span>(parent);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (bf == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        parent-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">        subL-&gt;_bf = <span class="number">-1</span>;</span><br><span class="line">        subLR-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (bf == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        parent-&gt;_bf = <span class="number">1</span>;</span><br><span class="line">        subL-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">        subLR-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4-4-RL型不平衡（双旋转）"><a href="#1-4-4-RL型不平衡（双旋转）" class="headerlink" title="1.4.4 RL型不平衡（双旋转）"></a>1.4.4 RL型不平衡（双旋转）</h3><p> 　　与LR型不平衡类似，这里直接给出代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">K</span>, <span class="keyword">class</span> <span class="title class_">V</span>&gt;</span><br><span class="line"><span class="type">void</span> avlTree&lt;K, V&gt;::<span class="built_in">rotateRL</span>(Node&lt;K, V&gt;* parent)</span><br><span class="line">&#123;</span><br><span class="line">    Node&lt;K, V&gt;* subR = parent-&gt;_right;</span><br><span class="line">    Node&lt;K, V&gt;* subRL = subR-&gt;_left;</span><br><span class="line">    <span class="type">int</span> bf = subRL-&gt;_bf;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">rotateLL</span>(parent-&gt;_right);</span><br><span class="line">    <span class="built_in">rotateRR</span>(parent);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (bf == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        subR-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">        parent-&gt;_bf = <span class="number">-1</span>;</span><br><span class="line">        subRL-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (bf == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        parent-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">        subR-&gt;_bf = <span class="number">1</span>;</span><br><span class="line">        subRL-&gt;_bf = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-红黑树（red-black-tree）"><a href="#2-红黑树（red-black-tree）" class="headerlink" title="2. 红黑树（red-black tree）"></a>2. 红黑树（red-black tree）</h1><h2 id="2-1-基本概念"><a href="#2-1-基本概念" class="headerlink" title="2.1 基本概念"></a>2.1 基本概念</h2><p>　　红黑树是一棵扩充二叉树，每个空指针用一个外部节点来代替，除此之外还有以下性质</p>
+<ul>
+<li>根节点和外部节点颜色都是黑色</li>
+<li>在根节点到外部节点的路径上，没有连续两个节点是红色</li>
+<li>在所有根节点到外部节点的路径上，黑色节点的数目都相同</li>
+</ul>
+<p>　　红黑树一个节点的阶（rank）：从该节点到一外部节点的路径上黑色节点的数量</p>
+<p>　　红黑树最大的高度是2log2(n+1)</p>
+<h2 id="2-2-RBT的搜索"><a href="#2-2-RBT的搜索" class="headerlink" title="2.2 RBT的搜索"></a>2.2 RBT的搜索</h2><p>　　与普通的搜索树相同，根据 theKey 不断向左孩子或右孩子移动寻找即可，时间复杂度为O(logn)</p>
+<h2 id="2-3-RBT的插入"><a href="#2-3-RBT的插入" class="headerlink" title="2.3 RBT的插入"></a>2.3 RBT的插入</h2><p>　　我们的插入目标实际上是，和普通搜索树一样插入一个元素，然后再让它额外满足红黑树的性质。变色处理仅仅在父节点为红色是才会触发，本质上是在满足没有两个相同节点是红色，接下来回溯处理是为了满足黑色节点。</p>
+<h3 id="2-3-1-情况一：变色处理"><a href="#2-3-1-情况一：变色处理" class="headerlink" title="2.3.1 情况一：变色处理"></a>2.3.1 情况一：变色处理</h3><p>　　这种情况是最简单的情况，如果插入节点的父节点和叔叔节点（父亲的对称孩子）是红色，则只需要进行变色处理</p>
+<ul>
+<li>父亲节点和叔叔节点变为黑色</li>
+<li>曾祖父节点变为红色</li>
+</ul>
+<p>　　循环处理直到根节点为止，最后将根节点变为黑色结束</p>
+<div align=center> <img src="/images/数据结构/平衡搜索树（AVL树和红黑树）/3219843-20231017172001762-391897544.png" width="80%"></img></div>
+
+<h3 id="2-3-2-情况二：单旋加变色处理"><a href="#2-3-2-情况二：单旋加变色处理" class="headerlink" title="2.3.2 情况二：单旋加变色处理"></a>2.3.2 情况二：单旋加变色处理</h3><p> 　　如果新插入节点的父节点红色，叔叔不存在或为黑色，并且新插入节点在外侧（外侧单璇）</p>
+<ul>
+<li>进行一次单旋转</li>
+<li>把父亲节点更改为黑色，曾祖父节点更改为红色（最后这个三角形是黑色连两个红色）</li>
+</ul>
+<div align=center> <img src="/images/数据结构/平衡搜索树（AVL树和红黑树）/3219843-20231017174935799-465145262.png" width="80%"></img></div>
+
+<h3 id="2-3-3-情况三：双旋加变色处理"><a href="#2-3-3-情况三：双旋加变色处理" class="headerlink" title="2.3.3 情况三：双旋加变色处理"></a>2.3.3 情况三：双旋加变色处理</h3><p> 　　如果新插入节点父节点为红色，叔叔节点不存在或为黑色，并且新插入节点在内侧（内侧双璇）</p>
+<ul>
+<li>对父亲节点进行一次单旋转</li>
+<li>对曾祖父节点进行一次单旋转</li>
+<li>将新插入节点修改为黑色，曾祖父节点修改为红色（最后这个三角形是黑色连两个红色）</li>
+</ul>
+<div align=center> <img src="/images/数据结构/平衡搜索树（AVL树和红黑树）/3219843-20231017201159760-1671481843.png" width="80%"></img></div>
+
+<p>​		下面是一个例子，首先插入新的红色元素26。因为该元素与父节点都为红色，违反了不能有两个红色的规则，并且它的<strong>叔叔节点为红色</strong>，符合<strong>情况一</strong>，进行调整：将他的父节点与叔叔节点修改为黑色，曾祖父节点修改为红色；此时元素28和元素30都为红色，违反了不能有两个红色的规则，并且它的<strong>叔叔节点为黑色</strong>，且该节点在内侧，符合<strong>情况三</strong>，需要进行两次单旋调整。</p>
+<div align=center> <img src="/images/数据结构/平衡搜索树（AVL树和红黑树）/e008f26ed79cc088820fcb68715ffbf.jpg" width="75%"></img></div>
+
+<h3 id="2-3-4-RBT插入的实现"><a href="#2-3-4-RBT插入的实现" class="headerlink" title="2.3.4 RBT插入的实现"></a>2.3.4 RBT插入的实现</h3><h4 id="2-3-4-1-对外暴露的插入函数"><a href="#2-3-4-1-对外暴露的插入函数" class="headerlink" title="2.3.4.1 对外暴露的插入函数"></a><strong>2.3.4.1 对外暴露的插入函数</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">K</span>, <span class="keyword">class</span> <span class="title class_">V</span>&gt;</span><br><span class="line"><span class="type">bool</span> RBTree&lt;K, V&gt;::<span class="built_in">insert</span>(K key, V val)</span><br><span class="line">&#123;</span><br><span class="line">    RBTNode&lt;K, V&gt;* z = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((z = <span class="keyword">new</span> <span class="built_in">RBTNode</span>&lt;K, V&gt;(key, val, RED, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>)) == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">insert</span>(<span class="keyword">this</span>-&gt;_root, z);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-4-2-按照普通的搜索树进行插入操作"><a href="#2-3-4-2-按照普通的搜索树进行插入操作" class="headerlink" title="2.3.4.2 按照普通的搜索树进行插入操作"></a><strong>2.3.4.2 按照普通的搜索树进行插入操作</strong></h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">K</span>, <span class="keyword">class</span> <span class="title class_">V</span>&gt;</span><br><span class="line"><span class="type">bool</span> RBTree&lt;K, V&gt;::<span class="built_in">insert</span>(RBTNode&lt;K, V&gt;*&amp; root, RBTNode&lt;K, V&gt;* node)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 1.根节点为空，直接插入</span></span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        node-&gt;_color = BLACK;</span><br><span class="line">        root = node;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 2.根节点不为空</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        RBTNode&lt;K, V&gt;* cur = root;</span><br><span class="line">        RBTNode&lt;K, V&gt;* parent = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 2.1)找到要插入节点的位置</span></span><br><span class="line">        <span class="keyword">while</span> (cur != <span class="literal">NULL</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            parent = cur;</span><br><span class="line">            <span class="keyword">if</span> (node-&gt;_key &lt; cur-&gt;_key)</span><br><span class="line">                cur = cur-&gt;_left;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (node-&gt;_key &gt; cur-&gt;_key)</span><br><span class="line">                cur = cur-&gt;_right;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;   <span class="comment">//不允许出现重复元素的节点</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 2.2)插入新节点</span></span><br><span class="line">        <span class="keyword">if</span> (parent-&gt;_key &gt; node-&gt;_key)</span><br><span class="line">        &#123;</span><br><span class="line">            parent-&gt;_left = node;</span><br><span class="line">            node-&gt;_parent = parent;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            parent-&gt;_right = node;</span><br><span class="line">            node-&gt;_parent = parent;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">insertFixUp</span>(root, node);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-4-3-插入完成后的颜色修正"><a href="#2-3-4-3-插入完成后的颜色修正" class="headerlink" title="2.3.4.3 插入完成后的颜色修正"></a>2.3.4.3 插入完成后的颜色修正</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">K</span>, <span class="keyword">class</span> <span class="title class_">V</span>&gt;</span><br><span class="line"><span class="type">bool</span> RBTree&lt;K, V&gt;::<span class="built_in">insertFixUp</span>(RBTNode&lt;K, V&gt;*&amp; root, RBTNode&lt;K, V&gt;* node)</span><br><span class="line">&#123;</span><br><span class="line">    RBTNode&lt;K, V&gt;* parent, * grandparent, * cur;</span><br><span class="line">    cur = node;</span><br><span class="line">    parent = cur-&gt;_parent;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 若“父节点存在，并且父节点的颜色是红色”</span></span><br><span class="line">    <span class="keyword">while</span> (parent &amp;&amp; <span class="built_in">rb_is_red</span>(parent))</span><br><span class="line">    &#123;</span><br><span class="line">        grandparent = parent-&gt;_parent;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//若“父节点”是“祖父节点的左孩子”</span></span><br><span class="line">        <span class="keyword">if</span> (parent == grandparent-&gt;_left)</span><br><span class="line">        &#123;</span><br><span class="line">            RBTNode&lt;K, V&gt;* uncle = grandparent-&gt;_right;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (uncle &amp;&amp; <span class="built_in">rb_is_red</span>(uncle))</span><br><span class="line">            &#123;<span class="comment">// 情况1：叔叔节点是红色, 修改后继续检查</span></span><br><span class="line">                <span class="built_in">rb_set_black</span>(uncle);</span><br><span class="line">                <span class="built_in">rb_set_black</span>(parent);</span><br><span class="line">                <span class="built_in">rb_set_red</span>(grandparent);</span><br><span class="line">                cur = grandparent;</span><br><span class="line">                parent = cur-&gt;_parent;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;<span class="comment">// 情况2: 叔叔节点不存在或者是黑色, 修改后结束循环</span></span><br><span class="line">                <span class="keyword">if</span> (parent-&gt;_left == cur)</span><br><span class="line">                &#123;<span class="comment">// 情况2.1：叔叔是黑色，且当前节点是左孩子 (单旋+变色)</span></span><br><span class="line">                    <span class="built_in">rightRotate</span>(grandparent);</span><br><span class="line">                    <span class="built_in">rb_set_black</span>(parent);</span><br><span class="line">                    <span class="built_in">rb_set_red</span>(grandparent); </span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;<span class="comment">// 情况2.2：叔叔是黑色，且当前节点是右孩子</span></span><br><span class="line">                    <span class="built_in">leftRotate</span>(parent);</span><br><span class="line">                    <span class="built_in">rightRotate</span>(grandparent);</span><br><span class="line">                    <span class="built_in">rb_set_black</span>(cur);</span><br><span class="line">                    <span class="built_in">rb_set_red</span>(grandparent);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span><span class="comment">//若“父节点”是“祖父节点的右孩子”</span></span><br><span class="line">        &#123;</span><br><span class="line">            RBTNode&lt;K, V&gt;* uncle = grandparent-&gt;_left;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (uncle &amp;&amp; <span class="built_in">rb_is_red</span>(uncle))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">rb_set_black</span>(uncle);</span><br><span class="line">                <span class="built_in">rb_set_black</span>(parent);</span><br><span class="line">                <span class="built_in">rb_set_red</span>(grandparent);</span><br><span class="line">                cur = grandparent;</span><br><span class="line">                parent = cur-&gt;_parent;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (parent-&gt;_right == cur)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="built_in">leftRotate</span>(grandparent);</span><br><span class="line">                    <span class="built_in">rb_set_black</span>(parent);</span><br><span class="line">                    <span class="built_in">rb_set_red</span>(grandparent);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="built_in">rightRotate</span>(parent);</span><br><span class="line">                    <span class="built_in">leftRotate</span>(grandparent);</span><br><span class="line">                    <span class="built_in">rb_set_black</span>(cur);</span><br><span class="line">                    <span class="built_in">rb_set_red</span>(grandparent);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 将根节点设为黑色</span></span><br><span class="line">    <span class="built_in">rb_set_black</span>(root);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/10/18/202310181024/">https://mingxuanwu.com/2023/10/18/202310181024/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"># 数据结构</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/10/23/202310231728/">Ubuntu Hexo Github.io 自建博客站</a>
+            
+            
+            <a class="next" rel="next" href="/2023/10/13/202310132010/">【数据结构】6.搜索树</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

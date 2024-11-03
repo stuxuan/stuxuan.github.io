@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>Linux下gcc编译，动态库和静态库，makefile，gdb调试 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Linux下gcc编译，动态库和静态库，makefile，gdb调试</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 24, 2023&nbsp;&nbsp;20:37:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-编译过程"><a href="#1-编译过程" class="headerlink" title="1.编译过程"></a>1.编译过程</h1><h2 id="1-1-预处理-Pre-Processing"><a href="#1-1-预处理-Pre-Processing" class="headerlink" title="1.1 预处理(Pre-Processing)"></a>1.1 预处理(Pre-Processing)</h2><p>　　展开头文件， 宏替换（变量宏、函数宏）、替换空格等</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -E hello.c  -o hello.i     // -E 预处理选项, -o 重命名</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Linux/LinuxGccMakefileGdb/3219843-20231024162751081-1963619126.png" alt="img"></p>
+<h2 id="1-2-编译-Compilation"><a href="#1-2-编译-Compilation" class="headerlink" title="1.2 编译(Compilation)"></a>1.2 编译(Compilation)</h2><p>　　逐行检查程序中出现的语法错误，简单的逻辑错误</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -S hello.i -o hello.s</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Linux/LinuxGccMakefileGdb/3219843-20231024162833550-951815448.png" alt="img"></p>
+<h2 id="1-3-汇编-Assemble"><a href="#1-3-汇编-Assemble" class="headerlink" title="1.3 汇编(Assemble)"></a>1.3 汇编(Assemble)</h2><p>　　将 .s 汇编文件中所有的汇编指令翻译成二进制机器码（下面就是来了个截图，二进制显示了乱码）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -c hello.s -o hello.o</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Linux/LinuxGccMakefileGdb/3219843-20231024162959191-1771458722.png" alt="img"></p>
+<h2 id="1-4-链接-Linking"><a href="#1-4-链接-Linking" class="headerlink" title="1.4 链接(Linking)"></a>1.4 链接(Linking)</h2><p>　　将 .o 的目标文件，链接库文件、数据段合并，地址回填（把汇编里相对地址替换成程序运行后真正可以运行的地址）。生成可执行文件 hello</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc hello.o -o hello</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-5-gcc常用参数"><a href="#1-5-gcc常用参数" class="headerlink" title="1.5 gcc常用参数"></a>1.5 gcc常用参数</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">-E // 展开头文件</span><br><span class="line">-s // 生成汇编文件</span><br><span class="line">-c // 编译生成2进制文件</span><br><span class="line">-I // 指定头文件路径 大i</span><br><span class="line">-L // 指定库文件路径</span><br><span class="line">-l // 指定库名 小L</span><br><span class="line">-g // 包含调试信息 </span><br><span class="line">-On // n取 0-3, n 越大优化级别越高</span><br><span class="line">-Wall //warning all 显示所有警告</span><br><span class="line">-D // 编译时动态注入一个宏, 编译的时候控制#define的具体数值</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-动态库和静态库"><a href="#2-动态库和静态库" class="headerlink" title="2.动态库和静态库"></a>2.动态库和静态库</h1><h2 id="2-1-函数库"><a href="#2-1-函数库" class="headerlink" title="2.1 函数库"></a>2.1 函数库</h2><p>　　本质：把具有相同功能的一组函数放到同一份文件中（源码或二进制的形式）</p>
+<h2 id="2-2-静态库"><a href="#2-2-静态库" class="headerlink" title="2.2 静态库"></a>2.2 静态库</h2><p>　　对执行速度有要求</p>
+<ul>
+<li>机制：把引入的库文件通过编译直接复制到 .out 文件中</li>
+<li>优点：将函数库中的函数本地化，寻址方便，速度快（函数库执行效率 &#x3D; 自定义函数的执行效率）</li>
+<li>缺点：每个程序都需要复制一份，会浪费内存</li>
+</ul>
+<p>　　制作静态库： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gcc -c add.c sub.c mul.c    // 制作 .o 文件</span><br><span class="line">ar rs libmymath.a add.o sub.o mul.o    // 制作静态库</span><br><span class="line">gcc hello.c -L ./ -lmymath -o app    // 指定头文件路径, 指定库名, 设置文件输出名app</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-动态库"><a href="#2-3-动态库" class="headerlink" title="2.3 动态库"></a>2.3 动态库</h2><p>　　对执行速度不敏感，对系统资源敏感；更新比较频繁（可以避免完全重新编译）</p>
+<ul>
+<li>机制：代码共享</li>
+<li>优点：节省内存（共享）、易于更新（动态链接）</li>
+<li>缺点：相较于静态库函数调用速度慢，函数地址是延时绑定机制</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gcc -c -fPIC add.c sub.c mul.c    // -fPIC生成与位置无关的目标文件</span><br><span class="line">gcc -shared -o libmymath.so sub.o mul.o add.o    // 生成一个动态库</span><br><span class="line">gcc hello.c -o app -L ./lib -l mymath -I ./inc    // 生成文件</span><br></pre></td></tr></table></figure>
+
+<p>　<strong>启动 .&#x2F;app 报错</strong>，错误原因：”动态链接器“ ld-linux-x86-64.so.2 搜索动态库的路径没有指定</p>
+<p>　　链接器：工作于 gcc 编译过程中的链接阶段。工作结束后生成可执行文件</p>
+<p>　　动态链接器：工作于可执行程序运行之后，辅助加载器负责将动态库加载到内存</p>
+<p>　<strong>解决办法</strong>：</p>
+<p>　　环境变量法：export LD_LIBRARY_PATH&#x3D;.&#x2F;lib 将当前动态库所在的目录加入到环境变量，终端退出后环境变量就会失效</p>
+<p>　　配置文件法：vi .bashrc 加入一行 export LD_LIBRARY_PATH&#x3D;$LD_LIBRARY_PATH:.&#x2F;lib，重启终端，每次启动终端自动生效</p>
+<p>　　拷贝法：把自己的动态库直接拷贝到 &#x2F;lib 或 &#x2F;usr&#x2F;lib 中</p>
+<p>　　缓存文件法（推荐）：修改配置文件，修改缓存文件，生成动态链接器需要搜索的新目录位置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/ld.so.conf    // 修改动态链接库的路径</span><br><span class="line">// 将绝对路径增加到文件中</span><br><span class="line">sudo ldconfig -v    // 更新 ld.so.cache 该文件影响动态链接库搜索的位置</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-makefile"><a href="#3-makefile" class="headerlink" title="3.makefile"></a>3.makefile</h1><h2 id="3-1-语法"><a href="#3-1-语法" class="headerlink" title="3.1 语法"></a>3.1 语法</h2><p>　目标：依赖条件</p>
+<p>　tab缩进，指令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">hello:hello.o add.o sub.o mul.o</span><br><span class="line">    gcc hello.o add.o sub.o mul.o -o hello</span><br><span class="line">hello.o:hello.c</span><br><span class="line">    gcc -c hello.c -o hello.o</span><br><span class="line">sub.o:sub.c</span><br><span class="line">    gcc -c sub.c -o sub.o</span><br><span class="line">add.o:add.c</span><br><span class="line">    gcc -c add.c -o add.o</span><br><span class="line">mul.o:mul.c</span><br><span class="line">    gcc -c mul.c -o mul.o</span><br></pre></td></tr></table></figure>
+
+<p>　<strong>模式规则</strong>：在makefile中，具有有严格统一的规则，使用模式规则代替，模式规则中只能使用 $&lt; 符号</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">%.o:%.c</span><br><span class="line">    gcc -c $&lt; -o $@</span><br></pre></td></tr></table></figure>
+
+<p>　<strong>静态模式规则：</strong>将模式规则指定给某一个变量使用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$(obj):%.o:%.c</span><br><span class="line">    gcc -c $&lt; -o $@</span><br></pre></td></tr></table></figure>
+
+<p>　<strong>伪目标：</strong>针对残缺的规则，使之生成目标（比如有一个clean.o文件已经是最新的，就不会执行clean清除命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.PHONY:clean ALL</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-2-函数介绍"><a href="#3-2-函数介绍" class="headerlink" title="3.2 函数介绍"></a>3.2 函数介绍</h2><h3 id="3-2-1-wildcard-函数"><a href="#3-2-1-wildcard-函数" class="headerlink" title="3.2.1 wildcard 函数"></a>3.2.1 wildcard 函数</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 匹配当前工作目录下的所有 .c 文件，将文件名组成列表，赋值给 src 变量</span><br><span class="line">// src = add.c sub.c mul.c hello.o</span><br><span class="line">src = $(wildcard ./*.c)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-2-patsubst-函数"><a href="#3-2-2-patsubst-函数" class="headerlink" title="3.2.2 patsubst 函数"></a>3.2.2 patsubst 函数</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 用来替换参数, 将 参数3 中包含 参数1 的部分替换为 参数2</span><br><span class="line">// obj = add.o sub.o mul.o hello.o</span><br><span class="line">obj = $(patsubst %.c, %.o, $(src))</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-3-普通变量和自动变量"><a href="#3-3-普通变量和自动变量" class="headerlink" title="3.3 普通变量和自动变量"></a>3.3 普通变量和自动变量</h2><p>　<strong>普通变量</strong></p>
+<ul>
+<li>定义变量语法：变量名 &#x3D; 变量值     （foo &#x3D; abc)</li>
+<li>取变量值语法：$(变量)           (bar &#x3D; $abc —&gt; bar &#x3D; abc)</li>
+</ul>
+<p>　<strong>自动变量</strong></p>
+<ul>
+<li>$@: 在规则的命令中，表示规则中的目标</li>
+<li>$^ : 在规则的命令中，表示所有依赖条件</li>
+<li>$&lt; : 在规则的命令中，表示第一个依赖条件。如果该变量应用在”模式规则“中，它可以将依赖条件列表中的每一个依赖，依次取出，套用模式规则</li>
+</ul>
+<h2 id="3-4-关键字"><a href="#3-4-关键字" class="headerlink" title="3.4 关键字"></a>3.4 关键字</h2><p>　　ALL: 默认情况下第一组生成文件的目标就是终极目标，或者显示的写ALL:hello表示终极目标，完成后结束makefile</p>
+<p>　　clean: 借助makefile清除项目中的指定文件，例如(clean: -rm -rf $(obj) hello</p>
+<p>　　指令 make -n 模拟执行命令，不真正执行，可以先看一次避免出问题</p>
+<h2 id="3-5-修改后的-makefile"><a href="#3-5-修改后的-makefile" class="headerlink" title="3.5 修改后的 makefile"></a>3.5 修改后的 makefile</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">src = $(wildcard *.c)</span><br><span class="line">obj = $(patsubst %.c, %.o, $(src))</span><br><span class="line"></span><br><span class="line">CC = gcc</span><br><span class="line">target = app</span><br><span class="line"></span><br><span class="line">ALL:$(target)</span><br><span class="line"></span><br><span class="line">$(target):$(obj)</span><br><span class="line">    $(CC) $^ -o $@</span><br><span class="line"></span><br><span class="line">$(obj):%.o %.c</span><br><span class="line">    $(CC) -c $&lt; -o $@</span><br><span class="line"></span><br><span class="line">clean:</span><br><span class="line">    -rm -rf $(obj) $(target)</span><br><span class="line"></span><br><span class="line">.PHONY:clean ALL</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-gdb调试"><a href="#4-gdb调试" class="headerlink" title="4. gdb调试"></a>4. gdb调试</h1><h2 id="4-1-基础指令"><a href="#4-1-基础指令" class="headerlink" title="4.1 基础指令"></a>4.1 基础指令</h2><p>　<strong>基础的断点设置和继续运行等指令</strong></p>
+<ul>
+<li>-g：使用该指令编译可执行文件，否则没有调试表</li>
+<li>gdb .&#x2F;a.out</li>
+<li>list：list 1 列出源码，根据源码指定行号设置断点，1表示从第一行开始显示源码</li>
+<li>b：b 55 在第55行添加断点</li>
+<li>run&#x2F;r：运行程序，启动调试（可以直接找到停止位置就是出错位置）</li>
+<li>next&#x2F;n：下一条指令（越过函数）</li>
+<li>step&#x2F;s：下一条执行（进入函数内部）</li>
+<li>print&#x2F;p：打印变量值，如p var 查看 var 变量的值</li>
+<li>continue：执行到下一个断点</li>
+<li>finish：结束当前函数调用</li>
+<li>quit：退出调试</li>
+<li>start：不使用断点，直接开始单步调试</li>
+</ul>
+<p>　<strong>设置一些条件和查看栈帧及变量</strong></p>
+<ul>
+<li>set args：启动gdb调试后，通过该指令可以设置main函数的参数，需要在start和run指令之前设置</li>
+<li>info b：查看当前断点信息表</li>
+<li>b 23 if i&#x3D;5：设置断点在23行，如果 i&#x3D;5 时断点才生效</li>
+<li>ptybe：查看变量类型</li>
+<li>display：设置跟踪变量，display i，跟踪变量 i</li>
+<li>undisplay：取消跟踪变量</li>
+<li>bt：列出当前程序存活的栈帧</li>
+<li>frame：如果有多层调用，在内层想查看外层栈帧里的参数，使用 frame n (n 是栈帧编号）切换栈帧，再使用 p var 打印变量</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/10/24/202310242037/">https://mingxuanwu.com/2023/10/24/202310242037/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/linux/"># linux</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/10/27/202310271715/">Linux 文件IO操作</a>
+            
+            
+            <a class="next" rel="next" href="/2023/10/23/202310231728/">Ubuntu Hexo Github.io 自建博客站</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

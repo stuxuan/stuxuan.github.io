@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【计算机网络：自顶向下方法】5.网络层：控制平面 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【计算机网络：自顶向下方法】5.网络层：控制平面</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">January 8, 2024&nbsp;&nbsp;17:48:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-路由选择算法"><a href="#1-路由选择算法" class="headerlink" title="1 路由选择算法"></a>1 路由选择算法</h1><ul>
+<li><p>路由：按照某种指标(传输延迟,所经过的站点数目等)找到一条从源节点到目标节点的较好路径</p>
+</li>
+<li><p>以网络为单位进行路由（路由信息通告+路由计算）</p>
+<ul>
+<li>一个网络使用的节点地址前缀相同，且物理上聚集</li>
+<li>路由：计算一个网络到另一个网络的路径</li>
+</ul>
+</li>
+<li><p>路由选择算法（routing algorithm）：网络层软件的一部分，完成路由功能</p>
+<ul>
+<li><p>从图中找到一棵</p>
+<p>汇集树（Sink Tree）</p>
+<ul>
+<li>此节点到其他节点的最优路径形成的树</li>
+<li>路由选择算法就是为所有路由器找到并使用汇集树</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240108103223825-183945271.png" width="50%"/></div>
+
+<h2 id="1-1-Link-State"><a href="#1-1-Link-State" class="headerlink" title="1.1 Link State"></a>1.1 Link State</h2><ul>
+<li><p>配置LS路由选择算法</p>
+<ul>
+<li>通过各种渠道获得<strong>整个网络的拓扑</strong>，整个网络<strong>链路代价</strong>等信息</li>
+<li>使用LS路由算法计算本站点到其他站点的最优路径（汇集树），得到路由表</li>
+<li>按照路由表转发分组（datagram方式）</li>
+</ul>
+</li>
+<li><p>LS路由选择算法工作流程</p>
+<ol>
+<li><p>发现相邻节点，获取对方网络地址</p>
+</li>
+<li><p>测量到相邻节点的代价（延迟、开销）</p>
+</li>
+<li><p>组装一个LS分组，描述它到相邻节点的代价情况</p>
+</li>
+<li><p>将分组通过扩散的方式发送到所有其他路由器</p>
+</li>
+<li><p>通过</p>
+<p>Dijkstra算法</p>
+<p>找出最短路径</p>
+<ul>
+<li>每个节点独立计算到其他节点的最短路径</li>
+<li>迭代算法：第K步知道本届点到K个其他节点的最短路径</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><p>符号标记</p>
+<ul>
+<li>c(i,j)：从节点i到节点j的链路代价（初始状态下非相邻节点之间代价为∞）</li>
+<li>D(v)：从源节点到目标节点的当前路径代价（节点的代价）</li>
+<li>P(v)：从源到节点V的路径前序节点（P(P(v))则表示的是前序的前序节点）</li>
+<li>N’：当前已知最优路径的节点集合（永久节点集合）临时节点：没找到最优路径；永久节点：找到最优路径</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240108105608997-442184590.png" width="50%"/></div>
+
+<ul>
+<li>目标：找到A到所有节点的最优路径</li>
+<li>初始状态：CDEFH与A不相邻，他们代价无限大且前序节点未知（D(v)&#x3D;∞, P(v)&#x3D;NULL）；临时节点为B和G</li>
+<li><strong>由于B代价最小，所以将B拉入永久节点中</strong>。此时永久节点B有两个邻居，临时节点为C和E，因为此时代价都比无穷小，所以对C和E进行重新标记</li>
+<li>临时节点当中<strong>E的代价最小</strong>，所以将<strong>E拉入永久节点中</strong>。此时临时节点集合为CFG，并重新计算代价。</li>
+<li><strong>此时G代价最小，将G拉入永久节点中</strong>。此时临时节点集合为CFH，并重新计算代价</li>
+<li><strong>此时F代价最小，将F拉入永久节点中。</strong>此时临时节点集合CDH。最后进行循环，并根据（D(v), P(v）二元组完成树的绘制</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240108112704479-980219258.png" width="60%"/></div>
+
+<ul>
+<li>Dijkstra算法讨论（n个节点）<ul>
+<li>每次迭代需要检查所有不在永久集合N中的节点</li>
+<li>n(n+1)&#x2F;2 O(n²) 复杂度（有更好的logn的实现）</li>
+<li>可能会存在震荡，每次计算出来的不一样，大家都去挤新的路径</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-2-Distance-Vector"><a href="#1-2-Distance-Vector" class="headerlink" title="1.2 Distance Vector"></a>1.2 Distance Vector</h2><ul>
+<li>基本思想<ul>
+<li>各路由器维护一张路由表（目标, 下一条, 代价）</li>
+<li>各路由器与相邻路由器交换路由表（持续）</li>
+<li>根据交换的信息，更新路由表</li>
+</ul>
+</li>
+</ul>
+<p>　　XYZ分别记录了自己到B的代价，然后告诉给A；A测量自己到XYZ的代价，最后判断到B应该走哪个节点。每个路由器仅维护了自己的终点和下一跳分别是哪个路由器，这个算法原理很简单</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240108114358009-190766306.png" width="50%"/></div>
+
+<h2 id="1-3-LS和DV对比"><a href="#1-3-LS和DV对比" class="headerlink" title="1.3 LS和DV对比"></a>1.3 LS和DV对比</h2><ul>
+<li>消息复杂度：<ul>
+<li>LS：有n个节点，E条链路，则报文数为 n*E</li>
+<li>DV：只和邻居交换信息</li>
+</ul>
+</li>
+<li>收敛时间：<ul>
+<li>LS：O(n²)</li>
+<li>DV：收敛缓慢，可能存在环路问题</li>
+</ul>
+</li>
+<li>健壮性：<ul>
+<li>DV：他可能告诉全网错误信息，自己的代价为0，然后扩散到全网，所有人都把消息转发给他</li>
+</ul>
+</li>
+</ul>
+<h1 id="2-自治系统内部的路由选择"><a href="#2-自治系统内部的路由选择" class="headerlink" title="2 自治系统内部的路由选择"></a>2 自治系统内部的路由选择</h1><h2 id="2-1-路由信息协议-RIP"><a href="#2-1-路由信息协议-RIP" class="headerlink" title="2.1 路由信息协议 RIP"></a>2.1 路由信息协议 RIP</h2><p>　　路由信息协议（Routing Information Protocol，RIP），该协议是基于距离矢量算法的路由协议。最大支持15跳的长度，DV每隔30秒与相邻路由器交换信息，每个通告最多包括25个目标子网。如果180秒（6个周期）没有收到下一个路由器的路由通告，认为该邻居已失效。</p>
+<p>　　RIP通过进程的方式实现，并且使用UDP报文传送数据，网络层的协议实际上使用传输层的服务来实现了网络层。</p>
+<h2 id="2-2-开放式最短路径优先-OSPF"><a href="#2-2-开放式最短路径优先-OSPF" class="headerlink" title="2.2 开放式最短路径优先 OSPF"></a>2.2 开放式最短路径优先 OSPF</h2><p>　　开放式最短路径优先（Open Shortest Path First，OSPF），该协议是基于链路状态算法的路由协议。OSPF通告信息中携带每个邻居路由器的一个表象，通过泛洪在IP数据报上直接传送OSPF报文（不通过UDP或TCP）。</p>
+<p>　　所有OSPF报文都经过认证（安全性高级特性），允许多个代价相同的路径存在，允许多种代价指标来计算路径，并且允许使用层次化的OSPF路由（本地和骨干2个层级，区域边界路由去、骨干路由器、边界路由器）</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240108162612562-33713110.png" width="50%"/></div>
+
+<h1 id="3-ISP之间的路由选择：BGP"><a href="#3-ISP之间的路由选择：BGP" class="headerlink" title="3 ISP之间的路由选择：BGP"></a>3 ISP之间的路由选择：BGP</h1><ul>
+<li>一个平面的路由</li>
+<li>一个网络中所有路由器的地位相同</li>
+<li>通过LS、DV计算所有路由器（子网）之间路径如何走</li>
+<li>所有路由器在同一个平面</li>
+<li>平面路由的问题<ul>
+<li>规模巨大的网络中，路由信息的存储、传输和计算代价巨大</li>
+<li>管理问题，不同的网络希望按照自己的方式管理网络，隐藏自己网络的细节，同时与其他网络互联</li>
+</ul>
+</li>
+<li>使用层次路由解决该问题<ul>
+<li>将互联网分成一个个区域路由器，每个区域内部自治</li>
+<li>互联网AS间路由：BGP（Border Gateway Protocol）自治区间路由协议</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240108164356193-203112966.png" width="50%"/></div>
+
+<h1 id="4-SDN控制平面"><a href="#4-SDN控制平面" class="headerlink" title="4 SDN控制平面"></a>4 SDN控制平面</h1><p>　　软件定义网络的方式通过可编程应用在控制器之上以网络应用形式实现各种网络功能，控制平面功能在数据交换设备之外实现</p>
+<p>　　控制平面通过南向接口给路由器传输流表，路由器基于流表匹配+动作的方式工作</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240108170949076-440246818.png" width="50%"/></div>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/01/08/202401081748/">https://mingxuanwu.com/2024/01/08/202401081748/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"># 计算机网络</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/01/10/202401101029/">【计算机网络：自顶向下方法】6.链路层和局域网</a>
+            
+            
+            <a class="next" rel="next" href="/2024/01/08/202401081024/">【计算机网络：自顶向下方法】4.网络层：数据平面</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

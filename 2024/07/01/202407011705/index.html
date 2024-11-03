@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>2.Config 配置系统 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">2.Config 配置系统</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 1, 2024&nbsp;&nbsp;10:29:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-Config"><a href="#1-Config" class="headerlink" title="1. Config"></a>1. Config</h1><h2 id="1-1-ConfigVarBase"><a href="#1-1-ConfigVarBase" class="headerlink" title="1.1 ConfigVarBase"></a>1.1 ConfigVarBase</h2><p>配置变量基类：每个配置的变量都有变量名<code>name</code>和变量描述<code>description</code>两个基础成员变量</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ConfigVarBase</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">typedef</span> std::shared_ptr&lt;ConfigVarBase&gt; ptr;</span><br><span class="line">    <span class="built_in">ConfigVarBase</span>(<span class="type">const</span> std::string&amp; name, <span class="type">const</span> std::string&amp; description = <span class="string">&quot;&quot;</span>)</span><br><span class="line">        :<span class="built_in">m_name</span>(name)</span><br><span class="line">        , <span class="built_in">m_description</span>(description) &#123;</span><br><span class="line">        std::<span class="built_in">transform</span>(m_name.<span class="built_in">begin</span>(), m_name.<span class="built_in">end</span>(), m_name.<span class="built_in">begin</span>(), ::tolower);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">ConfigVarBase</span>() &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">const</span> std::string&amp; <span class="title">getName</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_name; &#125;</span><br><span class="line">    <span class="function"><span class="type">const</span> std::string&amp; <span class="title">getDescription</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_description; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> std::string <span class="title">toString</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">bool</span> <span class="title">fromString</span><span class="params">(<span class="type">const</span> std::string&amp; val)</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> std::string <span class="title">getTypeName</span><span class="params">()</span> <span class="type">const</span> </span>= <span class="number">0</span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    std::string m_name;</span><br><span class="line">    std::string m_description;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-2-ConfigVar"><a href="#1-2-ConfigVar" class="headerlink" title="1.2 ConfigVar"></a>1.2 ConfigVar</h2><ul>
+<li>成员变量<code>T m_val</code>：保存变量本身</li>
+<li>成员变量<code>std::map&lt;uint64_t, on_change_cb&gt; m_cbs</code>：回调函数，变量变化调用</li>
+<li>父类成员变量<code>name</code>：变量名</li>
+<li>父类成员变量<code>description</code>：描述变量作用</li>
+<li>成员方法<code>toString()</code>：将<code>m_val</code>转换为<code>YAML String</code></li>
+<li>成员方法<code>fronString()</code>：将<code>YAML String</code>转换为<code>m_val</code></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">FromStr</span> = LexicalCast&lt;std::string, T&gt;</span><br><span class="line">                , <span class="keyword">class</span> ToStr = LexicalCast&lt;T, std::string&gt; &gt;</span><br><span class="line"><span class="keyword">class</span> ConfigVar : <span class="keyword">public</span> ConfigVarBase &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">typedef</span> std::shared_ptr&lt;ConfigVar&gt; ptr;</span><br><span class="line">    <span class="keyword">typedef</span> std::function&lt;<span class="type">void</span>(<span class="type">const</span> T&amp; old_value, <span class="type">const</span> T&amp; new_value)&gt; on_change_cb;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">ConfigVar</span>(<span class="type">const</span> std::string&amp; name</span><br><span class="line">        , <span class="type">const</span> T&amp; default_value</span><br><span class="line">        , <span class="type">const</span> std::string&amp; description = <span class="string">&quot;&quot;</span>)</span><br><span class="line">        :<span class="built_in">ConfigVarBase</span>(name, description)</span><br><span class="line">        , <span class="built_in">m_val</span>(default_value) &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::string <span class="title">toString</span><span class="params">()</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> boost::<span class="built_in">lexical_cast</span>&lt;std::string&gt;(m_val);</span><br><span class="line">            <span class="function">RWMutexType::ReadLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">ToStr</span>()(m_val);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">catch</span> (std::exception&amp; e) &#123;</span><br><span class="line">            <span class="built_in">SYLAR_LOG_ERROR</span>(<span class="built_in">SYLAR_LOG_ROOT</span>()) &lt;&lt; <span class="string">&quot;ConfigVar::toString exception &quot;</span></span><br><span class="line">                &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; <span class="string">&quot; convert: &quot;</span> &lt;&lt; <span class="built_in">TypeToName</span>&lt;T&gt;() &lt;&lt; <span class="string">&quot; to string&quot;</span></span><br><span class="line">                &lt;&lt; <span class="string">&quot; name=&quot;</span> &lt;&lt; m_name;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">fromString</span><span class="params">(<span class="type">const</span> std::string&amp; val)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="built_in">setValue</span>(<span class="built_in">FromStr</span>()(val));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">catch</span> (std::exception&amp; e) &#123;</span><br><span class="line">            <span class="built_in">SYLAR_LOG_ERROR</span>(<span class="built_in">SYLAR_LOG_ROOT</span>()) &lt;&lt; <span class="string">&quot;ConfigVar::fromString exception &quot;</span></span><br><span class="line">                &lt;&lt; e.<span class="built_in">what</span>() &lt;&lt; <span class="string">&quot; convert: string to &quot;</span> &lt;&lt; <span class="built_in">TypeToName</span>&lt;T&gt;()</span><br><span class="line">                &lt;&lt; <span class="string">&quot; name=&quot;</span> &lt;&lt; m_name</span><br><span class="line">                &lt;&lt; <span class="string">&quot; - &quot;</span> &lt;&lt; val;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">const</span> T <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="function">RWMutexType::ReadLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">        <span class="keyword">return</span> m_val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">setValue</span><span class="params">(<span class="type">const</span> T&amp; v)</span> </span>&#123;</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="function">RWMutexType::ReadLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">            <span class="keyword">if</span> (v == m_val) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; i : m_cbs) &#123;</span><br><span class="line">                i.<span class="built_in">second</span>(m_val, v);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function">RWMutexType::WriteLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">        m_val = v;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">std::string <span class="title">getTypeName</span><span class="params">()</span> <span class="type">const</span> <span class="keyword">override</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">TypeToName</span>&lt;T&gt;(); &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">uint64_t</span> <span class="title">addListener</span><span class="params">(on_change_cb cb)</span> </span>&#123;</span><br><span class="line">        <span class="type">static</span> <span class="type">uint64_t</span> s_fun_id = <span class="number">0</span>;</span><br><span class="line">        <span class="function">RWMutexType::WriteLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">        ++s_fun_id;</span><br><span class="line">        m_cbs[s_fun_id] = cb;</span><br><span class="line">        <span class="keyword">return</span> s_fun_id;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">delListener</span><span class="params">(<span class="type">uint64_t</span> key)</span> </span>&#123;</span><br><span class="line">        <span class="function">RWMutexType::WriteLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">        m_cbs.<span class="built_in">erase</span>(key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">on_change_cb <span class="title">getListener</span><span class="params">(<span class="type">uint64_t</span> key)</span> </span>&#123;</span><br><span class="line">        <span class="function">RWMutexType::ReadLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">        <span class="keyword">auto</span> it = m_cbs.<span class="built_in">find</span>(key);</span><br><span class="line">        <span class="keyword">return</span> it == m_cbs.<span class="built_in">end</span>() ? <span class="literal">nullptr</span> : it-&gt;second;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">clearListener</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="function">RWMutexType::WriteLock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">        m_cbs.<span class="built_in">clear</span>();</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    RWMutexType m_mutex;</span><br><span class="line">    T m_val;</span><br><span class="line">    <span class="comment">//变更回调函数组, uint64_t key,要求唯一，一般可以用hash</span></span><br><span class="line">    std::map&lt;<span class="type">uint64_t</span>, on_change_cb&gt; m_cbs;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-3-Config"><a href="#1-3-Config" class="headerlink" title="1.3 Config"></a>1.3 Config</h2><ul>
+<li>静态成员变量<code>ConfigVarMap</code>：定义为<code>unordered_map&lt;std::string, ConfigVarBase::ptr&gt;</code>，保存了全部配置文件的属性名以及对应的属性值</li>
+<li>静态成员函数<code>Lookup()</code>：根据参数名，返回一个<code>ConfigVar&lt;T&gt;</code>配置参数<ul>
+<li>如果已存在参数名<ul>
+<li>如果参数名和类型都相同，返回该参数</li>
+<li>如果类型名不相同，返回空指针</li>
+</ul>
+</li>
+<li>如果不存在参数名，创建<code>ConfigVar&lt;T&gt;</code>并返回</li>
+</ul>
+</li>
+<li>成员函数<code>LoadFromYaml()</code>：从<code>YAML</code>格式文档加载到一个</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Config</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">typedef</span> std::unordered_map&lt;std::string, ConfigVarBase::ptr&gt; ConfigVarMap;</span><br><span class="line">    <span class="keyword">typedef</span> RWMutex RWMutexType;</span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line">    <span class="type">static</span> <span class="keyword">typename</span> ConfigVar&lt;T&gt;::<span class="function">ptr <span class="title">Lookup</span><span class="params">(<span class="type">const</span> std::string&amp; name,</span></span></span><br><span class="line"><span class="params"><span class="function">        <span class="type">const</span> T&amp; default_value, <span class="type">const</span> std::string&amp; description = <span class="string">&quot;&quot;</span>)</span> </span>&#123;</span><br><span class="line">        <span class="function">RWMutexType::WriteLock <span class="title">lock</span><span class="params">(GetMutex())</span></span>;</span><br><span class="line">        <span class="keyword">auto</span> it = <span class="built_in">GetDatas</span>().<span class="built_in">find</span>(name);</span><br><span class="line">        <span class="keyword">if</span> (it != <span class="built_in">GetDatas</span>().<span class="built_in">end</span>()) &#123;</span><br><span class="line">            <span class="keyword">auto</span> tmp = std::dynamic_pointer_cast&lt;ConfigVar&lt;T&gt;&gt;(it-&gt;second);</span><br><span class="line">            <span class="keyword">if</span> (tmp) &#123;</span><br><span class="line">                <span class="built_in">SYLAR_LOG_INFO</span>(<span class="built_in">SYLAR_LOG_ROOT</span>()) &lt;&lt; <span class="string">&quot;Lookup name=&quot;</span> &lt;&lt; name &lt;&lt; <span class="string">&quot; exists&quot;</span>;</span><br><span class="line">                <span class="keyword">return</span> tmp;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="built_in">SYLAR_LOG_ERROR</span>(<span class="built_in">SYLAR_LOG_ROOT</span>()) &lt;&lt; <span class="string">&quot;Lookup name=&quot;</span> &lt;&lt; name &lt;&lt; <span class="string">&quot; exists but type not &quot;</span></span><br><span class="line">                    &lt;&lt; <span class="built_in">TypeToName</span>&lt;T&gt;() &lt;&lt; <span class="string">&quot; real_type=&quot;</span> &lt;&lt; it-&gt;second-&gt;<span class="built_in">getTypeName</span>()</span><br><span class="line">                    &lt;&lt; <span class="string">&quot; &quot;</span> &lt;&lt; it-&gt;second-&gt;<span class="built_in">toString</span>();</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (name.<span class="built_in">find_first_not_of</span>(<span class="string">&quot;abcdefghikjlmnopqrstuvwxyz._012345678&quot;</span>)</span><br><span class="line">            != std::string::npos) &#123;</span><br><span class="line">            <span class="built_in">SYLAR_LOG_ERROR</span>(<span class="built_in">SYLAR_LOG_ROOT</span>()) &lt;&lt; <span class="string">&quot;Lookup name invalid &quot;</span> &lt;&lt; name;</span><br><span class="line">            <span class="keyword">throw</span> std::<span class="built_in">invalid_argument</span>(name);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">typename</span> ConfigVar&lt;T&gt;::<span class="function">ptr <span class="title">v</span><span class="params">(<span class="keyword">new</span> ConfigVar&lt;T&gt;(name, default_value, description))</span></span>;</span><br><span class="line">        <span class="built_in">GetDatas</span>()[name] = v;</span><br><span class="line">        <span class="keyword">return</span> v;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line">    <span class="type">static</span> <span class="keyword">typename</span> ConfigVar&lt;T&gt;::<span class="function">ptr <span class="title">Lookup</span><span class="params">(<span class="type">const</span> std::string&amp; name)</span> </span>&#123;</span><br><span class="line">        <span class="function">RWMutexType::ReadLock <span class="title">lock</span><span class="params">(GetMutex())</span></span>;</span><br><span class="line">        <span class="keyword">auto</span> it = <span class="built_in">GetDatas</span>().<span class="built_in">find</span>(name);</span><br><span class="line">        <span class="keyword">if</span> (it == <span class="built_in">GetDatas</span>().<span class="built_in">end</span>()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> std::dynamic_pointer_cast&lt;ConfigVar&lt;T&gt;&gt;(it-&gt;second);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">LoadFromYaml</span><span class="params">(<span class="type">const</span> YAML::Node&amp; root)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">LoadFromConfDir</span><span class="params">(<span class="type">const</span> std::string&amp; path, <span class="type">bool</span> force = <span class="literal">false</span>)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">static</span> ConfigVarBase::ptr <span class="title">LookupBase</span><span class="params">(<span class="type">const</span> std::string&amp; name)</span></span>;</span><br><span class="line">    <span class="function"><span class="type">static</span> <span class="type">void</span> <span class="title">Visit</span><span class="params">(std::function&lt;<span class="type">void</span>(ConfigVarBase::ptr)&gt; cb)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> ConfigVarMap&amp; <span class="title">GetDatas</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">static</span> ConfigVarMap s_datas;</span><br><span class="line">        <span class="keyword">return</span> s_datas;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">static</span> RWMutexType&amp; <span class="title">GetMutex</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="type">static</span> RWMutexType s_mutex;</span><br><span class="line">        <span class="keyword">return</span> s_mutex;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-LexicalCast"><a href="#2-LexicalCast" class="headerlink" title="2. LexicalCast"></a>2. LexicalCast</h1><h2 id="2-1-泛型类型转换"><a href="#2-1-泛型类型转换" class="headerlink" title="2.1 泛型类型转换"></a>2.1 泛型类型转换</h2><ul>
+<li>把类型F转换为类型T</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">F</span>, <span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LexicalCast</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">T <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> F&amp; v)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> boost::<span class="built_in">lexical_cast</span>&lt;T&gt;(v);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-偏特化类型转换"><a href="#2-2-偏特化类型转换" class="headerlink" title="2.2 偏特化类型转换"></a>2.2 偏特化类型转换</h2><p>下面是几个例子方便理解，其他的大同小异不再列举</p>
+<ul>
+<li><code>YAML string</code>转换为<code>vector&lt;T&gt;</code></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LexicalCast</span>&lt;std::string, std::vector&lt;T&gt; &gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">std::vector&lt;T&gt; <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> std::string&amp; v)</span> </span>&#123;</span><br><span class="line">        YAML::Node node = YAML::<span class="built_in">Load</span>(v);</span><br><span class="line">        <span class="keyword">typename</span> std::vector&lt;T&gt; vec;</span><br><span class="line">        std::stringstream ss;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; node.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">            ss.<span class="built_in">str</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">            ss &lt;&lt; node[i];</span><br><span class="line">            vec.<span class="built_in">push_back</span>(<span class="built_in">LexicalCast</span>&lt;std::string, T&gt;()(ss.<span class="built_in">str</span>()));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> vec;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>YAML string</code>转换为<code>set&lt;T&gt;</code></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LexicalCast</span>&lt;std::string, std::set&lt;T&gt; &gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">std::set&lt;T&gt; <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> std::string&amp; v)</span> </span>&#123;</span><br><span class="line">        YAML::Node node = YAML::<span class="built_in">Load</span>(v);</span><br><span class="line">        <span class="keyword">typename</span> std::set&lt;T&gt; vec;</span><br><span class="line">        std::stringstream ss;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; node.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">            ss.<span class="built_in">str</span>(<span class="string">&quot;&quot;</span>);</span><br><span class="line">            ss &lt;&lt; node[i];</span><br><span class="line">            vec.<span class="built_in">insert</span>(<span class="built_in">LexicalCast</span>&lt;std::string, T&gt;()(ss.<span class="built_in">str</span>()));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> vec;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>set&lt;T&gt;</code>转换为<code>YAML string</code></li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LexicalCast</span>&lt;std::set&lt;T&gt;, std::string&gt; &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">std::string <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> std::set&lt;T&gt;&amp; v)</span> </span>&#123;</span><br><span class="line">        <span class="function">YAML::Node <span class="title">node</span><span class="params">(YAML::NodeType::Sequence)</span></span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; i : v) &#123;</span><br><span class="line">            node.<span class="built_in">push_back</span>(YAML::<span class="built_in">Load</span>(<span class="built_in">LexicalCast</span>&lt;T, std::string&gt;()(i)));</span><br><span class="line">        &#125;</span><br><span class="line">        std::stringstream ss;</span><br><span class="line">        ss &lt;&lt; node;</span><br><span class="line">        <span class="keyword">return</span> ss.<span class="built_in">str</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-Config使用示例"><a href="#3-Config使用示例" class="headerlink" title="3. Config使用示例"></a>3. Config使用示例</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">test_config</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 使用Lookup静态方法创建一个system.port</span></span><br><span class="line">    sylar::ConfigVar&lt;<span class="type">int</span>&gt;::ptr g_int_value_config =</span><br><span class="line">        sylar::Config::<span class="built_in">Lookup</span>(<span class="string">&quot;system.port&quot;</span>, (<span class="type">int</span>)<span class="number">8080</span>, <span class="string">&quot;system port&quot;</span>);</span><br><span class="line">    <span class="comment">// 使用Lookup静态方法创建一个system.userid</span></span><br><span class="line">    sylar::ConfigVar&lt;std::map&lt;std::string, std::string&gt;&gt;::ptr g_int_map_config =</span><br><span class="line">        sylar::Config::<span class="built_in">Lookup</span>(<span class="string">&quot;system.userid&quot;</span>, std::map&lt;std::string, std::string&gt;&#123;&#123;<span class="string">&quot;xuan&quot;</span>, <span class="string">&quot;0001&quot;</span>&#125;&#125;, <span class="string">&quot;system str int map&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用Lookup静态方法用该配置名查找对应的变量并输出</span></span><br><span class="line">    <span class="built_in">SYLAR_LOG_INFO</span>(<span class="built_in">SYLAR_LOG_ROOT</span>()) &lt;&lt; <span class="string">&quot;system.port: &quot;</span> &lt;&lt; sylar::Config::<span class="built_in">Lookup</span>&lt;<span class="type">int</span>&gt;(<span class="string">&quot;system.port&quot;</span>)-&gt;<span class="built_in">toString</span>();</span><br><span class="line">    <span class="built_in">SYLAR_LOG_INFO</span>(<span class="built_in">SYLAR_LOG_ROOT</span>()) &lt;&lt; <span class="string">&quot;system.userid: &quot;</span> &lt;&lt; sylar::Config::Lookup&lt;std::map&lt;std::string, std::string&gt;&gt;(<span class="string">&quot;system.userid&quot;</span>)-&gt;<span class="built_in">toString</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/07/01/202407011705/">https://mingxuanwu.com/2024/07/01/202407011705/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CPP%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/"># CPP高性能服务器</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/07/03/202407031905/">3.Thread 线程</a>
+            
+            
+            <a class="next" rel="next" href="/2024/06/30/202406301010/">1.Log 日志系统</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

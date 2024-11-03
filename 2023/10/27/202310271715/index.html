@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>Linux 文件IO操作 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Linux 文件IO操作</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 27, 2023&nbsp;&nbsp;17:15:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-打开和关闭文件"><a href="#1-打开和关闭文件" class="headerlink" title="1.打开和关闭文件"></a>1.打开和关闭文件</h1><h2 id="1-1-open"><a href="#1-1-open" class="headerlink" title="1.1 open"></a>1.1 open</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">open</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> flags)</span></span></span><br><span class="line"><span class="function"><span class="comment">/*</span></span></span><br><span class="line"><span class="comment"><span class="function">    pathname: 打开文件的路径名(相对、绝对)</span></span></span><br><span class="line"><span class="comment"><span class="function">    flags: 打开文件的方式(O_RDONLY | O_WRONLY | O_RDWR) --- &lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="comment"><span class="function">    return: 返回一个文件描述符或-1</span></span></span><br><span class="line"><span class="comment"><span class="function">*/</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">open</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* pathname, <span class="type">int</span> flags, <span class="type">mode_t</span> mode)</span></span></span><br><span class="line"><span class="function"><span class="comment">/*</span></span></span><br><span class="line"><span class="comment"><span class="function">    pathname: 打开文件的相对路径</span></span></span><br><span class="line"><span class="comment"><span class="function">    flags: 打开文件的方式(O_RDONLY|O_WRONLY|O_RDWR)</span></span></span><br><span class="line"><span class="comment"><span class="function">             还有很多标签可以在man里查看</span></span></span><br><span class="line"><span class="comment"><span class="function">    mode_t: 参数2如果指定了 O_CREAT, 则参数三传 8 进制数来描述文件权限</span></span></span><br><span class="line"><span class="comment"><span class="function">                                   例如 0664表示 rw-rw-r--</span></span></span><br><span class="line"><span class="comment"><span class="function">*/</span></span></span><br></pre></td></tr></table></figure>
+
+<p>　　注意，文件创建后的最终权限受到 open() 函数传入的参数影响，同时也受到 umask 屏蔽掩码共同影响</p>
+<p>　　最终创建出的文件权限 &#x3D; mode &amp; (~umask)</p>
+<div align=center> <img src="/images/Linux/LinuxFileIO/3219843-20231025220036901-1690576380.png" width="60%"></img> </div>
+
+<h2 id="1-2-close"><a href="#1-2-close" class="headerlink" title="1.2 close"></a>1.2 close</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">close</span><span class="params">(<span class="type">int</span> fd)</span></span></span><br><span class="line"><span class="function"><span class="comment">/*</span></span></span><br><span class="line"><span class="comment"><span class="function">    fd: open的返回值(文件描述符)</span></span></span><br><span class="line"><span class="comment"><span class="function">    return: 成功0, 失败-1, errno</span></span></span><br><span class="line"><span class="comment"><span class="function">*/</span></span></span><br></pre></td></tr></table></figure>
+
+<h1 id="2-文件读取和写入"><a href="#2-文件读取和写入" class="headerlink" title="2.文件读取和写入"></a>2.文件读取和写入</h1><p>　　read和write都是按字节操作的函数</p>
+<h2 id="2-1-read"><a href="#2-1-read" class="headerlink" title="2.1 read"></a>2.1 read</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">read</span><span class="params">(<span class="type">int</span> fd, <span class="type">void</span> *buf, <span class="type">size_t</span> count)</span></span></span><br><span class="line"><span class="function"><span class="comment">/*</span></span></span><br><span class="line"><span class="comment"><span class="function">    fd: 打开的文件描述符</span></span></span><br><span class="line"><span class="comment"><span class="function">    buf: 读取数据到缓冲区</span></span></span><br><span class="line"><span class="comment"><span class="function">    count: 缓冲区大小  size_t: 无符号整数   ssize_t 有符号整数</span></span></span><br><span class="line"><span class="comment"><span class="function">    </span></span></span><br><span class="line"><span class="comment"><span class="function">    return: </span></span></span><br><span class="line"><span class="comment"><span class="function">        成功: 读到文件末尾0,</span></span></span><br><span class="line"><span class="comment"><span class="function">                未读到文件末尾&gt;0</span></span></span><br><span class="line"><span class="comment"><span class="function">        失败: -1</span></span></span><br><span class="line"><span class="comment"><span class="function">                errno = EAGAIN(或EWOULDBLOCK): 非阻塞状态读（网络、设备）文件没读到数据</span></span></span><br><span class="line"><span class="comment"><span class="function">                errno != EAGAIN(或EWOULDBLOCK): 错误</span></span></span><br><span class="line"><span class="comment"><span class="function">*/</span> </span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-write"><a href="#2-2-write" class="headerlink" title="2.2 write"></a>2.2 write</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">write</span><span class="params">(<span class="type">int</span> fd, <span class="type">void</span> *buf, <span class="type">size_t</span> count)</span></span></span><br><span class="line"><span class="function"><span class="comment">/*</span></span></span><br><span class="line"><span class="comment"><span class="function">    fd: 打开的文件描述符</span></span></span><br><span class="line"><span class="comment"><span class="function">    buf: 储存写出数据的缓冲区地址</span></span></span><br><span class="line"><span class="comment"><span class="function">    count: 缓冲区大小  size_t: 无符号整数   ssize_t 有符号整数</span></span></span><br><span class="line"><span class="comment"><span class="function">    return: </span></span></span><br><span class="line"><span class="comment"><span class="function">         成功: &gt;0 写入的数据大小,  =0 没有写入数据</span></span></span><br><span class="line"><span class="comment"><span class="function">         失败: -1, errno</span></span></span><br><span class="line"><span class="comment"><span class="function">*/</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-与fgetc和fputc比较"><a href="#2-3-与fgetc和fputc比较" class="headerlink" title="2.3 与fgetc和fputc比较"></a>2.3 与fgetc和fputc比较</h2><p>　　read 和 write 是系统调用，fgetc 和 fputc 是 c 语言提供的函数。下面两个函数举例，同样复制一个txt文件，每次复制一个字节，c 语言提供的函数速度会远远快于系统调用，因为 c 语言封装的 read 和write 有一个缓冲区，分别是<strong>预读入</strong>和<strong>缓输出</strong>，虽然 fgetc 函数读取一个字节，但实际上它一次性会缓存4096字节在内存中，同样 fputc 虽然会写入一个字节，但它会先写入内存4096字节再一次性写入文件，这种机制避免了频繁IO降低性能</p>
+<div align=center> <img src="/images/Linux/LinuxFileIO/3219843-20231027111747890-35186311.png" width="75%"></img> </div>
+
+<div align=center> <img src="/images/Linux/LinuxFileIO/3219843-20231027111809460-598092748.png" width="75%"></img> </div>
+
+<h2 id="2-4-文件描述符"><a href="#2-4-文件描述符" class="headerlink" title="2.4 文件描述符"></a>2.4 文件描述符</h2><p> 　　<strong>PCB</strong>进程控制块里有一个成员是<strong>文件描述符表</strong>，open 函数返回的 <strong>fd</strong> 是一个下标，返回表中未被使用的最小的文件描述符（0、1、2分别是标准输入STDIN_FILENO、标准输出STDOUT_FILENO、标准出错STDERR_FILENO）</p>
+<h1 id="3-错误代码处理"><a href="#3-错误代码处理" class="headerlink" title="3. 错误代码处理"></a>3. 错误代码处理</h1><h2 id="3-1-strerror"><a href="#3-1-strerror" class="headerlink" title="3.1 strerror"></a>3.1 strerror</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">char</span>* <span class="title">strerror</span><span class="params">(EINTR)</span></span>;       <span class="comment">// 头文件&lt;string.h&gt;，引入errno.h头文件（错误号）, 该函数会打印错误号对应的信息（EINTR其实是4）</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-2-perror"><a href="#3-2-perror" class="headerlink" title="3.2 perror"></a>3.2 perror</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> fd = <span class="built_in">open</span>(filepath, O_RDWR|O_CREAT|O_TRUNC, <span class="number">0644</span>);</span><br><span class="line"><span class="keyword">if</span>(fd == <span class="number">-1</span>)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">perror</span>(<span class="string">&quot;open dst err&quot;</span>);    <span class="comment">// 打印该字符串以及errno错误号对应的错误信息</span></span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);    <span class="comment">// 程序非正常退出</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-改变已经打开文件的访问属性"><a href="#4-改变已经打开文件的访问属性" class="headerlink" title="4.改变已经打开文件的访问属性"></a>4.改变已经打开文件的访问属性</h1><h2 id="4-1-fcntl-f-control"><a href="#4-1-fcntl-f-control" class="headerlink" title="4.1 fcntl (f control)"></a>4.1 fcntl (f control)</h2><p>　　这个函数功能非常多，这只是一个例子</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">fcntl</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span> cmd, ...)</span></span>;</span><br><span class="line"><span class="comment">// 获取文件权限</span></span><br><span class="line"><span class="type">int</span> flag = <span class="built_in">fcntl</span>(fd, F_GETFL);</span><br><span class="line"><span class="comment">// 修改文件权限</span></span><br><span class="line">flag |= O_NONBLOCK;    <span class="comment">// 例如添加非阻塞权限</span></span><br><span class="line"><span class="comment">// 设置文件权限</span></span><br><span class="line"><span class="built_in">fcntl</span>(fd, F_SETFL, flag);</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-改变文件指针"><a href="#5-改变文件指针" class="headerlink" title="5.改变文件指针"></a>5.改变文件指针</h1><h2 id="5-1-lseek"><a href="#5-1-lseek" class="headerlink" title="5.1 lseek"></a>5.1 lseek</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">off_t</span> <span class="title">lseek</span><span class="params">(<span class="type">int</span> fd, <span class="type">off_t</span> offset, <span class="type">int</span> whence)</span></span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    fd: 文件描述符</span></span><br><span class="line"><span class="comment">    offset: 偏移量</span></span><br><span class="line"><span class="comment">    whence: 起始偏移位置 SEEK_SET起始位置 / SEEK_CUR当前位置 / SEEK_END结束位置</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    return: 成功返回起始位置的偏移, 失败返回-1</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>文件的“读”、“写”使用相同偏移位置，所以先使用 write 写入10个字节后，read 时指针也是在第10个字节开始的，这可能就需要 lseek 调整指针位置</li>
+<li>可以通过 int len &#x3D; lseek(fd, 0, SEEK_END); 获取当前文件的大小，从结束位置偏移 0 个字节返回</li>
+<li>可以通过 int len &#x3D; lseek(fd, 10, SEEK_END); 拓展文件大小，但必须引起IO操作才能拓展，write(fd, “a”, strlen(“a”)); 正常应该用 truncate()  函数扩展文件大小</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/10/27/202310271715/">https://mingxuanwu.com/2023/10/27/202310271715/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/linux/"># linux</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/10/28/202310280916/">Linux 文件和目录操作函数</a>
+            
+            
+            <a class="next" rel="next" href="/2023/10/24/202310242037/">Linux下gcc编译，动态库和静态库，makefile，gdb调试</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

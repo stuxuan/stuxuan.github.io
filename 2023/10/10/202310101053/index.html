@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【数据结构】4.二叉树 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【数据结构】4.二叉树</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">October 10, 2023&nbsp;&nbsp;10:53:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-树"><a href="#1-树" class="headerlink" title="1.树"></a>1.树</h1><p><strong>定义：</strong>一棵树 t 是一个非空有限元素的集合，其中一个元素为<strong>根</strong>（root），其余的元素组成 t 的<strong>子树</strong>（subtree）</p>
+<p><strong>级：</strong>树根是 1 级（level），其孩子是 2 级，孩子的孩子是 3 级</p>
+<p><strong>高度：</strong>高度（height）是一棵树中级的个数，也称为深度（depth）</p>
+<p><strong>叶子：</strong>没有孩子的元素称为叶子（leaf）</p>
+<p><strong>元素的度：</strong>叶子节点的个数</p>
+<p><strong>树的度：</strong>元素的度的最大值</p>
+<h1 id="2-二叉树"><a href="#2-二叉树" class="headerlink" title="2.二叉树"></a>2.二叉树</h1><p><strong>定义：二叉树</strong>（binary tree）t 是有限个元素的集合。当二叉树非空时，其中有一个元素称为<strong>根</strong>，其余元素被划分为两棵<strong>二叉树</strong>，分别称为 t 的左子树和右子树</p>
+<p><strong>二叉树和树的区别</strong>：</p>
+<ul>
+<li>二叉树每个元素恰好有两科子树（其中一个或两个可能为空），树每个元素可以有任意数量的子树</li>
+<li>二叉树中每个元素的子树都是有顺序的</li>
+</ul>
+<div align=center><img src="/images/数据结构/二叉树/3219843-20231003163110162-72638756.png" width="90%"></img> </div>
+
+<h1 id="3-二叉树的特性"><a href="#3-二叉树的特性" class="headerlink" title="3.二叉树的特性"></a>3.二叉树的特性</h1><ol>
+<li>一棵二叉树有 n 个元素，n&gt;0，则它有 n-1 条边（除了根节点每个元素都有一个边）</li>
+<li>一棵二叉树的高度为 h ，h≥0，则它最少有 h 个元素，最多有 2h - 1 个元素（最少就是一条线，最多就是满的树）</li>
+<li>一棵二叉树有 n 个元素，n&gt;0，则它的高度最大为 n，最小为 ⌈log2(n+1)⌉</li>
+<li>一棵完全二叉树的元素编号为 i ，1 ≤ i ≤ n</li>
+</ol>
+<p>　　　　4.1）如果 i&#x3D;1 ，则 i 为根节点；如果i &gt;1 ，父节点为 ⌊i&#x2F;2⌋</p>
+<p>　　　　4.2）如果 2i&gt;n，则该元素无左孩子；如果 2i&lt;n，则左孩子编号为 2i</p>
+<p>　　　　4.3）如果 2i+1&gt;n，则该元素无右孩子；如果 2i+1&lt;n，则右孩子编号为 2i+1</p>
+<p><strong>二叉树：</strong>每个节点都最多有2个子节点，并且是有序的</p>
+<p><strong>满二叉树：</strong>高度为 h 的二叉树恰好有 2h-1 个元素时，称为<strong>满二叉树</strong>（full binary tree)</p>
+<div align=center><img src="/images/数据结构/二叉树/3219843-20231003165916102-1651859344.png" width="50%"></img> </div>
+
+<p><strong>完全二叉树：</strong>一棵深度为k的有n个结点的二叉树，对树中的结点按从上至下、从左到右的顺序进行编号，如果编号为i（1≤i≤n）的<strong>结点与满二叉树</strong>中<strong>编号</strong>为 i 的结点在二叉树中的<strong>位置相同</strong>，则这棵二叉树称为完全二叉树。</p>
+<div align=center><img src="/images/数据结构/二叉树/3219843-20231003171344780-796145949.png" width="50%"></img> </div>
+
+<h1 id="4-二叉树的描述"><a href="#4-二叉树的描述" class="headerlink" title="4.二叉树的描述"></a>4.二叉树的描述</h1><h2 id="4-1-数组描述"><a href="#4-1-数组描述" class="headerlink" title="4.1 数组描述"></a>4.1 数组描述</h2><p>在缺少元素较多的情况下，这种表述非常浪费空间，但如果是一棵完全二叉树，这种表述最有效率</p>
+<div align=center><img src="/images/数据结构/二叉树/3219843-20231003171932074-86057805.png" width="80%"></img> </div>
+
+<h2 id="4-2-链表描述"><a href="#4-2-链表描述" class="headerlink" title="4.2 链表描述"></a>4.2 链表描述</h2><p> 二叉树结点结构体</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">binaryTreeNode</span></span><br><span class="line">&#123;</span><br><span class="line">    T element;</span><br><span class="line">    binaryTreeNode&lt;T&gt;* leftChild;   <span class="comment">// 左子树</span></span><br><span class="line">    binaryTreeNode&lt;T&gt;* rightChild;  <span class="comment">// 右子树</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">binaryTreeNode</span>() &#123; leftChild = rightChild = <span class="literal">NULL</span>; &#125;</span><br><span class="line">    <span class="built_in">binaryTreeNode</span>(<span class="type">const</span> T&amp; theElement) :<span class="built_in">element</span>(theElement)</span><br><span class="line">    &#123;</span><br><span class="line">        leftChild = rightChild = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">binaryTreeNode</span>(<span class="type">const</span> T&amp; theElement, </span><br><span class="line">        binaryTreeNode* theLeftChild, binaryTreeNode* theRightChild):<span class="built_in">element</span>(theElement)</span><br><span class="line">    &#123;</span><br><span class="line">        leftChild = theLeftChild;</span><br><span class="line">        rightChild = theRightChild;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>二叉树抽象父类</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">binaryTree</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">binaryTree</span>() &#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="type">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">int</span> <span class="title">size</span><span class="params">()</span> <span class="type">const</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 前序遍历</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">preOrder</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 中序遍历</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">inOrder</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 后序遍历</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">postOrder</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 层次遍历</span></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">levelOrder</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>二叉树的实现</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">pragma</span> once</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&quot;binaryTree.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&quot;binaryTreeNode.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;queue&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">E</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">linkedBinaryTree</span> : <span class="keyword">public</span> binaryTree&lt;binaryTreeNode&lt;E&gt;&gt;</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    binaryTreeNode&lt;E&gt;* root;          <span class="comment">// 根节点指针</span></span><br><span class="line">    <span class="type">int</span> treeSize;                     <span class="comment">// 树节点个数</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 构造函数</span></span><br><span class="line">    <span class="built_in">linkedBinaryTree</span>() &#123; root = <span class="literal">NULL</span>; treeSize = <span class="number">0</span>; &#125;</span><br><span class="line">    <span class="comment">// 析构函数</span></span><br><span class="line">    ~<span class="built_in">linkedBinaryTree</span>() &#123; cout &lt;&lt; <span class="string">&quot;析构遍历: &quot;</span>; <span class="built_in">erase</span>(); &#125;;</span><br><span class="line">    <span class="comment">// 二叉树是否为空</span></span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">empty</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> treeSize == <span class="number">0</span>; &#125;</span><br><span class="line">    <span class="comment">// 二叉树大小</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">size</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> treeSize; &#125;</span><br><span class="line">    <span class="comment">// 根节点</span></span><br><span class="line">    <span class="function">E* <span class="title">rootElement</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> treeSize == <span class="number">0</span> ? <span class="literal">NULL</span> : &amp;root-&gt;element; &#125;</span><br><span class="line">    <span class="comment">// 制作二叉树</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">makeTree</span><span class="params">(<span class="type">const</span> E&amp; element, linkedBinaryTree&lt;E&gt;&amp; left, linkedBinaryTree&lt;E&gt;&amp; right)</span></span>;</span><br><span class="line">    <span class="comment">// 前序遍历</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">preOrder</span><span class="params">()</span> </span>&#123; <span class="built_in">m_preOrder</span>(root); &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">m_preOrder</span><span class="params">(binaryTreeNode&lt;E&gt;*)</span></span>;</span><br><span class="line">    <span class="comment">// 中序遍历</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">inOrder</span><span class="params">()</span> </span>&#123; <span class="built_in">m_inOrder</span>(root); &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">m_inOrder</span><span class="params">(binaryTreeNode&lt;E&gt;*)</span></span>;</span><br><span class="line">    <span class="comment">// 后序遍历</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">postOrder</span><span class="params">()</span> </span>&#123; <span class="built_in">m_postOrder</span>(root); &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">m_postOrder</span><span class="params">(binaryTreeNode&lt;E&gt;*)</span></span>;</span><br><span class="line">    <span class="comment">// 层序遍历</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">levelOrder</span><span class="params">()</span> </span>&#123; <span class="built_in">m_levelOrder</span>(root); &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">m_levelOrder</span><span class="params">(binaryTreeNode&lt;E&gt;*)</span></span>;</span><br><span class="line">    <span class="comment">// 树的深度</span></span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">height</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">m_height</span>(root); &#125;</span><br><span class="line">    <span class="function"><span class="type">int</span> <span class="title">m_height</span><span class="params">(binaryTreeNode&lt;E&gt;*)</span> <span class="type">const</span></span>;</span><br><span class="line">    <span class="comment">// 释放空间</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">erase</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">E</span>&gt;</span><br><span class="line"><span class="type">void</span> linkedBinaryTree&lt;E&gt;::<span class="built_in">makeTree</span>(<span class="type">const</span> E&amp; element, linkedBinaryTree&lt;E&gt;&amp; left, linkedBinaryTree&lt;E&gt;&amp; right)</span><br><span class="line">&#123;</span><br><span class="line">    root = <span class="keyword">new</span> <span class="built_in">binaryTreeNode</span>&lt;E&gt;(element, left.root, right.root);</span><br><span class="line">    treeSize = left.treeSize + right.treeSize + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    left.root = right.root = <span class="literal">NULL</span>;</span><br><span class="line">    left.treeSize = right.treeSize = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">E</span>&gt;</span><br><span class="line"><span class="type">void</span> linkedBinaryTree&lt;E&gt;::<span class="built_in">m_preOrder</span>(binaryTreeNode&lt;E&gt;* p)</span><br><span class="line">&#123;<span class="comment">// 前序遍历</span></span><br><span class="line">    <span class="keyword">if</span> (p != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; p-&gt;element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">        <span class="built_in">m_preOrder</span>(p-&gt;leftChild);</span><br><span class="line">        <span class="built_in">m_preOrder</span>(p-&gt;rightChild);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">E</span>&gt;</span><br><span class="line"><span class="type">void</span> linkedBinaryTree&lt;E&gt;::<span class="built_in">m_inOrder</span>(binaryTreeNode&lt;E&gt;* p)</span><br><span class="line">&#123;<span class="comment">// 中序遍历</span></span><br><span class="line">    <span class="keyword">if</span> (p != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">m_inOrder</span>(p-&gt;leftChild);</span><br><span class="line">        cout &lt;&lt; p-&gt;element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">        <span class="built_in">m_inOrder</span>(p-&gt;rightChild);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">E</span>&gt;</span><br><span class="line"><span class="type">void</span> linkedBinaryTree&lt;E&gt;::<span class="built_in">m_postOrder</span>(binaryTreeNode&lt;E&gt;* p)</span><br><span class="line">&#123;<span class="comment">// 后序遍历</span></span><br><span class="line">    <span class="keyword">if</span> (p != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">m_postOrder</span>(p-&gt;leftChild);</span><br><span class="line">        <span class="built_in">m_postOrder</span>(p-&gt;rightChild);</span><br><span class="line">        cout &lt;&lt; p-&gt;element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">E</span>&gt;</span><br><span class="line"><span class="type">void</span> linkedBinaryTree&lt;E&gt;::<span class="built_in">m_levelOrder</span>(binaryTreeNode&lt;E&gt;* t)</span><br><span class="line">&#123;<span class="comment">// 层序遍历</span></span><br><span class="line">    queue&lt;binaryTreeNode&lt;E&gt;*&gt; q;</span><br><span class="line">    <span class="keyword">while</span> (t != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        cout &lt;&lt; t-&gt;element &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 把孩子放入队列</span></span><br><span class="line">        <span class="keyword">if</span> (t-&gt;leftChild != <span class="literal">NULL</span>)</span><br><span class="line">            q.<span class="built_in">push</span>(t-&gt;leftChild);</span><br><span class="line">        <span class="keyword">if</span> (t-&gt;rightChild != <span class="literal">NULL</span>)</span><br><span class="line">            q.<span class="built_in">push</span>(t-&gt;rightChild);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取下一个要访问的节点</span></span><br><span class="line">        <span class="keyword">if</span> (q.<span class="built_in">size</span>() == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        t = q.<span class="built_in">front</span>();</span><br><span class="line">        q.<span class="built_in">pop</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">E</span>&gt;</span><br><span class="line"><span class="type">int</span> linkedBinaryTree&lt;E&gt;::<span class="built_in">m_height</span>(binaryTreeNode&lt;E&gt;* t) <span class="type">const</span></span><br><span class="line">&#123;<span class="comment">// 返回树的高度</span></span><br><span class="line">    <span class="keyword">if</span> (t == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;                   <span class="comment">// 空树</span></span><br><span class="line">    <span class="type">int</span> hl = <span class="built_in">m_height</span>(t-&gt;leftChild);  <span class="comment">// 左侧</span></span><br><span class="line">    <span class="type">int</span> hr = <span class="built_in">m_height</span>(t-&gt;rightChild); <span class="comment">// 右侧</span></span><br><span class="line">    <span class="keyword">if</span> (hl &gt; hr)</span><br><span class="line">        <span class="keyword">return</span> ++hl;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> ++hr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">E</span>&gt;</span><br><span class="line"><span class="type">void</span> linkedBinaryTree&lt;E&gt;::<span class="built_in">erase</span>()</span><br><span class="line">&#123;<span class="comment">// 删除所有节点</span></span><br><span class="line">    binaryTreeNode&lt;E&gt;* p = root;</span><br><span class="line">    <span class="keyword">if</span> (p != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">m_postOrder</span>(p-&gt;leftChild);</span><br><span class="line">        <span class="built_in">m_postOrder</span>(p-&gt;rightChild);</span><br><span class="line">        <span class="keyword">delete</span> p;</span><br><span class="line">    &#125;</span><br><span class="line">    root = <span class="literal">NULL</span>;</span><br><span class="line">    treeSize = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/10/10/202310101053/">https://mingxuanwu.com/2023/10/10/202310101053/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"># 数据结构</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/10/12/202310121708/">【数据结构】5.大根堆和左高树</a>
+            
+            
+            <a class="next" rel="next" href="/2023/10/10/202310101023/">Unity Redis 订阅</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

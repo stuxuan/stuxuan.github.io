@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【计算机网络：自顶向下方法】3.传输层 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【计算机网络：自顶向下方法】3.传输层</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">January 5, 2024&nbsp;&nbsp;20:13:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-概述和传输层服务"><a href="#1-概述和传输层服务" class="headerlink" title="1 概述和传输层服务"></a>1 概述和传输层服务</h1><ul>
+<li>传输层服务：进程之间的逻辑通信<ul>
+<li>依赖网络层的服务（延时、带宽）</li>
+<li>对网络层的服务进行加强（数据丢失、顺序混乱、加密）</li>
+<li>TCP：多路复用解复用、建立连接、拥塞控制、流量控制</li>
+<li>UDP：多路复用解复用</li>
+<li>TCP和UDP都<strong>不</strong>提供延时和带宽保证</li>
+</ul>
+</li>
+<li>网络层服务：主机之间的逻辑通信</li>
+</ul>
+<h1 id="2-多路复用与解复用"><a href="#2-多路复用与解复用" class="headerlink" title="2 多路复用与解复用"></a>2 多路复用与解复用</h1><ul>
+<li>TCP多路解复用（通过四元组区分socket）<ul>
+<li>主机收到IP数据报，每个数据报有源IP端口和目标IP端口</li>
+<li>每个数据报承载一个传输层报文段</li>
+<li>主机根据IP和端口号将报文段发送给对应的socket套接字</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104175527823-1965413881.png" width="60%"/></div>
+
+<ul>
+<li>UDP多路解复用（通过二元组区分socket）<ul>
+<li>主机收到UDP报文段，检查报文段目标端口号</li>
+<li>根据端口号定位对应的socket套接字</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104175606099-1993200910.png" width="60%"/></div>
+
+<h1 id="3-无连接传输：UDP"><a href="#3-无连接传输：UDP" class="headerlink" title="3 无连接传输：UDP"></a>3 无连接传输：UDP</h1><p>UDP：用户数据报协议，是无连接的，每次以报文为单位发送，仅仅在网络层基础上增加了端口。头部只有8个字节（64bit），包括源端口号、目标端口号、长度、校验和</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104180504759-1624038073.png" width="60%"/></div>
+
+<h1 id="4-可靠数据传输原理"><a href="#4-可靠数据传输原理" class="headerlink" title="4 可靠数据传输原理"></a>4 可靠数据传输原理</h1><h2 id="4-1-RDT渐进式开发"><a href="#4-1-RDT渐进式开发" class="headerlink" title="4.1 RDT渐进式开发"></a>4.1 RDT渐进式开发</h2><p>渐进式的开发可靠数据传输协议（rdt）的发送方和接收方，使用有限状态机（FSM）来描述发送方和接收方</p>
+<h3 id="4-1-1-Rdt-1-0"><a href="#4-1-1-Rdt-1-0" class="headerlink" title="4.1.1 Rdt 1.0"></a>4.1.1 Rdt 1.0</h3><p>假设在可靠信道上的可靠数据传输</p>
+<ul>
+<li>下层的信道是完全可靠的<ul>
+<li>没有比特出错、没有分组丢失</li>
+</ul>
+</li>
+<li>发送方和接收方的FSM<ul>
+<li>发送方将数据发送到下层信道</li>
+<li>接收方从下层信道接收数据</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104191329441-1648784520.png" width="60%"/></div>
+
+<h3 id="4-1-2-Rdt-2-0"><a href="#4-1-2-Rdt-2-0" class="headerlink" title="4.1.2 Rdt 2.0"></a>4.1.2 Rdt 2.0</h3><p>下层信道可能会出错，出现比特翻转，应该设计具有比特容差的信道</p>
+<ul>
+<li>确认（ACK）：接收方显示告诉发送方分组已经正确接收</li>
+<li>否定（NAK）：接收方显示告诉发送方分组发生了差错<ul>
+<li>发送方接收到NAK后重传分组</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104192604919-1538858102.png" width="60%"/></div>
+
+<h3 id="4-1-3-Rdt-2-1"><a href="#4-1-3-Rdt-2-1" class="headerlink" title="4.1.3 Rdt 2.1"></a>4.1.3 Rdt 2.1</h3><p>ACK和NAK也可能出错，导致发送方不知道应该做什么，通过引入序号的机制可以解决该问题</p>
+<ul>
+<li>停止等待协议<ul>
+<li>发送方在每个分组中加入序号</li>
+<li>如果ACK&#x2F;NAK出错，发送方重传当前分组</li>
+<li>接收方收到重复的分组，重新发送ACK&#x2F;NAK，并将该分组丢弃（不发给上层）</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104194313439-133161608.png" width="60%"/></div>
+
+<h3 id="4-1-4-Rdt-2-2"><a href="#4-1-4-Rdt-2-2" class="headerlink" title="4.1.4 Rdt 2.2"></a>4.1.4 Rdt 2.2</h3><p>无NAK的协议，与Rdt2.1功能相同，但是只是用ACK就可以解决所有问题</p>
+<ul>
+<li>接收方对最后正确接收的分组发ACK</li>
+<li>收到重复的ACK（如ACK0）时，发送方与收到NAK采取相同的动作：重传当前分组</li>
+<li>为后面的一次性发送多个数据单位做准备</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104194555990-790609466.png" width="60%"/></div>
+
+<h3 id="4-1-5-Rdt-3-0"><a href="#4-1-5-Rdt-3-0" class="headerlink" title="4.1.5 Rdt 3.0"></a>4.1.5 Rdt 3.0</h3><p>具有比特差错和分组丢失的信道，解决下层通道可能丢失分组的问题，否则一直等待ack导致程序死锁</p>
+<ul>
+<li>发送端超时重传</li>
+<li>重传会导致数据重复，但rdt2.2序号已经解决了该问题</li>
+<li>接收方指明被正确接收的序列号</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104195124484-648280210.png" width="100%"/></div>
+
+<p>　　rdt3.0性能存在问题，每次传一个分组，然后等待回复后再传输一个分组，这期间链路都是空闲的，用形象的例子就是高速公路上每次只能有一辆车从一个地方开到另一个地方，然后再开回来。</p>
+<h2 id="4-2-流水线协议"><a href="#4-2-流水线协议" class="headerlink" title="4.2 流水线协议"></a>4.2 流水线协议</h2><ul>
+<li>流水线：允许发送方未得到确认的情况下发送多个分组<ul>
+<li>增加序号的范围：用多个bit描述分组的序号</li>
+<li>在发送方&#x2F;接收方都需要有缓冲区<ul>
+<li>发送方缓冲：未得到确认，可能需要重传</li>
+<li>接收方缓冲：上层用户取数据的速率 ≠ 接收到的数据速率，接收到的数据可能乱序，需要排序后交付</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104195646341-1375205214.png" width="60%"/></div>
+
+<h3 id="4-2-1-滑动窗口协议"><a href="#4-2-1-滑动窗口协议" class="headerlink" title="4.2.1 滑动窗口协议"></a>4.2.1 滑动窗口协议</h3><ul>
+<li>发送缓冲区<ul>
+<li>形式：内存中一个区域，落入缓冲区的分组可以发送</li>
+<li>功能：用于存放已发送，但是没有得到确认的分组</li>
+<li>必要性：需要重发时可用</li>
+</ul>
+</li>
+<li>发送缓冲区的大小：一次最多发送多少未经确认的分组<ul>
+<li><strong>停止等待协议</strong> &#x3D; 1 （GBN）</li>
+<li><strong>流水线协议</strong> &gt; 1，但链路利用率不能超100%（SR）</li>
+</ul>
+</li>
+<li>发送缓冲区中的分组<ul>
+<li>未发送的：落入缓冲区的分组，可以连续发送出去</li>
+<li>已发送但等待确认的分组：发送缓冲区的分组只有得到确认才能删除</li>
+</ul>
+</li>
+</ul>
+<p>　　滑动窗口协议-发送窗口：绿色部分是滑动窗口，表示了<strong>落入缓冲区的分组</strong>，可以发送；前沿和后沿指针中间表示了<strong>发送窗口</strong>，是已经发送但没有确认的部分。当0号得到确认后，后沿可以移动到1号位置，滑动窗口也向前滑动。</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104201217577-1888258078.png" width="50%"/></div>
+
+<p>​		滑动窗口协议-接受窗口：绿色部分是滑动窗口，表示可以接收的分组数量；如果接收到1、2分组但未接收到0号分组，滑动窗口不会向前滑动，当接收到0号分组后，会一次滑动3个序号的长度。</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104201648489-813927572.png" width="60%"/></div>
+
+<h3 id="4-2-2-GBN和SR"><a href="#4-2-2-GBN和SR" class="headerlink" title="4.2.2 GBN和SR"></a>4.2.2 GBN和SR</h3><ul>
+<li>GBN和SR都是发送窗口&gt;1，且未经确认可以发送多个分组</li>
+<li>回退N步(Go-back-N)：一个包丢失会导致整个窗口重传<ul>
+<li>接收窗口大小&#x3D;1</li>
+<li>接收端只能顺序接收</li>
+<li>发送端发送了012345，一旦1没有发送成功，就必须完全重新传输12345</li>
+<li>简单、所需资源少，但出错后回退N步代价大</li>
+</ul>
+</li>
+<li>选择性重传(Selective Repeat)<ul>
+<li>接收窗口大小&gt;1</li>
+<li>接收端可以乱序接收</li>
+<li>发送端可以根据接收端的信息选择性重传</li>
+<li>复杂、所需资源多，但出错后只需重传一个分组</li>
+</ul>
+</li>
+</ul>
+<h1 id="5-面向连接的传输：TCP"><a href="#5-面向连接的传输：TCP" class="headerlink" title="5 面向连接的传输：TCP"></a>5 面向连接的传输：TCP</h1><ul>
+<li>点对点：一个发送方，一个接收方</li>
+<li>可靠地、按顺序的字节流，无报文边界</li>
+<li>管道话（流水线）：TCP拥塞控制和流量控制、设置窗口大小</li>
+<li>发送和接收缓存</li>
+<li>全双工数据<ul>
+<li>同一连接中数据双向流动</li>
+<li>MSS：最大报文段大小</li>
+</ul>
+</li>
+<li>面向连接：在数据交换之前，通过握手初始化发送方和接收方的状态变量</li>
+<li>有流量控制：发送方不会淹没接收方</li>
+</ul>
+<h2 id="5-1-TCP报文结构"><a href="#5-1-TCP报文结构" class="headerlink" title="5.1 TCP报文结构"></a>5.1 TCP报文结构</h2><ul>
+<li>seq 序号：该包的序列号。TCP报文段body部分（应用层数据）首字节在字节流的编号，TCP协议根据seq来确定顺序</li>
+<li>ack 确认号：该包的确认号（累计确认）<strong>。</strong>表示对对方已经收到了多少字节流，期望从另一方收到的下一个字节的序号。</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240105111653723-1951368197.png" width="60%"/></div>
+
+<ul>
+<li>下面是TCP seq 序号的一个例子，该包的第一个包数据段 seq&#x3D;1，该包的body部分长度未1448，该包的下一个序号就是 1+1448，以此类推，seq和ack都是字节流为单位的编号</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240105153516772-235440992.png" width="80%"/></div>
+
+<h2 id="5-2-超时重传"><a href="#5-2-超时重传" class="headerlink" title="5.2 超时重传"></a>5.2 超时重传</h2><p>　　TCP往返延时（RTT）和超时：超时重传设置的时间与采样往返延时挂钩，TCP维持一个均值采样RTT，公式如下</p>
+<p>EstimatedRTT &#x3D; (1-α) * EstimatedRTT + α * SampleRTT （ α推荐值是α&#x3D;0.125）</p>
+<p>　　除了估算RTT外，测量RTT的变化也是有价值的，以下用于估算SampleRTT一般会偏离EstimatedRTT的程度：</p>
+<p>DevRTT &#x3D; (1-β) * DevRTT + β * |SampleRTT - EstimatedRTT|</p>
+<p>　　最后超时重传的时间通过下面公式计算，因为设置为均值RTT是没有价值的，但是也不应该比均值RTT大太多</p>
+<p>TimeoutInterval &#x3D; EstimatedRTT + 4 * DevRTT</p>
+<ul>
+<li><p>TCP设置的累计确认是类似于GBN的，ACK表示该序号以及该序号之前的字节流都完成了接收工作</p>
+</li>
+<li><p>两种情况会触发重传事件，重传机制类似于SR</p>
+</li>
+<li><ul>
+<li>超时（只重发最早的未确认段：SR）</li>
+<li>快速重传（收到ACK50后连续收到3个ACK50，重传序号最小的段ACK50）</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-3-流量控制"><a href="#5-3-流量控制" class="headerlink" title="5.3 流量控制"></a>5.3 流量控制</h2><p>接收方控制发送方，不让发送方发送过快导致接收方的缓冲区溢出</p>
+<ul>
+<li>接收方反馈给发送方的TCP报文头部rwnd字段“通告”其空闲buffer大小<ul>
+<li>RcvBuffer大小通过socket选项设置，默认为4096字节</li>
+<li>很多操作系统自动调整RcvBuffer</li>
+</ul>
+</li>
+<li>发送方限制未确认字节的个数≤发送方过来的rwnd值</li>
+<li>保证接收方不会淹没发送方</li>
+</ul>
+<h2 id="5-4-连接管理"><a href="#5-4-连接管理" class="headerlink" title="5.4 连接管理"></a>5.4 连接管理</h2><ul>
+<li>正式交换数据前，发送方和接收方握手建立通信关系<ul>
+<li>同意建立连接</li>
+<li>初始化连接参数</li>
+</ul>
+</li>
+<li>两次握手存在的问题<ul>
+<li>客户端：发起连接请求</li>
+<li>连接请求在网络中存在延时，导致客户端超时重发</li>
+<li>服务器：收到了第一次延时到达的请求，返回给客户端同意连接</li>
+<li>客户端：收到错误的同意连接，因为这个连接信息对应的是第一次延时的段</li>
+<li>服务器：会维护虚假的半连接，客户端已经放弃这个连接了，服务器仍然在维护</li>
+</ul>
+</li>
+<li>三次握手（本质上是客户端给服务器一个序号，服务器返回客户端一个序号，两方都确认收到该序号，最少需要3次）<ul>
+<li>客户端：选择初始化序号，发送TCP SYN报文，Seq&#x3D;X</li>
+<li>服务器：返回SYNACK报文，Seq&#x3D;Y，ACK&#x3D;X+1</li>
+<li>客户端：发送SYNACK报文（可能包含数据），ACK&#x3D;Y+1</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240105191637265-221893326.png" width="60%"/></div>
+
+<ul>
+<li>关闭连接（不太完美，用定时器在一段时间后如果还没收到就当他释放了）<ul>
+<li>客户端：申请连接拆除</li>
+<li>服务器：同意拆除连接（拆除客户端 -&gt; 服务器方向的连接）</li>
+<li>服务器：申请连接拆除</li>
+<li>客户端：同意拆除连接（拆除服务器 -&gt; 客户端方向的连接）</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240105191827237-736099766.png" width="60%"/></div>
+
+<h2 id="5-5-拥塞控制"><a href="#5-5-拥塞控制" class="headerlink" title="5.5 拥塞控制"></a>5.5 拥塞控制</h2><ul>
+<li>端到端的拥塞控制（TCP采用的方法）<ul>
+<li>没有来自网络层的显示反馈：路由器负担较轻、符合网络核心简单的原则</li>
+<li>端系统根据延时和丢失事件判断是否拥塞</li>
+</ul>
+</li>
+<li>网络辅助的拥塞控制<ul>
+<li>路由器提供给端系统反馈信息</li>
+<li>单bit置为显示有用色（SNA，DECbit，TCP&#x2F;IP ECN，ATM）</li>
+<li>显示提供发送端可以采用的速率</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-5-1-TCP拥塞感知"><a href="#5-5-1-TCP拥塞感知" class="headerlink" title="5.5.1 TCP拥塞感知"></a>5.5.1 TCP拥塞感知</h2><ul>
+<li><p>某个段超时了（丢失事件）：</p>
+<p>拥塞</p>
+<ul>
+<li>网络拥塞（某个缓冲区没有空间了，被丢弃）概率大</li>
+<li>出错被丢失（各级错误，没有通过校验，被丢失）概率小</li>
+<li>有可能出现误判，但整体控制方向是对的</li>
+</ul>
+</li>
+<li><p>有关某个段的3次重复ACK：</p>
+<p>轻微拥塞</p>
+<ul>
+<li>网络这时还能够进行一定程度的传输，拥塞但情况要比第一种好</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-5-2-TCP拥塞控制"><a href="#5-5-2-TCP拥塞控制" class="headerlink" title="5.5.2 TCP拥塞控制"></a>5.5.2 TCP拥塞控制</h2><ul>
+<li>通过维持 CongWin 拥塞窗口的值来控制发送端的发送速度<ul>
+<li>SS阶段：加倍增加（每个RTT）</li>
+<li>CA阶段：线性增加（每个RTT）</li>
+<li>超时或3个重复ack需要降低拥塞窗口的值<ul>
+<li>超时：CongWin降为1MSS，进入SS阶段再倍增到ConWin&#x2F;2（每个RTT），从而进入CA阶段</li>
+<li>3个重复ACK：CongWin降为CongWin&#x2F;2，CA阶段</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>联合控制（发送速率由下面两个联合控制）<ul>
+<li>缓冲区剩余大小</li>
+<li>拥塞窗口大小</li>
+</ul>
+</li>
+<li>TCP慢启动：<ul>
+<li>连接开始时，CongWin&#x3D;1MSS（例如MSS&#x3D;1460bytes，RTT&#x3D;200s，初始速率为58.4kbps）</li>
+<li>连接开始后，指数性增加速率，每个RTT CongWin加倍</li>
+<li>1 -&gt; 2 -&gt; 4 -&gt; 8 -&gt; 16 -&gt; 32 -&gt; 64 -&gt; 128 …</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240105195523530-797883725.png" width="30%"/></div>
+
+<ul>
+<li>TCP拥塞控制：Additive Increase Multiplicative Decrease（AIMD, 乘性减，加性增）<ul>
+<li>乘性减：超时：丢失事件后将CongWin将为1，将CongWin&#x2F;2作为阈值，进入慢启动SS阶段</li>
+<li>加性增：当CongWin&gt;阈值后，每个RTT将CongWin加1MSS</li>
+<li>3个重复ACK：直接进入加性增CA阶段</li>
+</ul>
+</li>
+<li>整体的吞吐量大约为 3&#x2F;4 最大吞吐量</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240105200224613-764273073.png" width="50%"/></div>
+
+<ul>
+<li><p>TCP公平性</p>
+<ul>
+<li>假设有两个设备，并且两个设备的RTT相同</li>
+<li>设备A和设备B的带宽和为R</li>
+</ul>
+<ol>
+<li>假设开始时B的速率比A的速率快，大家都处于拥塞避免的阶段，则A和B的和会向右上移动</li>
+<li>发生拥塞后，A和B的速率都降低到原来的 1&#x2F;2 ，此时A’和B’相当于橙色连线中点处的值</li>
+<li>不断循环该过程，A和B的速率会趋向于相同</li>
+</ol>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240105200706311-1259556491.png" width="40%"/></div>
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/01/05/202401052013/">https://mingxuanwu.com/2024/01/05/202401052013/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"># 计算机网络</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/01/08/202401081024/">【计算机网络：自顶向下方法】4.网络层：数据平面</a>
+            
+            
+            <a class="next" rel="next" href="/2024/01/04/202401041604/">【计算机网络：自顶向下方法】2.应用层</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

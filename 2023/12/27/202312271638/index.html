@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【计算机网络：自顶向下方法】1.计算机网络概述 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【计算机网络：自顶向下方法】1.计算机网络概述</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">December 27, 2023&nbsp;&nbsp;16:38:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-Internet-具体结构"><a href="#1-Internet-具体结构" class="headerlink" title="1 Internet 具体结构"></a>1 Internet 具体结构</h1><p>　　Internet是松散的层次结构，也叫做网络的网络，由无数互联的ISP（互联网服务提供商）组成</p>
+<ul>
+<li>节点<ul>
+<li>主机及其上运行的应用程序（主机：端系统；网络应用程序）</li>
+<li>路由器、交换机等网络交换设备（分组交换设备：转发分组packets）</li>
+</ul>
+</li>
+<li>边（通信链路）<ul>
+<li>接入网链路：主机连接到互联网的链路</li>
+<li>主干链路：路由器之间的链路（光纤、电缆、无线电、卫星）</li>
+</ul>
+</li>
+<li>协议<ul>
+<li>TCP、IP、HTTP、FTP、PPP等</li>
+</ul>
+</li>
+</ul>
+<h1 id="2-网络边缘"><a href="#2-网络边缘" class="headerlink" title="2 网络边缘"></a>2 网络边缘</h1><h2 id="2-1-网络结构"><a href="#2-1-网络结构" class="headerlink" title="2.1 网络结构"></a>2.1 网络结构</h2><ul>
+<li><strong>网络边缘：</strong>主机、应用程序</li>
+<li><strong>网络核心：</strong>互联着的路由器、网络的网络</li>
+<li><strong>接入网、物理媒体：</strong>有线或者无线通信链路</li>
+</ul>
+<h2 id="2-2-网络边缘"><a href="#2-2-网络边缘" class="headerlink" title="2.2 网络边缘"></a>2.2 网络边缘</h2><ul>
+<li><strong>端系统（主机）</strong>：运行的应用程序、Web、Email，在“网络的边缘”</li>
+<li><strong>客户端&#x2F;服务器模式</strong>：客户端向服务器请求、接收服务器，如Web浏览器&#x2F;服务器，email客户端&#x2F;服务器</li>
+<li><strong>对等（peer-peer）模式</strong>：很少甚至没有专门的服务器</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231226113247594-429412294.png" width="25%"/></div>
+
+<h3 id="2-2-1-面向连接服务"><a href="#2-2-1-面向连接服务" class="headerlink" title="2.2.1 面向连接服务"></a>2.2.1 面向连接服务</h3><p><strong>目标：</strong>在端系统之间传输数据，在数据传输之前握手做好准备（Transmission Control Protocol，TCP）传输控制协议</p>
+<p><strong>TCP：</strong>可靠地、按顺序地传送数据（确认和重传），流量控制（发送方不会淹没接收方），拥塞控制（网络拥塞时发送方降低发送速率）</p>
+<p><strong>案例：</strong>HTTP（web），FTP（文件传送），Telnet（远程登陆），SMTP（email）</p>
+<h3 id="2-2-2-无连接服务"><a href="#2-2-2-无连接服务" class="headerlink" title="2.2.2 无连接服务"></a>2.2.2 无连接服务</h3><p><strong>目标：</strong>在端系统之间传输数据，无连接服务（User Datagram Protocol，UDP）用户数据报协议</p>
+<p><strong>案例：</strong>流媒体、远程会议、DNS、Internet电话</p>
+<h1 id="3-网络核心"><a href="#3-网络核心" class="headerlink" title="3 网络核心"></a>3 网络核心</h1><h2 id="3-1-电路交换"><a href="#3-1-电路交换" class="headerlink" title="3.1 电路交换"></a>3.1 电路交换</h2><p>　　端到端的资源被分配给从源端到目标端的呼叫“call”。如下图所示，每段链路有4条线路，当完成呼叫后，独享这一条链路资源（性能保障），但如果没有数据发送，被分配的资源就会被浪费。</p>
+<p>　　电路交换的原理为呼叫分片，将网络资源分片，如频分、时分、波分</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231226205047279-537144527.png" width="40%"/></div>
+
+<h2 id="3-2-分组交换"><a href="#3-2-分组交换" class="headerlink" title="3.2 分组交换"></a>3.2 分组交换</h2><ul>
+<li>以分组为单位存储-转发的方式，网络带宽资源不再分为一个个的切片，传输时使用全部的带宽，主机之间传输的<strong>数据被分为一个个分组</strong></li>
+<li>网络核心中的路由器进行存储-转发，再转发之前需要接收到整个分组，线路延时会大于电路交换，并且存在不确定的排队时间</li>
+<li><strong>排队和延时</strong>都可能出现，极端情况下路由器缓存耗尽则分组会被抛弃造成<strong>包丢失</strong></li>
+<li><strong>网络核心的关键功能</strong>：路由（决定分组从源到目标的路径），转发（将分组从输入链路转移到输出链路）</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231226210810134-1051633214.png" width="60%"/></div>
+
+<h2 id="3-3-电路交换和分组交换对比"><a href="#3-3-电路交换和分组交换对比" class="headerlink" title="3.3 电路交换和分组交换对比"></a>3.3 电路交换和分组交换对比</h2><ul>
+<li>假设线路带宽为 1Mbps，每个用户活跃时带宽为 100kbps<ul>
+<li>线路交换：1M &#x2F; 100k &#x3D; 10 个用户（最大支持10个用户使用）</li>
+<li>分组交换：假设有35个用户，任意时刻&gt;&#x3D;10个用户的概率为 0.4%，可以理解为支持35个用户使用分组交换</li>
+</ul>
+</li>
+<li>分组交换延时更高，有数据丢失的风险，过度使用分组交换会导致网络拥塞</li>
+</ul>
+<h2 id="3-4-分组交换网络：存储-转发"><a href="#3-4-分组交换网络：存储-转发" class="headerlink" title="3.4 分组交换网络：存储-转发"></a>3.4 分组交换网络：存储-转发</h2><p>分组交换：分组的存储转发一段一段从源端传到目标端，按照有无网络层的连接分为以下两类</p>
+<ul>
+<li>数据报网络：<ul>
+<li>分组的目标地址决定路由器的下一条</li>
+<li>在不同的阶段路由可以改变</li>
+<li>类似于问路</li>
+<li>Internet</li>
+</ul>
+</li>
+<li>虚电路网络：<ul>
+<li>每个分组都携带标签（虚电路标识 VCID），标签决定下一跳</li>
+<li>呼叫建立时决定路径，在整个呼叫中路径不变</li>
+<li>路由器维持每个呼叫的状态信息</li>
+<li>X.25和ATM</li>
+</ul>
+</li>
+</ul>
+<p>数据报（datagram）的工作原理</p>
+<p>　　通信之前无需建立连接，每个分组都独立路由（路径不一样，可能失序），路由器根据目标地址进行路由</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231226212251617-1438021824.png" width="60%"/></div>
+
+<h1 id="4-接入网和物理媒体"><a href="#4-接入网和物理媒体" class="headerlink" title="4 接入网和物理媒体"></a>4 接入网和物理媒体</h1><ul>
+<li>modem（调制解调器），使用已有的电话线作为物理媒介，通过调制加载音频传输信号</li>
+<li>有线电视网络传输信号（非对称，最高30Mbps下行，2Mbps上行传输速率）</li>
+<li>无线接入网络，WLANs或者广域无线网（4G 5G LTE）</li>
+<li>物理媒体：同轴电缆，光纤和光缆</li>
+</ul>
+<h1 id="5-Internet结构和ISP"><a href="#5-Internet结构和ISP" class="headerlink" title="5 Internet结构和ISP"></a>5 Internet结构和ISP</h1><p>　　端系统通过<strong>接入ISPs</strong>（网络服务提供商）连接到互联网，接入ISPs必须是互联的，才能保证信息发送到任意2个不同ISP的端系统，导致“网络的网络”非常复杂。接入网连接入区域性ISP，区域性ISP与顶层ISP相连实现不同地区的网络互连，也可以通过IXP（对等ISP互联互通）互联。其中ICP（互联网内容提供商）如谷歌会部署专用网络和各级ISP连接</p>
+<ul>
+<li>第一层ISP：国家&#x2F;国际覆盖，速率极高：与其他第一层ISP相连，与大量第二层ISP和其他客户端相连</li>
+<li>第二层ISP：区域性ISP，与一个或多个第一层ISP相连，与其他第二层ISP相连</li>
+<li>第三层ISP和其他本地ISP：接入网（与端系统最近）</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231227110637511-1015198810.png" width="60%"/></div>
+
+<h1 id="6-分组延时、丢失和吞吐量"><a href="#6-分组延时、丢失和吞吐量" class="headerlink" title="6 分组延时、丢失和吞吐量"></a>6 分组延时、丢失和吞吐量</h1><ul>
+<li>分组延时<ul>
+<li>节点处理延时：检查bit级出错，检查头部决定传输方向</li>
+<li>排队延时：在输出链路上排队等待之前的包发送</li>
+<li>传输延时：包大小和链路带宽决定</li>
+<li>传播延时：物理链路距离和传播速度决定</li>
+</ul>
+</li>
+<li>排队延时<ul>
+<li>R（链路带宽bps）、L（分组长度bits）、a（分组到达平均速率）</li>
+<li>排队延时越接近1，平均延时会大幅上升</li>
+<li>Traceroute诊断程序，从源端到目标端经过的路由器，测量延时</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231227112816604-21499408.png" width="30%"/></div>
+
+<h1 id="7-协议层次和服务模型"><a href="#7-协议层次和服务模型" class="headerlink" title="7 协议层次和服务模型"></a>7 协议层次和服务模型</h1><ul>
+<li>服务和服务访问点<ul>
+<li>服务（service）：低层实体向上层实体提供他们之间通信的能力</li>
+<li>原语（primitive）：上层使用下层服务的形式，高层使用低层提供的服务，以及低层向高层提供服务都通过访问原语进行交互</li>
+<li>服务访问点SAP（services access point）：上层使用下层提供的服务通过层间接口的地点</li>
+</ul>
+</li>
+<li>服务的类型<ul>
+<li>面向连接的服务（包括建立连接、通信、拆除链接的过程，保序性，字节流）</li>
+<li>无连接的服务（不可靠、无序建立连接、可能重复和失序）</li>
+</ul>
+</li>
+<li>Internet 协议栈<ul>
+<li><strong>应用层</strong>（报文 message）：网络应用，在TCP和UDP基础上实现FTP、HTTP、SMTP、DNS等</li>
+<li><strong>传输层</strong>（报文段 segment）：主机之前的数据传输，在将网络层提供的端到端通信基础上细分为进程到进程（TCP、UDP）</li>
+<li><strong>网络层</strong>（分组 packet或数据报 datagram）：为数据报从源到目标选择路由（IP，路由协议）</li>
+<li><strong>链路层</strong>（帧 frame）：相邻网络节点间的数据传输（点对点协议，可靠或不可靠）</li>
+<li><strong>物理层</strong>（位 bit）：在线路上传播bit</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231227163100136-1365955141.png" width="60%"/></div>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/12/27/202312271638/">https://mingxuanwu.com/2023/12/27/202312271638/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"># 计算机网络</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/01/04/202401041604/">【计算机网络：自顶向下方法】2.应用层</a>
+            
+            
+            <a class="next" rel="next" href="/2023/12/09/202312091400/">【OpenSSL】Base64 二进制数据编码解码（OpenSSL BIO）</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

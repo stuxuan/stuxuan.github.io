@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【STL和泛型编程】4. hashtable、unordered_set、unordered_map | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【STL和泛型编程】4. hashtable、unordered_set、unordered_map</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">March 1, 2024&nbsp;&nbsp;17:18:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-hashtable"><a href="#1-hashtable" class="headerlink" title="1. hashtable"></a>1. hashtable</h1><p>前置知识：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/stux/p/17740271.html">【数据结构】3.跳表和散列</a> </p>
+<p>基本原理：</p>
+<ul>
+<li>将Key计算成一个数值，然后取余数得到它在表头中的位置</li>
+<li>table（篮子）里每个指针都指向一个链表（桶）来存储余数相同的值</li>
+<li>如果桶内的元素个数比篮子个数还多，则将篮子的大小扩充</li>
+<li>篮子是vector，数量是质数，初始为53，53扩充后为97</li>
+</ul>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240229100358719-996586763.png" width="40%"/></div>
+
+<p>　　hashtable需要传入Value(Key+Data)，Key，计算哈希的方法，从Value中取出Key的方法，比较Key是否相等的方法，以及分配器来实例化</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Value</span>, <span class="keyword">class</span> <span class="title class_">Key</span>, <span class="keyword">class</span> <span class="title class_">HashFcn</span>, <span class="keyword">class</span> <span class="title class_">ExtractKey</span>, <span class="keyword">class</span> <span class="title class_">EqualKey</span>, <span class="keyword">class</span> <span class="title class_">Alloc</span>=alloc&gt;</span><br><span class="line"><span class="keyword">class</span> hashtable &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">typedef</span> HashFcn   hasher;</span><br><span class="line">    <span class="keyword">typedef</span> EqualKey  key_equal;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="type">size_t</span>    size_type;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    hasher hash;</span><br><span class="line">    key_equal equals;</span><br><span class="line">    ExtractKey get_key;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">typedef</span> __hashtable_node&lt;Value&gt; node;</span><br><span class="line"></span><br><span class="line">    vector&lt;node*, Alloc&gt; bucket;</span><br><span class="line">    size_type num_element;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">size_type <span class="title">bucket_count</span><span class="params">()</span> <span class="type">const</span> </span>&#123;<span class="keyword">return</span> bucket.<span class="built_in">size</span>(); &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Value</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">__hashtable_node</span> &#123;</span><br><span class="line">    __hashtable_node* next;</span><br><span class="line">    Value val;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p> 　　hashtable的篮子使用vector数组实现，迭代器中有两个指针，<code>*cur</code>指向当前元素位置，<code>*ht</code>指向它在篮子中的位置，实现操作者视角的<code>++</code>操作</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Value</span>, <span class="keyword">class</span> <span class="title class_">Key</span>, <span class="keyword">class</span> <span class="title class_">HashFcn</span>, <span class="keyword">class</span> <span class="title class_">ExtractKey</span>, <span class="keyword">class</span> <span class="title class_">EqualKey</span>, <span class="keyword">class</span> <span class="title class_">Alloc</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">__hashtable_iterator</span> &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    node* cur;</span><br><span class="line">    hashtable* ht;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-unordered-set-multi"><a href="#2-unordered-set-multi" class="headerlink" title="2. unordered_set &#x2F; multi"></a>2. unordered_set &#x2F; multi</h1><p>　　第二个模板参数中，C++底层提供的哈希函数 hash<Key> 只适用于基本数据类型（包括 string 类型）；第三个模板参数中，仅支持可直接用 &#x3D;&#x3D; 运算符做比较的数据类型</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt; <span class="keyword">class</span> <span class="title class_">Key</span>,                      <span class="comment">//容器中存储元素的类型</span></span><br><span class="line">           <span class="keyword">class</span> <span class="title class_">Hash</span> = hash&lt;Key&gt;,        <span class="comment">//确定元素存储位置所用的哈希函数</span></span><br><span class="line">           <span class="keyword">class</span> Pred = equal_to&lt;Key&gt;,    <span class="comment">//判断各个元素是否相等所用的函数</span></span><br><span class="line">           <span class="keyword">class</span> Alloc = allocator&lt;Key&gt;   <span class="comment">//指定分配器对象的类型</span></span><br><span class="line">           &gt; <span class="keyword">class</span> unordered_set;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-unordered-map-multi"><a href="#3-unordered-map-multi" class="headerlink" title="3. unordered_map &#x2F; multi"></a>3. unordered_map &#x2F; multi</h1><p>　　Key是键值对中的键、T是键值对中的data，&lt;Key, T&gt;组成hashtable中的Value。接下来的模板参数与unordered_set中相同</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt; <span class="keyword">class</span> <span class="title class_">Key</span>,                        <span class="comment">//键值对中键的类型</span></span><br><span class="line">           <span class="keyword">class</span> <span class="title class_">T</span>,                          <span class="comment">//键值对中值的类型</span></span><br><span class="line">           <span class="keyword">class</span> <span class="title class_">Hash</span> = hash&lt;Key&gt;,           <span class="comment">//容器内部存储键值对所用的哈希函数</span></span><br><span class="line">           <span class="keyword">class</span> Pred = equal_to&lt;Key&gt;,       <span class="comment">//判断各个键值对键相同的规则</span></span><br><span class="line">           <span class="keyword">class</span> Alloc = allocator&lt; pair&lt;<span class="type">const</span> Key,T&gt; &gt;  <span class="comment">// 指定分配器对象的类型</span></span><br><span class="line">           &gt; <span class="keyword">class</span> unordered_map;</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-unordered-map-和-map-对比"><a href="#4-unordered-map-和-map-对比" class="headerlink" title="4. unordered_map 和 map 对比"></a>4. unordered_map 和 map 对比</h1><ul>
+<li>map &#x2F; set ，底层实现是红黑树<ul>
+<li>+ 自带排序的性质</li>
+<li>+ 查找的时间复杂度是O(logn)</li>
+<li>- 每个节点都需要存储额外的信息</li>
+</ul>
+</li>
+<li>unordered_map &#x2F; unordered_set，底层是哈希表<ul>
+<li>+ 哈希表通过Key计算查找非常快 理想情况下是O(1)</li>
+<li>- 篮子数量&gt;元素数量，每次扩充复制的时候比较耗时</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/03/01/202403011718/">https://mingxuanwu.com/2024/03/01/202403011718/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/STL%E5%92%8C%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/"># STL和泛型编程</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/05/09/202405091009/">【工具】读取数据并插入到数据库中</a>
+            
+            
+            <a class="next" rel="next" href="/2024/02/29/202402290956/">【STL和泛型编程】3. set、map分析（及typename起源）</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

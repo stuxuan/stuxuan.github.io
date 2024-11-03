@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【OpenSSL】哈希、非对称加密和对称加密函数使用 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【OpenSSL】哈希、非对称加密和对称加密函数使用</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">December 7, 2023&nbsp;&nbsp;21:04:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-哈希"><a href="#1-哈希" class="headerlink" title="1.哈希"></a>1.哈希</h1><h2 id="1-1-md5的使用"><a href="#1-1-md5的使用" class="headerlink" title="1.1 md5的使用"></a>1.1 md5的使用</h2><ul>
+<li>头文件</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openssl/md5.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openssl/sha.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>MD5 散列值的长度</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># <span class="keyword">define</span> MD5_DIGEST_LENGTH 16    <span class="comment">// 根据这个分配一块空内存保存散列值</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>初始化MD5 -&gt; 给MD5传入运算的数据（可以多次传入） -&gt; 计算MD5</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># <span class="keyword">define</span> MD5_DIGEST_LENGTH 16    <span class="comment">// md5哈希值长度</span></span></span><br><span class="line"><span class="comment">// 初始化函数, 初始化参数 c</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">MD5_Init</span><span class="params">(MD5_CTX *c)</span>;</span><br><span class="line"><span class="comment">/*    参数c: 传出参数    */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 添加md5运算的数据, 没有计算数据, 所以可以多次添加数据</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">MD5_Update</span><span class="params">(MD5_CTX *c, <span class="type">const</span> <span class="type">void</span> *data, <span class="type">size_t</span> len)</span>;</span><br><span class="line"><span class="comment">/*  参数:</span></span><br><span class="line"><span class="comment">        c: MD5_Init() 初始化得到的</span></span><br><span class="line"><span class="comment">        data: 传入参数, 字符串</span></span><br><span class="line"><span class="comment">        len: data数据的长度   */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 对添加的数据进行md5计算        </span></span><br><span class="line"><span class="type">int</span> <span class="title function_">MD5_Final</span><span class="params">(<span class="type">unsigned</span> <span class="type">char</span> *md, MD5_CTX *c)</span>;</span><br><span class="line"><span class="comment">/*  参数:</span></span><br><span class="line"><span class="comment">        md: 传出参数, 存储得到的哈希值</span></span><br><span class="line"><span class="comment">        c: MD5_Init() 初始化得到的        */</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>通过传参直接生成 md5 哈希值</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通过传递的参数, 直接生成一个md5哈希值，只能添加一次数据</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">char</span> *<span class="title function_">MD5</span><span class="params">(<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *d, <span class="type">size_t</span> n, <span class="type">unsigned</span> <span class="type">char</span> *md)</span>;</span><br><span class="line"><span class="comment">/*  参数:</span></span><br><span class="line"><span class="comment">        - d: 传入, 要进行md5运算的字符串</span></span><br><span class="line"><span class="comment">        - n: 字符串的的长度</span></span><br><span class="line"><span class="comment">        - md: 传出, 存储md5的哈希值</span></span><br><span class="line"><span class="comment">    返回值: 这个地址的函数第三个参数md地址        */</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>编译时记得加 lcrypto -lssl</li>
+</ul>
+<h1 id="2-非对称加密"><a href="#2-非对称加密" class="headerlink" title="2. 非对称加密"></a>2. 非对称加密</h1><h2 id="2-1-非对称加密简介"><a href="#2-1-非对称加密简介" class="headerlink" title="2.1 非对称加密简介"></a>2.1 非对称加密简介</h2><ul>
+<li>密钥对：公钥、私钥（非对称加密，一方加密只有另一方可以解密）<ul>
+<li>公钥加密、必须私钥解密</li>
+<li>私钥加密、必须公钥解密</li>
+</ul>
+</li>
+<li>应用场景：<ul>
+<li>密钥分发（对称加密的密钥分发）<ul>
+<li><strong>公钥加密，私钥解密</strong></li>
+<li>将公钥分发给其他人，其他人都可以使用公钥加密数据，但只有自己的私钥可以解密数据</li>
+</ul>
+</li>
+<li>数字签名（验证数据是否被篡改、数据的所有者）<ul>
+<li><strong>私钥加密，公钥解密</strong></li>
+<li>签名<ul>
+<li>对原始数据进行哈希运算，对哈希值加密得到密文</li>
+<li>将原始数据和加密的哈希值发送给其他人</li>
+</ul>
+</li>
+<li>校验签名<ul>
+<li>收到 原始数据 和 加密的哈希值</li>
+<li>对原始数据求 哈希值</li>
+<li>对加密的哈希值解密得到 哈希值</li>
+<li>比较两个哈希值判断数据是否被篡改（还需要验证公钥的发送人身份，CA机构就是干这个的）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-2-生成RSA密钥对"><a href="#2-2-生成RSA密钥对" class="headerlink" title="2.2 生成RSA密钥对"></a>2.2 生成RSA密钥对</h2><ul>
+<li>头文件</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openssl/rsa.h&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>得到RSA类型的变量</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">RSA* <span class="title function_">RSA_new</span><span class="params">(<span class="type">void</span>)</span>;        <span class="comment">// 申请一块内存, 存储了公钥和私钥</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">RSA_free</span><span class="params">(RSA *)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>生成密钥对，取公钥和私钥</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">RSA_generate_key_ex</span><span class="params">(RSA* rsa, <span class="type">int</span> bits, BIGNUM* e, BN_GENCB* cb)</span>;</span><br><span class="line"><span class="comment">/*  参数:</span></span><br><span class="line"><span class="comment">        rsa: 通过RSA_new()获得</span></span><br><span class="line"><span class="comment">        bits: 秘钥长度, 单位: bit, 常用的长度 1024*n (n正整数)</span></span><br><span class="line"><span class="comment">        e: 比较大的数(5位以内)</span></span><br><span class="line"><span class="comment">            通过 BIGNUM* e = BN_new(); 获得</span></span><br><span class="line"><span class="comment">            初始化: BN_set_word(e, 12345);</span></span><br><span class="line"><span class="comment">        cb: 回调函数, 用不到, 直接写NULL       */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// rsa公钥私钥类型是一样的: RSA类型</span></span><br><span class="line"><span class="comment">// 将参数rsa中的公钥提取出来</span></span><br><span class="line">RSA* <span class="title function_">RSAPublicKey_dup</span><span class="params">(RSA* rsa)</span>;</span><br><span class="line"><span class="comment">/*  rsa参数: 秘钥信息</span></span><br><span class="line"><span class="comment">    返回值: rsa公钥      */</span></span><br><span class="line"><span class="comment">// 将参数rsa中的私钥提取出来</span></span><br><span class="line">RSA* <span class="title function_">RSAPrivateKey_dup</span><span class="params">(RSA* rsa)</span>;</span><br><span class="line"><span class="comment">/*  rsa参数: 秘钥信息</span></span><br><span class="line"><span class="comment">    返回值: rsa私钥    */</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>将密钥存储到磁盘</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openssl/pem.h&gt;</span>    <span class="comment">// 头文件</span></span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span></span><br><span class="line">&#123;    <span class="comment">// 由于dll库里没有这个部分，需要包含进去一起编译</span></span><br><span class="line">    <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openssl/applink.c&gt;</span></span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">PEM_write_RSAPublicKey</span><span class="params">(FILE* fp, <span class="type">const</span> RSA* r)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">PEM_write_RSAPrivateKey</span><span class="params">(FILE* fp, <span class="type">const</span> RSA* r, <span class="type">const</span> EVP_CIPHER* enc, <span class="type">unsigned</span> <span class="type">char</span>* kstr, <span class="type">int</span> klen, pem_password_cb *cb, <span class="type">void</span>* u)</span>;    </span><br><span class="line"><span class="comment">/*  参数:</span></span><br><span class="line"><span class="comment">        fp: 需要打开一个磁盘文件, 并且指定写权限</span></span><br><span class="line"><span class="comment">        r: 存储了密钥对</span></span><br><span class="line"><span class="comment">        /------- 私钥独有的参数 -------/</span></span><br><span class="line"><span class="comment">        enc: 指定的加密算法 -&gt; 对称加密 -&gt; NULL</span></span><br><span class="line"><span class="comment">        kstr: 对称加密的秘钥 -&gt; NULL</span></span><br><span class="line"><span class="comment">        klen: 秘钥长度 -&gt; 0</span></span><br><span class="line"><span class="comment">        cb: 回调函数, 用不到, NULL</span></span><br><span class="line"><span class="comment">        u: 给回调传参, 用不到, NULL        */</span></span><br><span class="line">RSA* <span class="title function_">PEM_read_RSAPublicKey</span><span class="params">(FILE* fp, RSA** r, pem_password_cb *cb, <span class="type">void</span>* u)</span>;</span><br><span class="line">RSA* <span class="title function_">PEM_read_RSAPrivateKey</span><span class="params">(FILE* fp, RSA** r, pem_password_cb *cb, <span class="type">void</span>* u)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>示例代码</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openssl/pem.h&gt;</span></span></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    RSA* rsa = RSA_new();   <span class="comment">// 创建RSA变量</span></span><br><span class="line">    BIGNUM* e = BN_new();   <span class="comment">// 创建bignum变量并实例化</span></span><br><span class="line">    BN_set_word(e, <span class="number">12345</span>);</span><br><span class="line">    RSA_generate_key_ex(rsa, <span class="number">4096</span>, e, <span class="literal">NULL</span>);    <span class="comment">// 生成密钥对</span></span><br><span class="line">    FILE* fp = fopen(<span class="string">&quot;public.pem&quot;</span>, <span class="string">&quot;w&quot;</span>);</span><br><span class="line">    PEM_write_RSAPublicKey(fp, rsa);    <span class="comment">// 写入公钥</span></span><br><span class="line">    fp = fopen(<span class="string">&quot;private.pem&quot;</span>, <span class="string">&quot;w&quot;</span>);</span><br><span class="line">    PEM_write_RSAPrivateKey(fp, rsa, <span class="literal">NULL</span>, <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);    <span class="comment">// 写入私钥</span></span><br><span class="line">    fclose(fp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-3-加密"><a href="#2-3-加密" class="headerlink" title="2.3 加密"></a>2.3 加密</h2><ul>
+<li>使用公钥或私钥，加密或解密（加密后的长度和密钥长度相同，还需要指定填充方案，所以传入的数据应该小于等于密钥长度 - 填充长度</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ---- 加密使用 ----</span></span><br><span class="line"><span class="comment">// 公钥加密</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">RSA_public_encrypt</span><span class="params">(<span class="type">int</span> flen, <span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *from, <span class="type">unsigned</span> <span class="type">char</span> *to, RSA *rsa, <span class="type">int</span> padding)</span>;</span><br><span class="line"><span class="comment">// 私钥解密</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">RSA_private_decrypt</span><span class="params">(<span class="type">int</span> flen, <span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *from, <span class="type">unsigned</span> <span class="type">char</span> *to, RSA *rsa, <span class="type">int</span> padding)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ---- 签名使用 ----</span></span><br><span class="line"><span class="comment">// 私钥加密</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">RSA_private_encrypt</span><span class="params">(<span class="type">int</span> flen, <span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *from, <span class="type">unsigned</span> <span class="type">char</span> *to, RSA *rsa, <span class="type">int</span> padding)</span>;</span><br><span class="line"><span class="comment">// 公钥解密</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">RSA_public_decrypt</span><span class="params">(<span class="type">int</span> flen, <span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *from, <span class="type">unsigned</span> <span class="type">char</span> *to, RSA *rsa, <span class="type">int</span> padding)</span>;</span><br><span class="line"><span class="comment">/*  参数:</span></span><br><span class="line"><span class="comment">        flen: 要加密/解密的数据长度</span></span><br><span class="line"><span class="comment">            加密数据的长度 0 &lt; flen &lt;= 秘钥长度-11，解密数据的长度=密钥长度</span></span><br><span class="line"><span class="comment">        from: 传入, 要加密/解密的数据</span></span><br><span class="line"><span class="comment">        to: 传出, 存储数据, 加密-&gt;存储密文, 解密-&gt;存储明文</span></span><br><span class="line"><span class="comment">        rsa: 秘钥: 公钥/私钥</span></span><br><span class="line"><span class="comment">        padding: 指定填充方案, 数据填充, 不需要使用者做</span></span><br><span class="line"><span class="comment">            RSA_PKCS1_PADDING -&gt; 使用该方案会填充11字节     */</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>代码示例</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openssl/pem.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 创建密钥过程</span></span><br><span class="line">    RSA *rsa = RSA_new(); <span class="comment">// 创建RSA变量</span></span><br><span class="line">    BIGNUM *e = BN_new(); <span class="comment">// 创建bignum变量并实例化</span></span><br><span class="line">    BN_set_word(e, <span class="number">12345</span>);</span><br><span class="line">    RSA_generate_key_ex(rsa, <span class="number">1024</span>, e, <span class="literal">NULL</span>); <span class="comment">// 生成密钥对</span></span><br><span class="line">    RSA *pubKey = RSAPublicKey_dup(rsa);</span><br><span class="line">    RSA *priKey = RSAPrivateKey_dup(rsa);</span><br><span class="line">    <span class="comment">// 加密过程</span></span><br><span class="line">    <span class="type">int</span> keyLen = RSA_size(pubKey); <span class="comment">// 数据被加密后和密钥的长度相同</span></span><br><span class="line">    <span class="built_in">string</span> msg = <span class="string">&quot;Hello world!&quot;</span>;</span><br><span class="line">    <span class="type">char</span> *buf = new <span class="type">char</span>[keyLen];</span><br><span class="line">    <span class="type">int</span> ret = RSA_public_encrypt(msg.size(), (<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *)msg.data(), (<span class="type">unsigned</span> <span class="type">char</span> *)buf, pubKey, RSA_PKCS1_PADDING);</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;加密后的长度为 &quot;</span> &lt;&lt; ret &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="comment">// 解密过程</span></span><br><span class="line">    <span class="type">char</span> *newText = new <span class="type">char</span>[keyLen];</span><br><span class="line">    ret = RSA_private_decrypt(<span class="number">128</span>, (<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *)buf, (<span class="type">unsigned</span> <span class="type">char</span> *)newText, priKey, RSA_PKCS1_PADDING);</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;解密后的长度为 &quot;</span> &lt;&lt; ret &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; newText &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4-签名"><a href="#2-4-签名" class="headerlink" title="2.4 签名"></a>2.4 签名</h2><ul>
+<li>加密哈希值和验证哈希值，其实就是帮我们把加密和验证放到一个函数里了（这里有一个坑，要签名的数据长度必须小于密钥长度-11）</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">RSA_sign</span><span class="params">(<span class="type">int</span> type, <span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *m, <span class="type">unsigned</span> <span class="type">int</span> m_length, <span class="type">unsigned</span> <span class="type">char</span> *sigret, <span class="type">unsigned</span> <span class="type">int</span> *siglen, RSA *rsa)</span>;</span><br><span class="line"><span class="comment">/*  参数:</span></span><br><span class="line"><span class="comment">        type: 使用的哈希算法</span></span><br><span class="line"><span class="comment">            NID_MD5</span></span><br><span class="line"><span class="comment">            NID_SHA1</span></span><br><span class="line"><span class="comment">            NID_SHA224</span></span><br><span class="line"><span class="comment">             .....</span></span><br><span class="line"><span class="comment">        m: 要进行签名的数据</span></span><br><span class="line"><span class="comment">        m_length: 要签名的数据长度</span></span><br><span class="line"><span class="comment">            - 0 &lt; m_length &lt;= 秘钥长度-11</span></span><br><span class="line"><span class="comment">        sigret: 传出, 存储了签名之后的数据 -&gt; 密文</span></span><br><span class="line"><span class="comment">        siglen: sigret密文长度</span></span><br><span class="line"><span class="comment">        rsa: 私钥</span></span><br><span class="line"><span class="comment">    返回值: 判断函数状态          */</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">RSA_verify</span><span class="params">(<span class="type">int</span> type, <span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *m, <span class="type">unsigned</span> <span class="type">int</span> m_length, <span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *sigbuf, <span class="type">unsigned</span> <span class="type">int</span> siglen, RSA *rsa)</span>;</span><br><span class="line"><span class="comment">/*  参数:</span></span><br><span class="line"><span class="comment">        type: 使用的哈希算法, 和签名使用的哈希算法一致</span></span><br><span class="line"><span class="comment">            NID_MD5</span></span><br><span class="line"><span class="comment">            NID_SHA1</span></span><br><span class="line"><span class="comment">            NID_SHA224</span></span><br><span class="line"><span class="comment">             .....</span></span><br><span class="line"><span class="comment">        m: 进行签名的原始数据 -&gt; 接收到的</span></span><br><span class="line"><span class="comment">        m_length: m参数字符串的长度</span></span><br><span class="line"><span class="comment">        sigbuf: 接收到的签名数据</span></span><br><span class="line"><span class="comment">        siglen: sigbuf接收到的签名数据的长度</span></span><br><span class="line"><span class="comment">        rsa: 公钥</span></span><br><span class="line"><span class="comment">    返回值:</span></span><br><span class="line"><span class="comment">        如果!=1: 失败</span></span><br><span class="line"><span class="comment">        如果==1: 成功         */</span></span><br><span class="line">        </span><br></pre></td></tr></table></figure>
+
+<h1 id="3-对称加密"><a href="#3-对称加密" class="headerlink" title="3. 对称加密"></a>3. 对称加密</h1><ul>
+<li>生成加密解密的key</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openssl/aes.h&gt;</span></span></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> AES_BLOCK_SIZE 16    <span class="comment">// 明文分组的大小</span></span></span><br><span class="line"><span class="comment">// 加密的时候调用，aes中的秘钥格式 AES_KEY</span></span><br><span class="line"><span class="comment">// 封装加密时候使用的秘钥</span></span><br><span class="line">AES_KEY key;</span><br><span class="line"><span class="type">int</span> <span class="title function_">AES_set_encrypt_key</span><span class="params">(<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *userKey, <span class="type">const</span> <span class="type">int</span> bits, AES_KEY *key)</span>;</span><br><span class="line"><span class="comment">// 封装解密时候使用的秘钥</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">AES_set_decrypt_key</span><span class="params">(<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *userKey, <span class="type">const</span> <span class="type">int</span> bits, AES_KEY *key)</span>;</span><br><span class="line"><span class="comment">/*  userkey: 对称加密的密钥-&gt;字符串长度: 16, 24, 32byte</span></span><br><span class="line"><span class="comment">    bites: 指定密钥的长度: 单位 bit</span></span><br><span class="line"><span class="comment">    key: 传出参数           */</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>CBC方式加密 - 密码分组链接模式<ul>
+<li>ivec: 一个初始化向量，长度与分组长度相同（16, 24, 32byte -&gt; 128, 192, 256bit）。注意这个初始化向量传入之后会一直参与计算，实际上他是个传入传出参数，虽然没什么用</li>
+<li>length: 密文长度必须是16（24, 32）的整数倍，如果不够需要自己计算补充</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/第三方库/OpenSSL/3219843-20231208092111420-1289769346.png" width="70%"/></div> 
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">AES_cbc_encrypt</span><span class="params">(<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span> *in, <span class="type">unsigned</span> <span class="type">char</span> *out,</span></span><br><span class="line"><span class="params">                     <span class="type">size_t</span> length, <span class="type">const</span> AES_KEY *key,</span></span><br><span class="line"><span class="params">                     <span class="type">unsigned</span> <span class="type">char</span> *ivec, <span class="type">const</span> <span class="type">int</span> enc)</span>;</span><br><span class="line"><span class="comment">/*  参数:</span></span><br><span class="line"><span class="comment">        in: 要加密/解密的数据</span></span><br><span class="line"><span class="comment">        out: 传出参数</span></span><br><span class="line"><span class="comment">            加密: 存储密文</span></span><br><span class="line"><span class="comment">            解密: 存储明文</span></span><br><span class="line"><span class="comment">        length: 修改第一个参数in的长度</span></span><br><span class="line"><span class="comment">            (len = (字符串长度 + \0) % 16) == 0</span></span><br><span class="line"><span class="comment">        如果不是在函数内部会自动填充</span></span><br><span class="line"><span class="comment">            实际长度: ((len / 16) + 1 ) * 16</span></span><br><span class="line"><span class="comment">        key: 初始化之后的秘钥</span></span><br><span class="line"><span class="comment">        ivec: 初始化向量, 字符串 ==&gt; 长度和分组长度相同</span></span><br><span class="line"><span class="comment">        enc: 指定数据要解密还是解密</span></span><br><span class="line"><span class="comment">            # define AES_ENCRYPT     1 -&gt; 加密</span></span><br><span class="line"><span class="comment">            # define AES_DECRYPT     0 -&gt; 解密     */</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>示例代码</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;openssl/aes.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line">using namespace <span class="built_in">std</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 1.准备数据</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *pt = <span class="string">&quot;data1, data2, data3, data4, data5, data6, data7, data8, data9, data10&quot;</span>;</span><br><span class="line">    <span class="comment">// 2.准备密钥</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *key = <span class="string">&quot;123456787654321&quot;</span>; <span class="comment">// 16位（或24,32)</span></span><br><span class="line">    <span class="comment">// 3.初始化密钥</span></span><br><span class="line">    AES_KEY encKey;</span><br><span class="line">    AES_set_encrypt_key((<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span>*)key, <span class="number">128</span>, &amp;encKey);</span><br><span class="line">    <span class="comment">// 4.加密</span></span><br><span class="line">    <span class="type">int</span> length = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> len = <span class="built_in">strlen</span>((<span class="type">char</span> *)pt) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (len % <span class="number">16</span> != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        length = ((len / <span class="number">16</span>) + <span class="number">1</span>) * <span class="number">16</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        length = len;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> *out = new <span class="type">unsigned</span> <span class="type">char</span>[length]; <span class="comment">// 存储密文</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> ivec[<span class="number">16</span>];</span><br><span class="line">    <span class="built_in">memset</span>(ivec, <span class="number">9</span>, <span class="keyword">sizeof</span>(ivec));</span><br><span class="line">    AES_cbc_encrypt((<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span>*)pt, out, length, &amp;encKey, ivec, AES_ENCRYPT);</span><br><span class="line">    <span class="comment">// 5.解密</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span>* data = new <span class="type">unsigned</span> <span class="type">char</span>[length];</span><br><span class="line">    AES_KEY deckey;</span><br><span class="line">    AES_set_decrypt_key((<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span>*)key, <span class="number">128</span>, &amp;deckey);</span><br><span class="line">    <span class="built_in">memset</span>(ivec, <span class="number">9</span>, <span class="keyword">sizeof</span>(ivec));</span><br><span class="line">    AES_cbc_encrypt((<span class="type">const</span> <span class="type">unsigned</span> <span class="type">char</span>*)out, data, length, &amp;deckey, ivec, AES_DECRYPT);</span><br><span class="line">    <span class="comment">// 6.打印</span></span><br><span class="line">    <span class="built_in">cout</span>&lt;&lt;data&lt;&lt;<span class="built_in">endl</span>;</span><br><span class="line">    delete[] out;</span><br><span class="line">    delete[] data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/12/07/202312072104/">https://mingxuanwu.com/2023/12/07/202312072104/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93%E8%AE%B0%E5%BD%95/"># 第三方库记录</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/12/09/202312091400/">【OpenSSL】Base64 二进制数据编码解码（OpenSSL BIO）</a>
+            
+            
+            <a class="next" rel="next" href="/2023/12/02/202312021427/">【C++ Primer Plus】C++11 深入理解右值、右值引用和完美转发</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

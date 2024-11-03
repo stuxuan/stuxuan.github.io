@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【计算机网络：自顶向下方法】4.网络层：数据平面 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【计算机网络：自顶向下方法】4.网络层：数据平面</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">January 8, 2024&nbsp;&nbsp;10:24:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-数据平面和控制平面"><a href="#1-数据平面和控制平面" class="headerlink" title="1. 数据平面和控制平面"></a>1. 数据平面和控制平面</h1><ul>
+<li>网络层服务：<ul>
+<li>在发送主机和接收主机之间发送段（segment）</li>
+<li>在发送端将段封装到数据报中</li>
+<li>在接收端将段上交给传输层实体</li>
+<li>网络层协议存在于每一个主机和路由器</li>
+<li>路由器检查每一个经过它的IP数据报的头部</li>
+</ul>
+</li>
+<li>网络层功能<ul>
+<li>转发（局部）：将数据从路由器的输入接口转发到合适的输出接口</li>
+<li>路由（全局）：使用路由算法来决定分组从发送主机到目标接收主机的路径<ul>
+<li>路由选择算法</li>
+<li>路由选择协议</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>数据平面（局部）<ul>
+<li>本地，每个路由器的功能</li>
+<li>决定从路由器输入端口到达的分组如何转发到输出端口</li>
+<li>转发功能：<ul>
+<li>传统方式：基于目标地址+转发表</li>
+<li>SDN方式（软件定义网络）：基于多个字段+流表</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>控制平面（全局）<ul>
+<li>网络范围内的逻辑</li>
+<li>决定数据报如何在路由器之间路由，决定数据报从源到目标主机之间的端到端路径</li>
+<li>2个控制平面方法<ul>
+<li>传统的路由算法：在路由器中被实现</li>
+<li>SDN：在远程的服务器中实现</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-1-传统方式"><a href="#1-1-传统方式" class="headerlink" title="1.1 传统方式"></a>1.1 传统方式</h2><p>传统方式的路由转发是垂直集成的方式：每一个路由器既实现了数据平面的功能，又实现了控制平面的功能，它们是紧耦合的关系。路由器通过路由选择算法计算出端到端的路径（控制平面），路由器再根据IP协议和转发表进行局部的转发（数据平面）</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240106210244431-1529670772.png" width="50%"/></div>
+
+<h2 id="1-2-SDN方式"><a href="#1-2-SDN方式" class="headerlink" title="1.2 SDN方式"></a>1.2 SDN方式</h2><p> 软件定义网络 Software-Defined Networking 是通过远程的控制器与本地控制代理（CA）交互，这种方式控制平面在云端，是集中式的控制器，相对于分布在所有路由器中的控制器它更方便修改协议，用软件定义逻辑</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240106210655224-1584773305.png" width="60%"/></div>
+
+<h1 id="2-路由器组成"><a href="#2-路由器组成" class="headerlink" title="2 路由器组成"></a>2 路由器组成</h1><ul>
+<li>路由：运行路由选择算法／协议 (RIP, OSPF, BGP)-生成 <strong>路由表</strong></li>
+<li>转发：从输入到输出链路交换数据报-根据<strong>路由表</strong>进行分组的转发</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240106212001213-801121273.png" width="55%"/></div>
+
+<ul>
+<li>传统方式下：路由器根据分组头部的目标地址，查路由表然后进行转发</li>
+<li>SDN的分组交换机：查分组头部多个层面的信息，匹配流表相应的字段，找到匹配的流表，按照流表的动作去做相应的动作（改字段、泛洪等等，该流表由同一的控制平面服务器下发）</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240106212447943-1713802270.png" width="55%"/></div>
+
+<ul>
+<li>输入输出端口的缓冲区<ul>
+<li>不同端口进入的数据都需要从红色端口转发出去，导致输入速率和输出速率不匹配，输入和输出都需要缓冲队列应对速率不匹配</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240106213036119-1882449804.png" width="55%"/></div>
+
+<ul>
+<li>交换结构<ul>
+<li>N个输入端口，交换机的交换速度是输入线路速度的N倍比较理想，才不会成为瓶颈</li>
+<li>三种典型的交换机结构如下<ul>
+<li>通过总线-内存-总线的方式转发，内存本身就是瓶颈</li>
+<li>通过总线交换，速度更优，但存在总线竞争</li>
+<li>通过交叉的网络实现更快的转发速度</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240106213251295-303601544.png" width="55%"/></div>
+
+<ul>
+<li>调度机制<ul>
+<li>FIFO：按照分组到来的次序发送</li>
+<li>优先权：根据优先权高低发送</li>
+<li>轮转：每个数据报都有一个数据类型，每个类型轮转的发送</li>
+</ul>
+</li>
+</ul>
+<h1 id="3-IP协议"><a href="#3-IP协议" class="headerlink" title="3 IP协议"></a>3 IP协议</h1><div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240107153841148-454762682.png" width="60%"/></div>
+
+<p>每一个数据包最大1500字节，超出的部分需要进行分片处理，通过多个组发送到目标端。</p>
+<ul>
+<li>IP分片和重组<ul>
+<li>16-bit-identifier：相同的编码来表示这是一组完整的数据，只是被分片处理分别到达目标端</li>
+<li>fragment offset：以8个字节为单位计算，例如A分组携带1480B字节位置，则偏移量为185，B分组携带2960B字节位置，则偏移量为370</li>
+<li>fragflag：为1表示后面还有数据，0表示这是最后一组数据</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240107155105319-495210850.png" width="60%"/></div>
+
+<h2 id="3-1-IP编制"><a href="#3-1-IP编制" class="headerlink" title="3.1 IP编制"></a>3.1 IP编制</h2><ul>
+<li>IP地址：32位标识，对主机或者路由器的接口编址</li>
+<li>接口：主机&#x2F;路由器和物理链路的连接处<ul>
+<li>路由器有多个接口（只有一个接口就没办法做转发的工作了）</li>
+<li>主机有一个或多个接口</li>
+<li>IP地址和每一个接口关联</li>
+</ul>
+</li>
+<li>一个IP地址和一个接口相关联</li>
+<li>子网：前缀一样，设备间数据转发无需借助路由器，直接使用交换机即可转发数据</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240107155736415-896149534.png" width="50%"/></div>
+
+<ul>
+<li>内网专用地址<ul>
+<li>10.0.0.0 - 10.255.255.255 MASK 255.0.0.0</li>
+<li>172.16.0.0 - 172.31.255.255 MASK 255.255.0.0</li>
+<li>192.168.0.0 - 192.168.255.255.255 MASK 255.255.255.0</li>
+</ul>
+</li>
+<li>无类域间路由（Classless Inter Domain Routing，CIDR）<ul>
+<li>子网掩码：通过子网掩码来表示谁是网络号，谁是主机号</li>
+<li>a.b.c.d&#x2F;x：200.23.16.0&#x2F;23：前23位为网络号，之后的为主机号</li>
+<li>对于路由器来说，只需要把IP和掩码进行与操作就可以知道应该送到哪个网络</li>
+</ul>
+</li>
+<li>动态主机配置协议（DHCP，Dynamic Host Configuration Protocol）<ul>
+<li>允许主机在加入网络的时候，动态地从服务器那里获得IP地址</li>
+<li>主机发送 DHCP request 报文请求地址</li>
+<li>DHCP服务器返回 DHCP ack 报文</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-2-路由聚集"><a href="#3-2-路由聚集" class="headerlink" title="3.2 路由聚集"></a>3.2 路由聚集</h2><p>　　通过层次编码实现路由聚集，子网通过路由通告告诉上层的ISP路由器哪些地址需要转发给我，上层ISP路由器经过路由聚集后再告诉上层互联网路由器哪些地址转发给我</p>
+<p>　　ISP供应商收到数据后通过比对下面4个组织的路由表决定具体谁是它的下一条</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240107163733328-679587322.png" width="50%"/></div>
+
+<h2 id="3-3-网络地址转换NAT"><a href="#3-3-网络地址转换NAT" class="headerlink" title="3.3 网络地址转换NAT"></a>3.3 网络地址转换NAT</h2><p>NAT，Network Address Translation：大内网的设备在离开内网时统一转换为外网的地址，使得外网可以进行传输，在返回时再转换回内网地址（需要特殊处理）</p>
+<ul>
+<li>多个局域网IP可以共享同一个IP地址</li>
+<li>可以在局域网设备改变地址的情况下不通告外界</li>
+<li>改变ISP地址不需要改变内网地址</li>
+<li>局域网内部设备没有明确的地址，对外部可见，相对更加安全</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240107164827631-129974690.png" width="60%"/></div>
+
+<ul>
+<li>NAT的实现方法<ul>
+<li>外出数据包：将内网IP和端口替换为路由器一个没有使用的源IP和端口</li>
+<li>记录内网IP和端口与替换IP和端口的对应关系</li>
+<li>进入数据包：替换目标IP地址和端口为内网，转发到对应的局域网主机</li>
+</ul>
+</li>
+<li>NAT穿透问题<ul>
+<li>数据包主动向外网进行连接容易，但外网设备主动和内网设备进行连接存在穿越问题</li>
+<li>可以静态配置路由器端口对应的内网设备和端口</li>
+<li>通过中继的方式进行连接，内网连接到中继，外网也连接到中继，通过中继告诉局域网内设备有人想要建立连接</li>
+</ul>
+</li>
+</ul>
+<h1 id="4-通用转发和SDN"><a href="#4-通用转发和SDN" class="headerlink" title="4 通用转发和SDN"></a>4 通用转发和SDN</h1><ul>
+<li>通过水平集成控制平面的开放实现，创造出更好的产业生态</li>
+<li>集中式实现控制逻辑，网络管理更容易</li>
+<li>基于流表匹配+行动的工作方式允许“可编程的”分组交换机</li>
+<li>可以实现不同线路流量控制这种复杂的功能</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240108100753820-354447929.png" width="60%"/></div>
+
+<ul>
+<li>SDN框架下，可以实现路由器、防火墙、交换机的功能</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240108101847396-1145765171.png" width="60%"/></div>
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/01/08/202401081024/">https://mingxuanwu.com/2024/01/08/202401081024/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"># 计算机网络</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/01/08/202401081748/">【计算机网络：自顶向下方法】5.网络层：控制平面</a>
+            
+            
+            <a class="next" rel="next" href="/2024/01/05/202401052013/">【计算机网络：自顶向下方法】3.传输层</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

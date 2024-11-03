@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【C++ Primer Plus】C++11 深入理解右值、右值引用和完美转发 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【C++ Primer Plus】C++11 深入理解右值、右值引用和完美转发</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">December 2, 2023&nbsp;&nbsp;14:27:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-右值引用和移动语义"><a href="#1-右值引用和移动语义" class="headerlink" title="1. 右值引用和移动语义"></a>1. 右值引用和移动语义</h1><h2 id="1-1-左值和右值"><a href="#1-1-左值和右值" class="headerlink" title="1.1 左值和右值"></a>1.1 左值和右值</h2><ul>
+<li>左值 local value：存储在内存中、有明确存储地址（可寻址）的数据（x、y、z）</li>
+<li>右值 read value：不一定可以寻址，例如存储于寄存器中的数据；通常字面量都是右值，除了字符串常量（1、3）</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> x = <span class="number">1</span>;</span><br><span class="line"><span class="type">int</span> y = <span class="number">3</span>;</span><br><span class="line"><span class="type">int</span> z = x + y;</span><br></pre></td></tr></table></figure>
+
+<p> 　对于x++和++x虽然都是自增操作，但x++编译器首先生成一份临时值，然后对x自增，最后返回临时内容，所以x++是右值；++x是对x递增后返回自身，所以++x是左值</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x++;    <span class="comment">// 右值引用</span></span><br><span class="line">++x;    <span class="comment">// 左值引用</span></span><br><span class="line"><span class="type">int</span> *p1 = &amp;x++;    <span class="comment">// 右值引用所以编译失败</span></span><br><span class="line"><span class="type">int</span> *p2 = &amp;++x;    <span class="comment">// 左值引用可以编译成功</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="1-2-左值引用和右值引用"><a href="#1-2-左值引用和右值引用" class="headerlink" title="1.2 左值引用和右值引用"></a>1.2 左值引用和右值引用</h2><ul>
+<li>左值引用：必须引用一个左值。</li>
+<li>常量左值引用：可以引用左值或右值。可以引用右值的原理是延长右值的生命周期，但这种引用存在一个问题，常量左值引用导致无法修改对象内容。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> &amp;x1 = <span class="number">7</span>;         <span class="comment">// 非常量左值引用 编译错误</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> &amp;x = <span class="number">11</span>;   <span class="comment">// 语句结束后，11的生命周期被延长了</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> x = <span class="number">11</span>;    <span class="comment">// 语句结束后，11立刻被销毁</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>右值引用：引用右值且只能引用右值的方法</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> &amp;&amp;k = <span class="number">11</span>;    <span class="comment">// 右值引用（延长右值的生命周期）</span></span><br></pre></td></tr></table></figure>
+
+<p> 　　对于数字的表示可能不太清晰，因为数字本身就有些虚无缥缈，下面用一个类的例子来更好解释右值引用的优势，可以减少复制构造来优化性能（但实际上编译器会帮我们优化）</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">char</span>* pc;</span><br><span class="line">    <span class="built_in">MyClass</span>();</span><br><span class="line">    <span class="built_in">MyClass</span>(<span class="type">const</span> MyClass&amp; myclass);</span><br><span class="line">    ~<span class="built_in">MyClass</span>() &#123; cout &lt;&lt; <span class="string">&quot;dtor&quot;</span> &lt;&lt; endl; <span class="keyword">delete</span> pc; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">show</span><span class="params">()</span> </span>&#123; cout &lt;&lt; <span class="string">&quot;Show: &quot;</span> &lt;&lt; pc &lt;&lt; endl; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">MyClass::<span class="built_in">MyClass</span>() &#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;ctor&quot;</span> &lt;&lt; endl;</span><br><span class="line">    pc = <span class="keyword">new</span> <span class="type">char</span>[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++)</span><br><span class="line">        pc[i] = <span class="string">&#x27;c&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MyClass::<span class="built_in">MyClass</span>(<span class="type">const</span> MyClass&amp; myclass) &#123;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;copy ctor&quot;</span> &lt;&lt; endl;</span><br><span class="line">    pc = myclass.pc;    <span class="comment">// **浅复制**, 编译器不优化则返回值调用赋值构造函数, 接下来析构原对象的时候这里内存会指向空内存!!!</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++)</span><br><span class="line">        pc[i] = myclass.pc[i];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">MyClass <span class="title">make_myclass</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    MyClass mc;    <span class="comment">// 1.构造函数     3.析构函数, 析构这里的mc对象（此时如果是浅复制，新的对象指向的内存也将为空, 引发指针异常)</span></span><br><span class="line">    <span class="keyword">return</span> mc;     <span class="comment">// 2.拷贝函数, 返回拷贝的对象</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    MyClass&amp;&amp; mc = <span class="built_in">make_myclass</span>();    <span class="comment">// 返回值的生命周期被延长</span></span><br><span class="line">    mc.<span class="built_in">show</span>();</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line">    MyClass mc2 = <span class="built_in">make_myclass</span>();    <span class="comment">// 再次调用拷贝构造函数</span></span><br><span class="line">    mc<span class="number">2.</span><span class="built_in">show</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>优化前：MyClass&amp;&amp; mc &#x3D; make_myclass(); 调用后<ul>
+<li><strong>ctor:</strong> 调用mc的构造函数</li>
+<li><strong>copy ctor</strong>:返回值时调用mc的拷贝函数（因为没有重写移动构造函数，所以返回值时才会调用拷贝构造函数）</li>
+<li><strong>dtor:</strong> 返回值后将mc销毁调用析构函数（注意这里的复制构造函数会存在问题：如果是浅复制，此时销毁的对象会把堆区内存销毁导致新的对象空引用，所以还是强调必须重写复制构造函数）</li>
+<li>由于右值引用，延长了右值的生命周期</li>
+<li><strong>dtor:</strong> main函数结束再调用一次析构函数</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/C++PrimerPlus/万能转发/3219843-20231201163214362-1242853350.png" width="70%"/></div> 
+
+<ul>
+<li>编译器优化后：MyClass&amp;&amp; mc &#x3D; make_myclass(); 注意其实编译器优化会解决一些潜在的问题，当然我们只要有堆内存操作都必须重写拷贝构造函数，就解决了这个问题，详情看代码注释<ul>
+<li><strong>ctor:</strong> 调用构造函数</li>
+<li><strong>dtor:</strong> 调用析构函数</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/C++PrimerPlus/万能转发/3219843-20231201163017197-1640725329.png" width="70%"/></div> 
+
+<ul>
+<li>MyClass mc &#x3D; make_myclass(); 该函数调用后<ul>
+<li><strong>ctor:</strong> 调用mc的构造函数</li>
+<li><strong>copy ctor:</strong> 返回值 调用mc的拷贝函数</li>
+<li><strong>dtor:</strong> 返回值后销毁mc 调用析构函数</li>
+<li><strong>copy ctor:</strong> 为了构造mc2 调用构造函数</li>
+<li><strong>dtor:</strong> 销毁返回值临时变量 调用析构函数</li>
+<li><strong>dtor:</strong> main函数结束后再调用一次析构函数</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-3-移动语义"><a href="#1-3-移动语义" class="headerlink" title="1.3 移动语义"></a>1.3 移动语义</h2><p>　　上面其实已经用到了移动语义，移动语义主要就是解决C++复制构造对性能的影响。但也存在问题，例如移动构造函数运行过程中发生了异常，这会造成源对象和目标对象都不完整。这里再用一个例子说明，该Useless类内有一个元素个数为 n 的 char 数组，静态变量 ct 记录了对象个数。（下面的流程基于未优化-fno-elide-constructors编译，否则编译器会自己优化掉移动构造函数的部分）</p>
+<ul>
+<li>Useless one(20, ‘o’); 调用 int char 构造函数</li>
+<li>Useless one(20, ‘c’); 调用 int char 构造函数</li>
+<li>Useless three(one + two);<ul>
+<li>one + two 调用 operator+ 运算符重载，在内部调用 int 构造函数构造了对象 temp</li>
+<li>返回值时调用移动语义构造函数（未优化的情况下，实际上因为重写了移动构造函数这里才会调用，否则返回值会调用复制构造函数），夺走 temp 里指针指向的内容并把它的指针设置为空，这样它在销毁时不会把堆区内存清空</li>
+<li>临时对象 temp 被销毁</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Useless</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="type">int</span> n;            <span class="comment">// 元素个数</span></span><br><span class="line">    <span class="type">char</span>* pc;        <span class="comment">// 数据指针</span></span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> ct;    <span class="comment">// 对象个数</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">ShowObject</span><span class="params">()</span><span class="type">const</span></span>;</span><br><span class="line">    <span class="built_in">Useless</span>(<span class="type">int</span> k);</span><br><span class="line">    <span class="built_in">Useless</span>(<span class="type">int</span> k, <span class="type">char</span> ch);</span><br><span class="line">    <span class="built_in">Useless</span>(Useless&amp;&amp; f);        <span class="comment">// 移动构造</span></span><br><span class="line">    ~<span class="built_in">Useless</span>();</span><br><span class="line">    Useless <span class="keyword">operator</span>+(<span class="type">const</span> Useless&amp; f)<span class="type">const</span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">ShowData</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">int</span> Useless::ct = <span class="number">0</span>;</span><br><span class="line">Useless::<span class="built_in">Useless</span>(<span class="type">int</span> k) :<span class="built_in">n</span>(k) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;int 参数的构造函数; 对象个数为: %d\n&quot;</span>, ++ct);</span><br><span class="line">    pc = <span class="keyword">new</span> <span class="type">char</span>[n];</span><br><span class="line">    <span class="built_in">ShowObject</span>();</span><br><span class="line">&#125;</span><br><span class="line">Useless::<span class="built_in">Useless</span>(<span class="type">int</span> k, <span class="type">char</span> ch) :<span class="built_in">n</span>(k) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;int char参数的构造函数; 对象个数为: %d\n&quot;</span>, ++ct);</span><br><span class="line">    pc = <span class="keyword">new</span> <span class="type">char</span>[n];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++)&#123;</span><br><span class="line">        pc[i] = ch;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">ShowObject</span>();</span><br><span class="line">&#125;</span><br><span class="line">Useless::<span class="built_in">Useless</span>(Useless&amp;&amp; f) :<span class="built_in">n</span>(f.n) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;移动构造函数; 对象个数为: %d\n&quot;</span>, ++ct);</span><br><span class="line">    pc = f.pc;</span><br><span class="line">    f.pc = <span class="literal">nullptr</span>;</span><br><span class="line">    f.n = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">ShowObject</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Useless::~<span class="built_in">Useless</span>() &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;析构函数调用; 元素个数为: %d\n&quot;</span>, --ct);</span><br><span class="line">    <span class="built_in">ShowObject</span>();</span><br><span class="line">    <span class="keyword">delete</span>[] pc;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Useless Useless::<span class="keyword">operator</span>+(<span class="type">const</span> Useless&amp; f)<span class="type">const</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;进入 operator+\n&quot;</span>);</span><br><span class="line">    Useless temp = <span class="built_in">Useless</span>(n + f.n);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">        temp.pc[i] = pc[i];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = n; i &lt; temp.n; i++)</span><br><span class="line">        temp.pc[i] = f.pc[i - n];</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;离开 operator+\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> temp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Useless::ShowObject</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;元素个数: %d, 数据地址: %x\n&quot;</span>, n, (<span class="type">void</span>*)pc);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Useless::ShowData</span><span class="params">()</span><span class="type">const</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;元素个数为空\n&quot;</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%c &quot;</span>, pc[i]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="function">Useless <span class="title">one</span><span class="params">(<span class="number">20</span>, <span class="string">&#x27;o&#x27;</span>)</span></span>;    <span class="comment">// int char 构造函数 对象个数1</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    <span class="function">Useless <span class="title">two</span><span class="params">(<span class="number">20</span>, <span class="string">&#x27;c&#x27;</span>)</span></span>;    <span class="comment">// int char 构造函数 对象个数2</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    <span class="function">Useless <span class="title">three</span><span class="params">(one + two)</span></span>;    <span class="comment">// 1. operator+ 调用 int 构造函数 对象个数3;  2. operator+ 返回右值, 调用移动构造函数(减少了复制的次数) 对象个数4;  3.临时对象被销毁 对象个数3</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;object one: \n&quot;</span>);</span><br><span class="line">    one.<span class="built_in">ShowData</span>();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;object two: \n&quot;</span>);</span><br><span class="line">    two.<span class="built_in">ShowData</span>();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;object three: \n&quot;</span>);</span><br><span class="line">    three.<span class="built_in">ShowData</span>();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-4-强制移动"><a href="#1-4-强制移动" class="headerlink" title="1.4 强制移动"></a>1.4 强制移动</h2><p>　　移动构造函数和移动赋值运算符都必须使用右值，但如果让他们使用左值就需要一些特殊处理</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Useless choices[<span class="number">10</span>];</span><br><span class="line">Useless best;</span><br><span class="line"><span class="type">int</span> pick = <span class="number">5</span>;</span><br><span class="line">best = chioces[pick];    <span class="comment">// 由于这里是左值，所以会调用普通的复制赋值运算符</span></span><br></pre></td></tr></table></figure>
+
+<p>　　可以使用C++11头文件utility中提供的move函数来实现将左值转换为右值，但是注意右值的字段会被夺走，并且必须定义了移动赋值运算符或移动构造函数</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;utility&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::string str = <span class="string">&quot;Hello&quot;</span>;</span><br><span class="line">    std::vector&lt;std::string&gt; v;</span><br><span class="line">    <span class="comment">//调用常规的拷贝构造函数，新建字符数组，拷贝数据</span></span><br><span class="line">    v.<span class="built_in">push_back</span>(str);</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;After copy, str is \&quot;&quot;</span> &lt;&lt; str &lt;&lt; <span class="string">&quot;\&quot;\n&quot;</span>;</span><br><span class="line">    <span class="comment">//调用移动构造函数，掏空str，掏空后，最好不要使用str</span></span><br><span class="line">    v.<span class="built_in">push_back</span>(std::<span class="built_in">move</span>(str));</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;After move, str is \&quot;&quot;</span> &lt;&lt; str &lt;&lt; <span class="string">&quot;\&quot;\n&quot;</span>;</span><br><span class="line">    std::cout &lt;&lt; v[<span class="number">0</span>] &lt;&lt; <span class="string">&quot;, &quot;</span> &lt;&lt; v[<span class="number">1</span>] &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-万能引用"><a href="#2-万能引用" class="headerlink" title="2. 万能引用"></a>2. 万能引用</h1><p>　　很多时候我们希望传递的是一个引用而非通过拷贝构造传递，这可以提高程序效率；但仅仅通过fn(className&amp; c)来传递引用会导致不能传递右值，fn(const className&amp; c)又会导致传递进来的参数不能被修改，所以提出了万能引用的概念</p>
+<h2 id="2-1-引用折叠"><a href="#2-1-引用折叠" class="headerlink" title="2.1 引用折叠"></a>2.1 引用折叠</h2><p>　　万能引用实际上就是发生了类型推导，如果源对象是一个左值，则推导出左值引用；如果源对象是一个右值，则推导出右值引用。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">foo</span><span class="params">(<span class="type">int</span> &amp;&amp;i)</span> </span>&#123;&#125;    <span class="comment">// i为右值引用</span></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="type">void</span> <span class="title">bar</span><span class="params">(T &amp;&amp;t)</span> </span>&#123;&#125;    <span class="comment">// t为万能引用</span></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt; <span class="type">void</span> <span class="title">bar</span><span class="params">(vector&lt;T&gt; &amp;&amp;t)</span> </span>&#123;&#125;    <span class="comment">// 非万能引用，必须是直接的T</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">get_val</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> <span class="number">5</span>;&#125;</span><br><span class="line"><span class="type">int</span> &amp;&amp;x = <span class="built_in">get_val</span>();    <span class="comment">// x 为右值引用</span></span><br><span class="line"><span class="keyword">auto</span> &amp;&amp;y = <span class="built_in">get_val</span>();   <span class="comment">// y 为万能引用</span></span><br></pre></td></tr></table></figure>
+
+<p>　　C++11 通过一套引用叠加推导的规则来实现万能引用——引用折叠，可以注意到实际类型是左值引用，则最终类型一定是左值引用；只有引用类型是一个非引用类型或者右值引用，最后推导出来的才是一个右值引用</p>
+<div align="center"><img src="/images/C++PrimerPlus/万能转发/3219843-20231201180321028-1811664675.png" width="100%"/></div> 
+
+<p>　　通过下面几行代码理解引用折叠，首先是C++11规定的展开时的定义</p>
+<ul>
+<li><p>实参类型为T的左值, 则模板 T 展开为 T&amp;</p>
+<ul>
+<li>此时Test形参的类型为 T&amp; &amp;&amp;，经过折叠后为 T&amp; 左值引用</li>
+<li>此时static_cast&lt;T&amp;&gt;(t) 将t转为左值引用，所以调用左值引用的函数</li>
+</ul>
+</li>
+<li><p>实参类型为T的右值, 则模板 T 展开为 T </p>
+</li>
+<li><ul>
+<li>此时Test形参的类型为 T &amp;&amp;，所以为右值引用</li>
+<li>此时static_cast&lt;T&amp;&amp;&gt;(t) 将t转为右值引用，所以调用右值引用的函数</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">process</span><span class="params">(<span class="type">int</span>&amp; i)</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;左值引用&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">process</span><span class="params">(<span class="type">int</span>&amp;&amp; i)</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;右值引用&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Test</span><span class="params">(T&amp;&amp; t)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">process</span>(<span class="built_in">static_cast</span>&lt;T&amp;&amp;&gt;(t));</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">Test</span>(a);    <span class="comment">// C++11规定 实参类型为T的左值, 则模板T展开为int&amp;</span></span><br><span class="line">    <span class="built_in">Test</span>(<span class="number">1</span>);    <span class="comment">// C++11规定 实参类型为T的右值, 则模板T展开为int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-2-完美转发"><a href="#2-2-完美转发" class="headerlink" title="2.2 完美转发"></a>2.2 完美转发</h2><p>　　通过 std::forward<T>() 可以实现完美转发，不论左值还是右值都可以通过引用的方式传参，提高程序运行的效率。下面给出了一个完美转发的例子，打印了 T 的实际类型，并通过修改 t 的值实现了修改 a 的值（传入左值即左值引用），同样如果传入类的右值一样是右值引用。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">show_Type</span><span class="params">(T&amp;&amp; t)</span> </span>&#123;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;is int&amp;: &quot;</span> &lt;&lt; std::is_same_v&lt;T, <span class="type">int</span>&amp;&gt; &lt;&lt; std::endl;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;is int : &quot;</span> &lt;&lt; std::is_same_v&lt;T, <span class="type">int</span>&gt; &lt;&lt; std::endl;</span><br><span class="line">    t = <span class="number">10</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">perfect_forwarding</span><span class="params">(T&amp;&amp; t)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">show_Type</span>(std::forward&lt;T&gt;(t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">5</span>;</span><br><span class="line">    <span class="built_in">perfect_forwarding</span>(<span class="number">5</span>);    <span class="comment">// 该参数在不同函数间始终以右值引用方式传递</span></span><br><span class="line">    <span class="built_in">perfect_forwarding</span>(a);    <span class="comment">// 该参数在不同函数间始终以左值引用方式传递</span></span><br><span class="line">    std::cout &lt;&lt; a;           <span class="comment">// 由于以引用的方式传递, 这里内存中的数值也一样会修改</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-move-和-forward"><a href="#3-move-和-forward" class="headerlink" title="3. move 和 forward"></a>3. move 和 forward</h1><ul>
+<li>std::move接受一个对象，并允许您将其视为临时对象（右值）。尽管这不是语义要求，但是通常，接受对右值的引用的函数会使它无效。当看到时std::move，表明该对象的值以后不应再使用，但是仍然可以分配一个新值并继续使用它</li>
+<li>std::forward有一个用例：将模板化的函数参数（在函数内部）转换为用于传递它的调用方的值类别（左值或右值）。这允许将右值参数作为右值传递，并将左值作为左值传递，这是“完美转发”的方案</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/12/02/202312021427/">https://mingxuanwu.com/2023/12/02/202312021427/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/C-Primer-Plus/"># C++ Primer Plus</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/12/07/202312072104/">【OpenSSL】哈希、非对称加密和对称加密函数使用</a>
+            
+            
+            <a class="next" rel="next" href="/2023/11/30/202311301623/">【C++ Primer Plus】泛型编程之迭代器和容器</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

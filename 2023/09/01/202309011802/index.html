@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【操作系统】2.进程和线程 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【操作系统】2.进程和线程</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">September 1, 2023&nbsp;&nbsp;18:02:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-操作系统的多进程图像"><a href="#1-操作系统的多进程图像" class="headerlink" title="1.操作系统的多进程图像"></a>1.操作系统的多进程图像</h1><p>操作系统main函数中最后 if(!fork()) {init();} ，也就是main函数最后创建了第1个进程，init执行了shell(Windows)桌面。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230823210227479-185176628.png" width="40%" ></img></p>
+<p>**操作系统管理和组织进程都使用PCB(Process Control Block)**，不同的程序的PCB放在不同的位置，用于记录该进程运行时的状态。操作系统对进程进行分类，例如等待执行的进程和等待某些事件完成的进程，例如等待磁盘读写。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230823210852686-768354236.png" width="50%" ></img></p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230823210922733-1520726283.png" width="50%" ></img></p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230823210932611-1363068434.png" width="50%" ></img></p>
+<ol>
+<li><p>新建态：系统完成创建进程的一系列工作。只能转换到就绪态</p>
+</li>
+<li><p>就绪态：拥有除CPU之外的其他所需的所有资源。当拥有CPU时就可以转换到运行态</p>
+</li>
+<li><p>运行态：用于CPU和所需的所有资源</p>
+</li>
+<li><ol>
+<li>当时间片到或者处理机被抢占了，就转换到就绪态；</li>
+<li>当进程用“系统调用”的方式申请某种系统资源或者请求等待某个事件的发生，则进入阻塞态（主动）</li>
+</ol>
+</li>
+<li><p>阻塞态：没有所需要的资源。当所需要的资源得到分配时，进入就绪态（被动）</p>
+</li>
+<li><p>终止态：进程运行结束或者出现不可修复的错误时，由运行态转到终止态</p>
+</li>
+</ol>
+<p><img src="/images/操作系统/进程和线程/3219843-20230823211127083-182331251.png" width="50%" ></img></p>
+<p><strong>进程切换的三个部分：队列操作+调度+切换</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">pCur.state = <span class="string">&#x27;W&#x27;</span>;    <span class="comment">// 启动磁盘读写，将当前进程设置为阻塞状态</span></span><br><span class="line">schedule();    　　   <span class="comment">// 将pCur放到DiskWaitQueue</span></span><br><span class="line">schedule() </span><br><span class="line">&#123;</span><br><span class="line">    pNew = getNext(ReadyQueue);　　<span class="comment">// 从就绪队列找到下一个进程，调度函数算法非常复杂</span></span><br><span class="line">    switch_to(pCur,pNew);　　<span class="comment">// 保存当前进程的现场，把下一个进程的现场恢复</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把当前进程的现场保存到pCur中（PCB），把切换程序的pNew（PCB）读取到寄存器中</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230823211849158-141628520.png" width="50%" ></img></p>
+<p><strong>多个进程同时存在于内存的问题：</strong>不同进程的地址可能影响其他进程的代码，这可能导致其他进程的崩溃。操作系统需要维护一张<strong>映射表</strong>，将内存映射到实际的内存地址中，把<strong>不同的进程隔离</strong>开来保证进程的安全，下图中同样对内存100的操作分别映射到了内存地址780和内存地址1260。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230823212257632-420283698.png" width="50%" ></img></p>
+<p>但实际上<strong>多进程之间可能存在合作关系</strong>，比如打印机进程需要读取word进程的内容来完成打印的工作，这时可以提交到共享缓冲区。但这里可能存在一个问题，因为进程1和进程2是交替进行的，可能进程1首先读取到空间7是空的，接下来切换到进程2也读取到空间7是空的，开始向空间7写入，接下来切换到进程1继续在这里写入，会导致写入缓冲区的内容是错误的。所以操作系统需要管理一个合理的进程推进顺序。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230823212758616-590416553.png" width="30%" ></img></p>
+<h1 id="2-用户级线程"><a href="#2-用户级线程" class="headerlink" title="2.用户级线程"></a>2.用户级线程</h1><p><strong>进程</strong> &#x3D; 资源（映射表） + 指令执行序列</p>
+<p><strong>线程</strong>是只切换指令，如PC和寄存器，而不切换映射表，这种切换保留了并发了优点，避免了进程切换的代价</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824093807428-889055931.png" width="50%" ></img></p>
+<p>举例说明，对于浏览器来说，可以用一个线程接收服务器数据，一个线程显示文本，一个线程处理图片，一个线程显示图片，它们不需要用多个映射表完全分离开，没有必要用多个进程完成这些工作。我们需要的工作主要就是下面看到的两个部分，创建<strong>Create线程</strong>进行工作处理，使用<strong>Yield跳转</strong>到另一个线程工作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">WebExplorer</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> URL[] = <span class="string">&quot;http://cms.hit.edu.cn&quot;</span>; </span><br><span class="line">    <span class="type">char</span> buffer[<span class="number">1000</span>];</span><br><span class="line">    pthread_create(..., GetData, URL, buffer);</span><br><span class="line">    pthread_create(..., Show, buffer); </span><br><span class="line">&#125;  </span><br><span class="line"><span class="type">void</span> <span class="title function_">GetData</span><span class="params">(<span class="type">char</span> *URL, <span class="type">char</span> *p)</span></span><br><span class="line">&#123;...&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">Show</span><span class="params">(<span class="type">char</span> *p)</span></span><br><span class="line">&#123;...&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/操作系统/进程和线程/3219843-20230824094927161-891649213.png" width="50%" ></img></p>
+<p> 线程切换的详细过程：<strong>每个线程都有自己的栈</strong>。线程1执行过程中，首先调用函数B()，保护现场，将上一段程序的帧指针和函数B完成后PC应指向的地址压入栈（参见<a target="_blank" rel="noopener" href="https://www.cnblogs.com/stuxuan/p/17563233.html">【深入理解计算机系统】3.程序的机器级表示</a>），接下来调用Yield()函数，保护现场，将之前的帧指针和Yield函数结束后的PC204压入栈，接下来Yield函数将当前栈指针1000保存在TCB1中，并将栈指针切换到TCB2的栈指针2000，完成了线程间的切换。接下来线程2的Yield使得栈指针回到1000处，继续上一个线程对应位置执行。下面给出了用户级线程的Create和Yield核心代码。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824095455155-757300554.png" width="50%" ></img></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">Yield</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    TCB1.esp = esp;　　<span class="comment">//Thread Control Block</span></span><br><span class="line">    esp = TCB2.esp;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">ThreadCreate</span><span class="params">(A)</span></span><br><span class="line">&#123;</span><br><span class="line">    TCB *tcb=<span class="built_in">malloc</span>(); 　　<span class="comment">//申请空间保存TCB</span></span><br><span class="line">    *<span class="built_in">stack</span>=<span class="built_in">malloc</span>(); 　　　<span class="comment">//申请空间保存栈</span></span><br><span class="line">    *<span class="built_in">stack</span> = A; 　　　　　　<span class="comment">//向栈中压入数据</span></span><br><span class="line">    tcb.esp=<span class="built_in">stack</span>; 　　　　<span class="comment">//将栈和TCB建立联系</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/操作系统/进程和线程/3219843-20230824162448352-1323358407.png" width="60%" ></img></p>
+<h1 id="3-内核级线程"><a href="#3-内核级线程" class="headerlink" title="3.内核级线程"></a>3.内核级线程</h1><p>用户级线程存在的问题，用户级线程在请求下载数据的过程中，理想情况是下载了一些后跳转到显示文本的线程执行，但实际上内核级线程不知道这些事情，由于等待网卡IO会阻塞这个进程，最后导致浏览器没有实现我们需要的功能。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824104955407-236858842.png" width="50%" ></img></p>
+<p>所以引入内核级线程，ThreadCreate是系统调用，会进入内核，Yield的调度由系统决定。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824105135475-1586458063.png" width="50%" ></img></p>
+<p>接下来看一下多核和多CPU，可以看到多核CPU只有一套MMU（内存映射），也就是多核心CPU在执行进程的时候，也需要切换内存映射再执行，只有多处理器才能并行运行多个进程。但这个时候内核级线程的优势就体现出来了，多核CPU可以<strong>并行</strong>的执行同一进程不同线程的代码，因为这些代码共用一套内存映射。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824105251636-168712850.png" width="50%" ></img></p>
+<p>对于内核级线程，它与用户级线程的区别是</p>
+<p>用户级线程在用户栈执行，多个用户级线程对应了<strong>多个用户栈</strong>，1个TCB（用户态）关联1个用户栈；</p>
+<p>内核级线程在用户栈和内核栈都需要执行和调用函数，所以多内核级线程实际上对应了<strong>多套栈（包括用户栈和内核栈）</strong>，1个TCB（内核态）关联1个用户栈和1个内核栈。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824152942111-1843970938.png" width="20%" ></img></p>
+<p>int中断指令会引起内核栈的切换，内核栈中记录了<strong>用户栈</strong>和<strong>用户代码</strong>两部分内容。SS寄存器（栈顶段地址）和SP寄存器（偏移地址）的值，SS:SP是此时栈顶位置；PC记录了用户代码程序运行的代码位置，CS记录了用户代码段基址</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824153816599-1578613073.png" width="50%" ></img></p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824154707938-1812745636.png" width="50%" ></img></p>
+<p> 内核级线程的切换包含5个阶段</p>
+<p>1.中断入口（进入切换）：系统中断线程1从用户态进入内核态，用户态寄存器的值保存到内核栈</p>
+<p>2.中断处理（引发切换）：调用schedule函数，引起TCB切换。这里有可能启动磁盘读写或时钟中断，内核会调用schedule找到下一个要执行的TCB，然后用next指针指向这个TCB</p>
+<p>3.内核栈切换（switch_to)：把当前ESP寄存器放在current指向的TCB中，然后把next指向的esp赋给寄存器，完成内核栈指向地址的切换，现在ESP指向了下一个线程的TCB地址</p>
+<p>4.中断返回（iret）：把TCB存储的内核栈现场恢复出来</p>
+<p>5.用户栈切换：切换回用户态PC指针还有对应的用户栈</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824155625977-594619065.png" width="65%" ></img></p>
+<h1 id="4-内核级线程实现"><a href="#4-内核级线程实现" class="headerlink" title="4.内核级线程实现"></a>4.内核级线程实现</h1><p>首先从这段代码开始，main函数开始，首先遇到函数A，用户栈中压入A的返回地址（也就是B的初始地址），在A函数执行中遇到<strong>fork()<strong>函数，首先将系统调用号__NR_fork移入%eax寄存器，然后调用</strong>INT 0x80</strong>中断，执行这条指令时<strong>PC自动加1</strong>，此时PC指向下一行mov res,%eax。触发INT 0x80中断后，cpu立刻找到用户栈对应的内核栈，将当前时刻的<strong>SS和SP压入内核栈</strong>，接下来将返回地址<strong>CSIP</strong>压入内核栈，也就是mov res,%eax这一行。接下来执行<strong>system_call</strong>。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824194225785-630803737.png" width="50%" ></img></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">_system_call:</span><br><span class="line">	cmpl $nr_system_calls-1,%eax # 调用号超出范围就在eax设置-1并退出</span><br><span class="line">	ja bad_sys_call</span><br><span class="line">	push %ds %es %fs   # 保存原段寄存器值</span><br><span class="line">	pushl %edx %ecx %ebx    # 一个系统调用最多带3个参数，这里存放了系统对应C语言函数调用的参数</span><br><span class="line">	movl $0x10,%edx    # 设置ds和es到内核段</span><br><span class="line">	mov %dx,%ds</span><br><span class="line">	mov %dx,%ex    #edx的低16位赋值给ds和es指向内核数据段</span><br><span class="line">	movl $0x17,%edx</span><br><span class="line">	mov %dx,%fs</span><br><span class="line">	call _sys_call_table(,%eax,4)</span><br><span class="line">	pushl %eax　　#系统调用返回值压入栈</span><br></pre></td></tr></table></figure>
+
+<p>下图为切换5段论的中断入口和中断出口。_system_call首先保护现场，将原段寄存器的值压入栈，然后将调用的参数压入栈，接下来调用sys_fork，他首先判断判断当前程序TCB是不是等于0，等于0说明已经就绪，如果不等于0说明线程阻塞，则应该重新调度reschedule（也就是切换5段论中间3段，切换TCB），完成后进行中断返回ret_from_sys_call</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824202510103-1223666827.png" width="60%" ></img></p>
+<p>下图为切换5段论的中断出口，对应入口的大量push压入栈，出口把保存在TCB中的数据pop出栈</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824202545778-2076866479.png" width="60%" ></img></p>
+<p>切换5段论中的switch_to使用的时TSS切换，是一个长跳转。TR表示当前cpu对应的任务段，TR改变时会把寄存器中的内容全部保存到旧的TSS中，然后把新的TSS中所有内容都会加载到寄存器</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824202836284-1525593732.png" width="60%" ></img></p>
+<p>创建一个线程最重要的就是做出可以切换的样子。_sys_fork首先拷贝父进程的所有参数，这些参数都已经在中断过程压入内核栈，</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824203527095-530062562.png" width="60%" ></img></p>
+<p>copy_process的细节：创建栈。申请一页内存用于保存PCB和内核栈，注意这里内核栈重新创建，但ss和esp的栈与父进程一模一样，也就是它可以和父进程用同样的代码同样的栈，eip是int 0x80中断的下一句话。<strong>最后如果创建了子进程，会把%eax置为0，所以从子进程返回到mov res,%eax的时候，res是0；但如果从父进程返回到mov res,%eax，res是非0，所以有一段经典代码if(!fork()){子进程代码段}else{父进程代码段}，这样就实现了子进程和父进程都返回这个位置，但执行不同的代码</strong></p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824204140548-153693038.png" width="60%" ></img></p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824204529799-1167394624.png" width="60%" ></img></p>
+<p>如何让子进程执行我们想要的代码？下面给出了更为详细的代码，如果非fork则执行代码，如果是父进程则执行另一部分代码。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824205045741-1359048264.png" width="60%" ></img></p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824205223886-1912770547.png" width="60%" ></img></p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230824205541221-387081613.png" width="60%" ></img></p>
+<h1 id="5-CPU调度策略"><a href="#5-CPU调度策略" class="headerlink" title="5.CPU调度策略"></a>5.CPU调度策略</h1><p>吞吐量和响应时间之间有矛盾：响应时间小 -&gt; 切换次数多 -&gt; 系统内耗大 -&gt; 吞吐量小</p>
+<p>前台任务和后台任务的关注点不同：前台任务关注响应时间（从提交到相应的时间间隔），后台任务关注周转时间（从提交到完成的时间间隔）</p>
+<p>需要综合考虑IO约束型任务和CPU约束型任务</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230825165754317-1275574044.png" width="50%" ></img></p>
+<p> 应该综合考虑花费时间短的程序优先执行来降低周转时间，划分时间片来降低响应时间，同时也应该为前台和后台应用划分优先级</p>
+<h1 id="6-进程同步与信号量"><a href="#6-进程同步与信号量" class="headerlink" title="6.进程同步与信号量"></a>6.进程同步与信号量</h1><p>不同进程需要合作，例如打印机的打印队列与word文档之间的合作，这种同步是通过<strong>信号量</strong>控制的</p>
+<p>进程同步就是控制进程交替执行的过程，保证多进程合作合理有序</p>
+<p>假设有3个生产者进程P，1个消费者进程C，1个缓冲区，用信号量来表示缓冲区的状态，这些进程就可以<strong>通过信号量实现进程同步</strong>（也就是进程的等待和唤醒）</p>
+<p>（1）缓冲区满，P1执行，P1发现缓冲区满所以sleep，设置sem&#x3D;-1（有1个进程等待，缓冲区缺少１个位置）</p>
+<p>（2）P2执行，P2 sleep，设置sem&#x3D;-2（有2个进程等待）</p>
+<p>（3）C执行，打印1份文件，缓冲区增加1个空间，wakeup P1，设置sem&#x3D;-1</p>
+<p>（4）C再执行，缓冲区又增加1个空间，wakeup P2，设置sem&#x3D;0</p>
+<p>（4）C再执行，不需要唤醒进程，设置sem&#x3D;1（缓冲区盈余1个位置）</p>
+<p>（5）P3执行，因为缓冲区还有内容，直接执行，设置sem&#x3D;0</p>
+<p><strong>信号量的临界区保护</strong></p>
+<p>信号量是一个共有的变量，大家一起修改一起使用，多进程切换过程中可能存在问题。下面生产者P1和P2会修改empty信号量，调用生产者P1或P2时，他们都会首先读取现在的信号量，接下来将信号量-1，并把这个值赋回给公共的信号量。接下来右图给出了一种可能的调度，由于生产者P1在信号量-1之后没有将该信号量赋值给公共的信号量，此时发生调度转到了生产者P2，这就导致本来应该两个生产者使信号量-2，但实际上只-1</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230825200210222-404775037.png" width="50%" ></img></p>
+<p>解决方法：写共享变量empty时阻止其他进程访问，即<strong>上锁</strong>的思想</p>
+<p><strong>临界区：</strong>一次只允许一个进程进入的该进程的那一段代码，在这里就是每个进程中修改empty的这段代码，这里最重要的工作就是找到进程临界区的代码。<strong>核心思想</strong>就是进程<strong>进入临界区</strong>代码时进行一些操作，<strong>退出临界区</strong>后再进行一些操作，<strong>基本原则</strong>是<strong>互斥进入</strong>，其次应该<strong>有空让进</strong>，并且是<strong>有限等待</strong>的。</p>
+<p>下面是两种临界区控制的尝试，分别为轮换法和标记法。</p>
+<p><strong>轮换法：</strong> 使用turn变量控制进入。首先看互斥进入，如果P0进入说明turn&#x3D;0，如果P1进入说明turn&#x3D;1，满足互斥性，但是可能P0完成后将turn置为1，P1进程又在阻塞状态，就导致P1进程不使用临界区代码，P0进程又无法进入临界区代码，不满足有空让进</p>
+<p><strong>标记法：</strong>如果进程想要进入自己的临界区，就将自己的标记flag设置为true。首先看互斥性，如果P0进入说明flag[0]&#x3D;true，flag[1]&#x3D;false，如果P1进入说明flag[1]&#x3D;true，flag[0]&#x3D;false，满足互斥性。接下来看有空让进，两个进程都会检测对方是否想要进入临界区，如果想要进入就谦让，但有可能双方同时调整了自己的标志位，最后导致双方互相谦让，没有人能进入临界区，不满足无限等待</p>
+<p><strong>这两种标志太对称了，你也一样我也一样，最后卡死在这个地方</strong></p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230825202036657-1843163074.png" width="80%" ></img></p>
+<p><strong>Peterson算法：</strong>如果P0想要进入临界区，修改P0的flag为true，并且修改turn下一次应该是进程1运行。</p>
+<p>互斥性：</p>
+<p>P0进入flag[0]&#x3D;true，flag[1]&#x3D;false或turn&#x3D;0</p>
+<p>P1进入flag[1]&#x3D;true，flag[0]&#x3D;false或turn&#x3D;1</p>
+<p>连起来看就是如果P0和P1同时进入时一定flag[0]&#x3D;flag[1]&#x3D;true，那么只能turn&#x3D;0&#x3D;1，矛盾，满足互斥性</p>
+<p>有空让进：P1不在临界区时，出临界区设置flag[1]&#x3D;false，入临界区前turn&#x3D;0，P0都可以进入</p>
+<p>无限等待：turn一定等于0或等于1，所以永远有一个可以进入</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230825203038494-492450629.png" width="50%" ></img></p>
+<p><strong>多个进程进入临界区的解决办法：</strong></p>
+<p><strong>1.面包店算法。</strong>仍然是标记和轮转的结合，每个进程都会获得一个序号，序号最小的进入，进程离开时序号为0，不为0的号就是标记。每个进入商店的客户都会获得一个号码，号码小的先得到服务。互斥进入一定满足，因为大家号不一样，有空让进也满足，最小序号的进入，有限等待也满足，他是一个队列。但代码实现很复杂，有可能溢出，排号也很麻烦</p>
+<p><strong>2.硬件实现：</strong>最简单的办法实际上是阻止调度，临界区出现问题的根本原因是调度，另一个进程操作了一个共有的变量。硬件提供了cli()关中断和sti()开中断，可以在cpu硬件中加一个标记，但多CPU不太好使</p>
+<p><strong>3.硬件原子指令法</strong>：锁本质上就是一个变量，让其他代码不能同时执行这一段的代码，也就是这段代码不能因为调度被打断。硬件提供了一种一次执行完毕的指令，如果x是true，则该指令返回true，在while处空转；如果x是false，它会把x置为true，接下来返回false，进入临界区执行，但其它代码就无法进入了</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230825210502215-1604700392.png" width="50%" ></img></p>
+<h1 id="7-信号量的代码实现"><a href="#7-信号量的代码实现" class="headerlink" title="7.信号量的代码实现"></a>7.信号量的代码实现</h1><p>在 <code>linux-0.11/include/linux</code>  下定义信号量的数据结构</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> _SEM_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _SEM_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/sched.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SEMTABLE_LEN    20</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SEM_NAME_LEN    20</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">semaphore</span>&#123;</span></span><br><span class="line">    <span class="type">char</span> name[SEM_NAME_LEN];</span><br><span class="line">    <span class="type">int</span> value;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> *<span class="title">queue</span>;</span></span><br><span class="line">&#125; <span class="type">sem_t</span>;</span><br><span class="line"><span class="keyword">extern</span> <span class="type">sem_t</span> semtable[SEMTABLE_LEN];</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>在 <code>linux-0.11/kernel</code>  下编写信号量的4个系统调用</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/sem.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/sched.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;asm/segment.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/tty.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/kernel.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/fdreg.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;asm/system.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;asm/io.h&gt;</span></span></span><br><span class="line"><span class="type">sem_t</span> semtable[SEMTABLE_LEN];</span><br><span class="line"><span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个信号量或者打开一个已有的信号量</span></span><br><span class="line"><span class="type">sem_t</span> *<span class="title function_">sys_sem_open</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name,<span class="type">unsigned</span> <span class="type">int</span> value)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> kernelname[<span class="number">100</span>];   </span><br><span class="line">    <span class="type">int</span> isExist = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> i=<span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 信号量名字长度不能越界</span></span><br><span class="line">    <span class="keyword">while</span>(get_fs_byte(name+i) != <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(i&lt;<span class="number">100</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            kernelname[i]=get_fs_byte(name+i);</span><br><span class="line">            i++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 判断信号两是否已经存在</span></span><br><span class="line">    <span class="type">int</span> name_len = <span class="built_in">strlen</span>(kernelname);</span><br><span class="line">    <span class="type">int</span> sem_name_len =<span class="number">0</span>;</span><br><span class="line">    <span class="type">sem_t</span> *p=<span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">for</span>(i=<span class="number">0</span>;i&lt;cnt;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        sem_name_len = <span class="built_in">strlen</span>(semtable[i].name);</span><br><span class="line">        <span class="keyword">if</span>(sem_name_len == name_len)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(!<span class="built_in">strcmp</span>(kernelname,semtable[i].name))</span><br><span class="line">            &#123;</span><br><span class="line">                 isExist = <span class="number">1</span>;</span><br><span class="line">                 <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(isExist == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        p=(<span class="type">sem_t</span>*)(&amp;semtable[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        i=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(i=<span class="number">0</span>;i&lt;name_len;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            semtable[cnt].name[i]=kernelname[i];</span><br><span class="line">        &#125;</span><br><span class="line">        semtable[cnt].value = value;</span><br><span class="line">        p=(<span class="type">sem_t</span>*)(&amp;semtable[cnt]);</span><br><span class="line">        cnt++;</span><br><span class="line">     &#125;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 信号量P原子操作</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sys_sem_wait</span><span class="params">(<span class="type">sem_t</span> *sem)</span></span><br><span class="line">&#123;</span><br><span class="line">    cli();</span><br><span class="line">    <span class="keyword">while</span>(sem-&gt;value &lt;= <span class="number">0</span>)</span><br><span class="line">        sleep_on(&amp;(sem-&gt;<span class="built_in">queue</span>));</span><br><span class="line">    sem-&gt;value--;               </span><br><span class="line">    sti();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 信号量V原子操作</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sys_sem_post</span><span class="params">(<span class="type">sem_t</span> *sem)</span></span><br><span class="line">&#123;</span><br><span class="line">    cli();</span><br><span class="line">    sem-&gt;value++;</span><br><span class="line">    <span class="keyword">if</span>((sem-&gt;value) &lt;= <span class="number">1</span>)</span><br><span class="line">        wake_up(&amp;(sem-&gt;<span class="built_in">queue</span>));</span><br><span class="line">    sti();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放信号量</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sys_sem_unlink</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> kernelname[<span class="number">100</span>];   <span class="comment">/* 应该足够大了 */</span></span><br><span class="line">    <span class="type">int</span> isExist = <span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> i=<span class="number">0</span>;</span><br><span class="line">    <span class="type">int</span> name_cnt=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>( get_fs_byte(name+name_cnt) != <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">            name_cnt++;</span><br><span class="line">    <span class="keyword">if</span>(name_cnt&gt;SEM_NAME_LEN)</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">for</span>(i=<span class="number">0</span>;i&lt;name_cnt;i++)</span><br><span class="line">            kernelname[i]=get_fs_byte(name+i);</span><br><span class="line">    <span class="type">int</span> name_len = <span class="built_in">strlen</span>(name);</span><br><span class="line">    <span class="type">int</span> sem_name_len =<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(i=<span class="number">0</span>;i&lt;cnt;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        sem_name_len = <span class="built_in">strlen</span>(semtable[i].name);</span><br><span class="line">        <span class="keyword">if</span>(sem_name_len == name_len)</span><br><span class="line">        &#123;</span><br><span class="line">                <span class="keyword">if</span>( !<span class="built_in">strcmp</span>(kernelname,semtable[i].name))</span><br><span class="line">            &#123;</span><br><span class="line">                 isExist = <span class="number">1</span>;</span><br><span class="line">                 <span class="keyword">break</span>;</span><br><span class="line">             &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(isExist == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> tmp=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(tmp=i;tmp&lt;=cnt;tmp++)</span><br><span class="line">        &#123;</span><br><span class="line">            semtable[tmp]=semtable[tmp+<span class="number">1</span>];</span><br><span class="line">        &#125;</span><br><span class="line">        cnt = cnt<span class="number">-1</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<p>实际生产者和消费者调用信号量实现的一个简述</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">METUX: 互斥信号量, 防止生产消费同时进行</span></span><br><span class="line"><span class="comment">FULL:    产品剩余信号量, 大于0表示可以消费</span></span><br><span class="line"><span class="comment">EMPTY:  空信号量, 大于0时生产者才生产</span></span><br><span class="line"><span class="comment">消费者消费完后程序结束</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 生产者</span></span><br><span class="line">sem_wait(empty);</span><br><span class="line">sem_wait(metux);</span><br><span class="line"><span class="comment">/* 生产者执行代码 */</span></span><br><span class="line">sem_post(full);</span><br><span class="line">sem_post(metux);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 消费者</span></span><br><span class="line">sem_wait(full);</span><br><span class="line">sem_wait(metux);</span><br><span class="line"><span class="comment">/* 消费者执行代码 */</span></span><br><span class="line">sem_post(empty);</span><br><span class="line">sem_post(metux);</span><br></pre></td></tr></table></figure>
+
+<h1 id="8-实验"><a href="#8-实验" class="headerlink" title="8.实验"></a>8.实验</h1><p>1.尝试体验使用fork创建进程，main函数中实现了进程创建和执行不同的函数，cpuio_bound模拟了进程使用cpu和进行io</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/times.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HZ    100</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">cpuio_bound</span><span class="params">(<span class="type">int</span> last, <span class="type">int</span> cpu_time, <span class="type">int</span> io_time)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> * argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pid_t</span> n_proc[<span class="number">10</span>];    <span class="comment">//子进程的PID号</span></span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    <span class="keyword">for</span>(i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         *fork()创建进程</span></span><br><span class="line"><span class="comment">         *返回值为0则创建子进程成功并从子进程返回</span></span><br><span class="line"><span class="comment">         *返回值为PID则是从父进程返回</span></span><br><span class="line"><span class="comment">         *返回值小于0表示进程创建失败</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        n_proc[i] = fork(); </span><br><span class="line">        <span class="keyword">if</span>(n_proc[i] == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 从子进程返回会进入下面该代码区</span></span><br><span class="line">            <span class="comment">// 执行函数结束后return0结束子进程</span></span><br><span class="line">            cpuio_bound(<span class="number">20</span>, <span class="number">2</span>*i, <span class="number">20</span><span class="number">-2</span>*i);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(n_proc[i] &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Faild to fork child process %d!\n&quot;</span>, i+<span class="number">1</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 父进程执行完创建子进程后会进入该代码区打印子进程的PID</span></span><br><span class="line">    <span class="keyword">for</span>(i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Child PID: %d\n&quot;</span>, n_proc[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    wait(&amp;i);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 此函数按照参数占用CPU和I/O时间</span></span><br><span class="line"><span class="comment"> * last: 函数实际占用CPU和I/O的总时间，不含在就绪队列中的时间，&gt;=0是必须的</span></span><br><span class="line"><span class="comment"> * cpu_time: 一次连续占用CPU的时间，&gt;=0是必须的</span></span><br><span class="line"><span class="comment"> * io_time: 一次I/O消耗的时间，&gt;=0是必须的</span></span><br><span class="line"><span class="comment"> * 如果last &gt; cpu_time + io_time，则往复多次占用CPU和I/O</span></span><br><span class="line"><span class="comment"> * 所有时间的单位为秒</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">cpuio_bound</span><span class="params">(<span class="type">int</span> last, <span class="type">int</span> cpu_time, <span class="type">int</span> io_time)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tms</span> <span class="title">start_time</span>, <span class="title">current_time</span>;</span></span><br><span class="line">    <span class="type">clock_t</span> utime, stime;</span><br><span class="line">    <span class="type">int</span> sleep_time;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (last &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* CPU Burst */</span></span><br><span class="line">        times(&amp;start_time);</span><br><span class="line">        <span class="comment">/* 其实只有t.tms_utime才是真正的CPU时间。但我们是在模拟一个</span></span><br><span class="line"><span class="comment">         * 只在用户状态运行的CPU大户，就像“for(;;);”。所以把t.tms_stime</span></span><br><span class="line"><span class="comment">         * 加上很合理。*/</span></span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">        &#123;</span><br><span class="line">            times(&amp;current_time);</span><br><span class="line">            utime = current_time.tms_utime - start_time.tms_utime;</span><br><span class="line">            stime = current_time.tms_stime - start_time.tms_stime;</span><br><span class="line">        &#125; <span class="keyword">while</span> ( ( (utime + stime) / HZ )  &lt; cpu_time );</span><br><span class="line">        last -= cpu_time;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (last &lt;= <span class="number">0</span> )</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* IO Burst */</span></span><br><span class="line">        <span class="comment">/* 用sleep(1)模拟1秒钟的I/O操作 */</span></span><br><span class="line">        sleep_time=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (sleep_time &lt; io_time)</span><br><span class="line">        &#123;</span><br><span class="line">            sleep(<span class="number">1</span>);</span><br><span class="line">            sleep_time++;</span><br><span class="line">        &#125;</span><br><span class="line">        last -= sleep_time;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;                    </span><br></pre></td></tr></table></figure>
+
+<h2 id="8-1实现进程的内核级切换"><a href="#8-1实现进程的内核级切换" class="headerlink" title="8.1实现进程的内核级切换"></a>8.1实现进程的内核级切换</h2><p> <strong>内核创建流程</strong>：通过 <code>int0x80</code>  中断进入 <code>system_call</code> 汇编函数，根据 <code>__NR_fork</code>  号调用 <code>sys_fork</code>  函数，该函数中调用了 <code>copy_process</code> 函数来创建自己的内核栈并牵手父进程的用户栈</p>
+<p> <strong>进程切换流程：</strong> <code>schedule</code> 函数找到下一进程的PCB（进程控制块）和LDT（局部描述符），调用 <code>switch_to</code> 汇编函数进行PCB和内核栈的切换，并弹出回用户栈 </p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230908213521533-782219238.png" width="50%" ></img></p>
+<p><strong>补充：</strong>写给之后的计算机内存管理。 <code>fork()</code> 会产生一个和父进程完全相同的子进程，但子进程在此后多会 <code>exec</code> 系统调用，出于效率考虑，linux中引入了“读时共享，写时复制“技术，也就是只有进程空间的各段的内容要发生变化时，才会将父进程的内容复制一份给子进程，而读取的值不需要进行复制</p>
+<p>在<code>fork</code>之后<code>exec</code>之前两个进程用的是相同的物理内存，子进程的代码段、数据段、堆栈都是指向父进程的物理内存，也就是两者的虚拟内存不同，但其对应的物理空间是同一个，当父子进程中有更改相应段的行为发生时，再为子进程相应的段分配物理空间</p>
+<p>如果不是因为<code>exec</code>，内核会给子进程的数据段、堆栈段分配相应的物理空间（至此两者有各自的进程空间，互不影响），而代码段继续共享父进程的物理空间（两者的代码完全相同）</p>
+<p>如果是因为<code>exec</code>，由于两者执行的代码不同，子进程的代码段也会分配单独的物理空间</p>
+<p>总之，不同进程之间应该是完全隔离开的，进程是操作系统资源分配的基本单位。线程才可以与进程共享物理内存</p>
+<p><strong>实验部分：</strong> Linux0.11中的 <code>switch_to</code> 是使用Intel提供的 <code>ljmp</code> 指令完成的，它将TSS中保存的寄存器映像完全覆盖到CPU中实现进程切换，但这个指令大约需要200个时钟周期，执行时间很长，本次实验主要目的是：</p>
+<ul>
+<li>（1）重写 <code>switch_to</code></li>
+<li>（2）将重写的 <code>switch_to</code> 和 <code>schedule()</code> 函数接在一起</li>
+<li>（3）修改 <code>fork()</code></li>
+</ul>
+<p>现在不使用 TSS 进行切换，而是采用切换内核栈的方式来完成进程切换，所以在新的 switch_to 中将用到当前进程的 PCB、目标进程的 PCB、当前进程的内核栈、目标进程的内核栈等信息（内核栈中记录了用户栈和用户代码两部分内容；PCB中记录了进程相关信息，如进程状态，PID，I&#x2F;O等）。</p>
+<p>Linux 0.11 进程的内核栈和该进程的 PCB 在同一页内存上（一块 4KB 大小的内存），其中 PCB 位于这页内存的低地址，栈位于这页内存的高地址；另外，由于当前进程的 PCB 是用一个全局变量 current 指向的，所以只要告诉新 switch_to()函数一个指向目标进程 PCB 的指针就可以了。同时还要将 next 也传递进去，虽然 TSS(next)不再需要了，但是 LDT(next)仍然是需要的，也就是说，现在每个进程不用有自己的 TSS 了，因为已经不采用 TSS 进程切换了，但是每个进程需要有自己的 LDT，地址分离地址还是必须要有的，而进程切换必然要涉及到 LDT 的切换。（整个系统中一个处理器只有一个GDT（全局描述符），每个程序对应一个LDT（局部描述符），包含其代码、数据、堆栈等）</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230831190951075-244623851.png" width="70%" ></img></p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230901180018101-1742318132.png" width="40%" ></img></p>
+<h3 id="8-1-1修改switch-to汇编代码"><a href="#8-1-1修改switch-to汇编代码" class="headerlink" title="8.1.1修改switch_to汇编代码"></a>8.1.1修改switch_to汇编代码</h3><p>把原有的switch_to代码注释</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230909173945908-2016020934.png" width="70%" ></img></p>
+<p>我们的目的是不使用TSS而是使用内核栈完成进程的切换，应该在 <code>switch_to</code> 中完成PCB、内核栈的切换。首先修改 <code>kernel/system_call.s</code> 中的 <code>switch_to</code> 这段汇编代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">switch_to:</span><br><span class="line">// 因为该汇编函数在c语言中调用，所以需要手动处理栈帧</span><br><span class="line">    pushl %ebp</span><br><span class="line">    movl  %esp,%ebp</span><br><span class="line">    pushl %ecx</span><br><span class="line">    pushl %ebx</span><br><span class="line">    pushl %eax</span><br><span class="line">    movl  8(%ebp),%ebx</span><br><span class="line">    cmpl  %ebx,current</span><br><span class="line">    je    1f</span><br><span class="line"></span><br><span class="line">// --------pcb切换--------</span><br><span class="line">    movl  %ebx,%eax</span><br><span class="line">    xchgl %eax,current</span><br><span class="line"></span><br><span class="line">// ----TSS中内核栈指针重写-----</span><br><span class="line">    movl tss,%ecx</span><br><span class="line">    addl $4096,%ebx</span><br><span class="line">    movl %ebx,ESP0(%ecx)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// -------切换内核栈-------</span><br><span class="line">    movl %esp,KERNEL_STACK(%eax)</span><br><span class="line">    movl 8(%ebp),%ebx</span><br><span class="line">    movl KERNEL_STACK(%ebx),%esp</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// --------切换LDT--------</span><br><span class="line">    movl 12(%ebp),%ecx</span><br><span class="line">    lldt %cx</span><br><span class="line">    movl $0x17,%ecx</span><br><span class="line">    mov  %cx,%fs</span><br><span class="line">    cmpl %eax,last_task_used_math</span><br><span class="line">    jne  1f</span><br><span class="line">    clts</span><br><span class="line"></span><br><span class="line">1:</span><br><span class="line">    popl %eax</span><br><span class="line">    popl %ebx</span><br><span class="line">    popl %ecx</span><br><span class="line">    popl %ebp</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
+
+<p>switch_to这段代码在 <code>schedule</code> 函数中进行调用，首先将当前ebp指向的帧指针地址压入内核栈，之后将当前esp指向的地址赋值给帧指针，此时ebp指向的内存地址保存的是上一个帧指针的位置</p>
+<p>接下来进行了三次压栈操作，分别将三个寄存器的值保存到内核栈中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pushl %ebp     movl  %esp,%ebp</span><br><span class="line">pushl %ecx     pushl %ebc          pushl %eax</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/操作系统/进程和线程/3219843-20230901100153159-2087058072.png" width="80%" ></img></p>
+<p>第一行将ebp+8位置的值放到寄存器ebx中，然后对比ebx和全局变量current的值，如果相同则是同一进程，直接跳出该部分代码（下图第1列）</p>
+<p>第二行代码实现了ebx -&gt; eax, eax和current交换，也就是此时ebx和current都指向下一进程的PCB，eax指向当前进程的pcb（下图第2列）</p>
+<p>第三行，虽然现在不使用TSS进行进程切换，但这种中断机制还需要保持，我们在 <code>sched.c</code> 中定义了全变量 <code>struct tss_struct *tss=&amp;(init_task.task.tss)</code> ，也就是0号进程的TSS，所有进程共用这个TSS（下图第3列）</p>
+<p>ebx指向PCB地址，Linux0.11中进程的内核栈和PCB放在一块大小为4K的内存段中，高地址开始是内核栈，低地址开始是PCB，所以ebx+4096实际上就是内核栈的地址，其中 <code>ESP0=4</code> ，因为TSS中内核栈指针esp0就放在偏移为4的地方，也就是我们将内核栈的地址赋给了TSS中的内核栈地址，实现了内核栈指针的重写</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">movl  8(%ebp),%ebx      cmpl  %ebx,current      je   1f</span><br><span class="line">movl  %ebx,%eax         xchgl %eax,current</span><br><span class="line">movl  tss,%ecx          addl $4096,%ebx         movl %ebx,ESP0(%ecx)</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* linux/sched.h */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tss_struct</span> &#123;</span></span><br><span class="line">    <span class="type">long</span>    back_link;</span><br><span class="line">    <span class="type">long</span>    esp0;</span><br><span class="line">    <span class="comment">/* ...... */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/操作系统/进程和线程/3219843-20230901100443098-1526061308.png" width="80%" ></img></p>
+<p>第一行完成了内核栈的切换。首先将当前进程esp保存到当前PCB的kernelstack中。此时ebx保存的是下一进程内核栈的地址，应该改成PCB地址，所以重新取ebp+8的位置放入ebx寄存器。接下来将ebx寄存器中保存的kernelstack地址读入esp寄存器，实现内核栈esp的切换，所以这里也需要在 <code>sched.h</code> 中增加一个 <code>kernelstack</code> 变量&#96;&#96;</p>
+<p>第二行完成了LDT的切换。将下一进程的内核栈地址送入%ecx，加载LDT局部描述符等。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">movl %esp,KERNEL_STACK(%eax)  movl 8(%ebp),%ebx  movl KERNEL_STACK(%ebx),%esp</span><br><span class="line">movl 12(%ebp),%ecx            lldt %cx           movl $0x17,%ecx                 mov  %cx,%fs</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* linux/sched.h */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> &#123;</span></span><br><span class="line"><span class="type">long</span> state;</span><br><span class="line"><span class="type">long</span> counter;</span><br><span class="line"><span class="type">long</span> priority;</span><br><span class="line"><span class="type">long</span> kernelstack;    <span class="comment">// 需要增加变量</span></span><br><span class="line"><span class="comment">/* ...... */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>至此 <code>switch_to</code> 汇编代码全部写完，我们需要给他添加全局标识符以及定义用到的变量</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230901113117966-1541067216.png" width="80%" ></img></p>
+<p> 因为PCB结构增加了kernelstack，所以0号进程的PCB初始化时也应该改变，以及信号量对应的位置需要改变</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230901155420158-464214456.png" width="80%" ></img></p>
+<p>由于PCB结构体发生变化，所以0号进程初始化的时候也需要相应做出改变</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230909220720480-541965712.png" width="80%" ></img></p>
+<h3 id="8-1-2-修改fork-c代码"><a href="#8-1-2-修改fork-c代码" class="headerlink" title="8.1.2 修改fork.c代码"></a>8.1.2 修改fork.c代码</h3><p>我们修改完swtich_to汇编代码实际上实现了内核级线程的切换，同样我们创建线程的时候也需要构造出相同的样子。第一段代码是sys_fork系统调用函数，下面是fork.c中copy_process()函数的完整代码，调用了一个汇编函数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">sys_fork:</span><br><span class="line">    call find_empty_process</span><br><span class="line">    testl %eax,%eax</span><br><span class="line">    js 1f</span><br><span class="line">    push %gs</span><br><span class="line">    pushl %esi</span><br><span class="line">    pushl %edi</span><br><span class="line">    pushl %ebp</span><br><span class="line">    pushl %eax</span><br><span class="line">    call copy_process</span><br><span class="line">    addl $20,%esp</span><br><span class="line">1:    ret</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 添加外部声明, 这里使用了一段汇编来实现弹出栈信息到寄存器</span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">long</span> <span class="title function_">first_return_from_kernel</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">copy_process</span><span class="params">(<span class="type">int</span> nr,<span class="type">long</span> ebp,<span class="type">long</span> edi,<span class="type">long</span> esi,<span class="type">long</span> gs,<span class="type">long</span> none,</span></span><br><span class="line"><span class="params">        　 　 　　<span class="type">long</span> ebx,<span class="type">long</span> ecx,<span class="type">long</span> edx,</span></span><br><span class="line"><span class="params">       　　  　　 <span class="type">long</span> fs,<span class="type">long</span> es,<span class="type">long</span> ds,</span></span><br><span class="line"><span class="params">       　　　  　 <span class="type">long</span> eip,<span class="type">long</span> cs,<span class="type">long</span> eflags,<span class="type">long</span> esp,<span class="type">long</span> ss)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> *<span class="title">p</span>;</span></span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> *<span class="title">f</span>;</span></span><br><span class="line"></span><br><span class="line">    p = (<span class="keyword">struct</span> task_struct *) get_free_page();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!p)</span><br><span class="line">        <span class="keyword">return</span> -EAGAIN;</span><br><span class="line">    task[nr] = p;</span><br><span class="line"></span><br><span class="line">    *p = *current;    <span class="comment">/* NOTE! this doesn&#x27;t copy the supervisor stack */</span></span><br><span class="line">    p-&gt;state = TASK_UNINTERRUPTIBLE;</span><br><span class="line">    p-&gt;pid = last_pid;</span><br><span class="line">    p-&gt;father = current-&gt;pid;</span><br><span class="line">    p-&gt;counter = p-&gt;priority;</span><br><span class="line">    p-&gt;signal = <span class="number">0</span>;</span><br><span class="line">    p-&gt;alarm = <span class="number">0</span>;</span><br><span class="line">    p-&gt;leader = <span class="number">0</span>;        <span class="comment">/* process leadership doesn&#x27;t inherit */</span></span><br><span class="line">    p-&gt;utime = p-&gt;stime = <span class="number">0</span>;</span><br><span class="line">    p-&gt;cutime = p-&gt;cstime = <span class="number">0</span>;</span><br><span class="line">    p-&gt;start_time = jiffies;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化内核栈 </span></span><br><span class="line">    <span class="type">long</span>* krnstack;</span><br><span class="line">    <span class="comment">// 这里PAGE_SIZE是4096, p是PCB的地址，PCB地址加上4096就是内核栈地址</span></span><br><span class="line">    krnstack = (<span class="type">long</span>*) (PAGE_SIZE + (<span class="type">long</span>)p);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ss和sp等都是 copy_process() 函数的参数，来自父进程内核栈</span></span><br><span class="line">    *(--krnstack) = ss &amp; <span class="number">0xffff</span>;</span><br><span class="line">    *(--krnstack) = esp;</span><br><span class="line">    *(--krnstack) = eflags;</span><br><span class="line">    *(--krnstack) = cs &amp; <span class="number">0xffff</span>;</span><br><span class="line">    *(--krnstack) = eip;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// “内核级线程切换五段论”中的最后一段切换，即完成用户栈和用户代码的切换</span></span><br><span class="line">    <span class="comment">// 依靠的核心指令就是 iret，回到用户态程序，当然在切换之前应该恢复一下执行现场，主要就是</span></span><br><span class="line">    <span class="comment">// eax,ebx,ecx,edx,esi,edi,gs,fs,es,ds 等寄存器的恢复.</span></span><br><span class="line">    *(--krnstack) = ds &amp; <span class="number">0xffff</span>;</span><br><span class="line">    *(--krnstack) = es &amp; <span class="number">0xffff</span>;</span><br><span class="line">    *(--krnstack) = fs &amp; <span class="number">0xffff</span>;</span><br><span class="line">    *(--krnstack) = gs &amp; <span class="number">0xffff</span>;</span><br><span class="line">    *(--krnstack) = esi;</span><br><span class="line">    *(--krnstack) = edi;</span><br><span class="line">    *(--krnstack) = edx;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 处理 switch_to 返回，即结束后 ret 指令要用到的，ret 指令默认弹出一个 EIP 操作</span></span><br><span class="line">    *(--krnstack) = (<span class="type">long</span>)first_return_from_kernel;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// swtich_to 函数中的 “切换内核栈” 后的弹栈操作</span></span><br><span class="line">    *(--krnstack) = ebp;</span><br><span class="line">    *(--krnstack) = ecx;</span><br><span class="line">    *(--krnstack) = ebx;</span><br><span class="line">    *(--krnstack) = <span class="number">0</span>;              </span><br><span class="line"></span><br><span class="line">    <span class="comment">// 存放在 PCB 中的内核栈指针 指向 初始化完成时内核栈的栈顶</span></span><br><span class="line">    p-&gt;kernelstack = krnstack;</span><br><span class="line">    <span class="keyword">if</span> (last_task_used_math == current)</span><br><span class="line">        __asm__(<span class="string">&quot;clts ; fnsave %0&quot;</span>::<span class="string">&quot;m&quot;</span> (p-&gt;tss.i387));</span><br><span class="line">    <span class="keyword">if</span> (copy_mem(nr,p)) &#123;</span><br><span class="line">        task[nr] = <span class="literal">NULL</span>;</span><br><span class="line">        free_page((<span class="type">long</span>) p);</span><br><span class="line">        <span class="keyword">return</span> -EAGAIN;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;NR_OPEN;i++)</span><br><span class="line">        <span class="keyword">if</span> ((f=p-&gt;filp[i]))</span><br><span class="line">            f-&gt;f_count++;</span><br><span class="line">    <span class="keyword">if</span> (current-&gt;pwd)</span><br><span class="line">        current-&gt;pwd-&gt;i_count++;</span><br><span class="line">    <span class="keyword">if</span> (current-&gt;root)</span><br><span class="line">        current-&gt;root-&gt;i_count++;</span><br><span class="line">    <span class="keyword">if</span> (current-&gt;executable)</span><br><span class="line">        current-&gt;executable-&gt;i_count++;</span><br><span class="line">    set_tss_desc(gdt+(nr&lt;&lt;<span class="number">1</span>)+FIRST_TSS_ENTRY,&amp;(p-&gt;tss));</span><br><span class="line">    set_ldt_desc(gdt+(nr&lt;&lt;<span class="number">1</span>)+FIRST_LDT_ENTRY,&amp;(p-&gt;ldt));</span><br><span class="line">    p-&gt;state = TASK_RUNNING;    <span class="comment">/* do this last, just in case */</span></span><br><span class="line">    <span class="keyword">return</span> last_pid;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/操作系统/进程和线程/3219843-20230901120055039-2145393151.png" width="80%" ></img></p>
+<h3 id="8-1-3-修改sched-c函数"><a href="#8-1-3-修改sched-c函数" class="headerlink" title="8.1.3 修改sched.c函数"></a>8.1.3 修改sched.c函数</h3><p>我们已经完成了关键的switch_to汇编代码编写，使得系统可以不使用TSS而是用内核级线程切换；同时我们也完成了fork.c函数的修改，使得我们创建的内核级线程对应了我们switch_to需要的样子。</p>
+<p>最后我们对sched.c进行修改，首先声明外部函数switch_to，需要传入当前PCB地址以及LDT地址，然后声明我们在switch_to中需要的全局变量tss地址，最后修改schedule函数中的句子。</p>
+<p><img src="/images/操作系统/进程和线程/3219843-20230909174108696-527174429.png" width="80%" ></img></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/09/01/202309011802/">https://mingxuanwu.com/2023/09/01/202309011802/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"># 操作系统</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/09/07/202309071054/">Hololens2 开发问题存档</a>
+            
+            
+            <a class="next" rel="next" href="/2023/08/23/202308231617/">【操作系统】1.操作系统启动</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

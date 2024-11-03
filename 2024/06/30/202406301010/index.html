@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>1.Log 日志系统 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">1.Log 日志系统</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">June 30, 2024&nbsp;&nbsp;10:29:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-LogLevel"><a href="#1-LogLevel" class="headerlink" title="1. LogLevel"></a>1. LogLevel</h1><p>日志级别：通过<code>LogLevel</code>类可以定义日志的重要级别</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LogLevel</span></span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="keyword">enum</span> <span class="title class_">Level</span></span><br><span class="line">        &#123;</span><br><span class="line">            UNKNOW = <span class="number">0</span>,</span><br><span class="line">            DEBUG = <span class="number">1</span>,</span><br><span class="line">            INFO = <span class="number">2</span>,</span><br><span class="line">            WARN = <span class="number">3</span>,</span><br><span class="line">            ERROR = <span class="number">4</span>,</span><br><span class="line">            FATAL = <span class="number">5</span></span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="function"><span class="type">static</span> <span class="type">const</span> <span class="type">char</span> *<span class="title">ToString</span><span class="params">(LogLevel::Level level)</span></span>;			<span class="comment">// enum转string</span></span><br><span class="line">        <span class="function"><span class="type">static</span> LogLevel::Level <span class="title">FromString</span><span class="params">(<span class="type">const</span> std::string &amp;str)</span></span>;	<span class="comment">// string转enum</span></span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="2-LogEvent"><a href="#2-LogEvent" class="headerlink" title="2. LogEvent"></a>2. LogEvent</h1><p>日志事件：日志事件<code>LogEvent</code>类包含当前日志的所有具体信息，包括<code>Logger</code>日志器、<code>LogLevel</code>日志级别、行号、线程号等。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LogEvent</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">typedef</span> std::shared_ptr&lt;LogEvent&gt; ptr;</span><br><span class="line">    <span class="built_in">LogEvent</span>(std::shared_ptr&lt;Logger&gt; logger, LogLevel::Level level, <span class="type">const</span> <span class="type">char</span> *file, <span class="type">int32_t</span> line, <span class="type">uint32_t</span> elapse, <span class="type">uint32_t</span> thread_id, <span class="type">uint32_t</span> fiber_id, <span class="type">uint64_t</span> time, <span class="type">const</span> std::string &amp;thread_name);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="type">const</span> <span class="type">char</span> *<span class="title">getFile</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_file; &#125;</span><br><span class="line">    <span class="function"><span class="type">int32_t</span> <span class="title">getLine</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_line; &#125;</span><br><span class="line">    <span class="function"><span class="type">uint32_t</span> <span class="title">getElapse</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_elapse; &#125;</span><br><span class="line">    <span class="function"><span class="type">uint32_t</span> <span class="title">getThreadId</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_threadId; &#125;</span><br><span class="line">    <span class="function"><span class="type">uint32_t</span> <span class="title">getFiberId</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_fiberId; &#125;</span><br><span class="line">    <span class="function"><span class="type">uint64_t</span> <span class="title">getTime</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_time; &#125;</span><br><span class="line">    <span class="function"><span class="type">const</span> std::string &amp;<span class="title">getThreadName</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_threadName; &#125;</span><br><span class="line">    <span class="function">std::string <span class="title">getContent</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_ss.<span class="built_in">str</span>(); &#125;</span><br><span class="line">    <span class="function">std::shared_ptr&lt;Logger&gt; <span class="title">getLogger</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_logger; &#125;</span><br><span class="line">    <span class="function">LogLevel::Level <span class="title">getLevel</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_level; &#125;</span><br><span class="line">    <span class="function">std::stringstream &amp;<span class="title">getSS</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> m_ss; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">format</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *fmt, ...)</span></span>;			<span class="comment">// 传入多个字符串作为日志字节流内容</span></span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">format</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *fmt, va_list al)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *m_file = <span class="literal">nullptr</span>;</span><br><span class="line">    <span class="type">int32_t</span> m_line = <span class="number">0</span>;</span><br><span class="line">    <span class="type">uint32_t</span> m_elapse = <span class="number">0</span>;</span><br><span class="line">    <span class="type">uint32_t</span> m_threadId = <span class="number">0</span>;</span><br><span class="line">    <span class="type">uint32_t</span> m_fiberId = <span class="number">0</span>;</span><br><span class="line">    <span class="type">uint64_t</span> m_time = <span class="number">0</span>;</span><br><span class="line">    std::string m_threadName;</span><br><span class="line">    std::stringstream m_ss;</span><br><span class="line">    std::shared_ptr&lt;Logger&gt; m_logger;</span><br><span class="line">    LogLevel::Level m_level;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="3-LogFormatter"><a href="#3-LogFormatter" class="headerlink" title="3. LogFormatter"></a>3. LogFormatter</h1><p>格式化文本：日志格式器<code>LogFormatter</code>，返回格式化字符串</p>
+<ul>
+<li>成员函数<code>init()</code>：根据构造函数传入的<code>pattern:%xxx %xxx&#123;xxx&#125; %%</code>初始化<code>m_items</code></li>
+<li>成员函数<code>format()</code>：根据传入的<code>Logger</code>日志器、<code>LogLevel</code>日志级别、<code>LogEvent</code>日志事件，遍历调用<code>m_items</code>将其转换为格式化文本</li>
+<li>成员对象<code>string``m_pattern</code></li>
+<li>成员对象<code>vector&lt;FormatItem::ptr&gt; m_items</code><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LogFormatter</span></span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="keyword">typedef</span> std::shared_ptr&lt;LogFormatter&gt; ptr;</span><br><span class="line">        <span class="built_in">LogFormatter</span>(<span class="type">const</span> std::string &amp;pattern);</span><br><span class="line"></span><br><span class="line">        <span class="function">std::string <span class="title">format</span><span class="params">(std::shared_ptr&lt;Logger&gt; logger, LogLevel::Level level, LogEvent::ptr event)</span></span>;</span><br><span class="line">        <span class="function">std::ostream &amp;<span class="title">format</span><span class="params">(std::ostream &amp;ofs, std::shared_ptr&lt;Logger&gt; logger, LogLevel::Level level, LogEvent::ptr event)</span></span>;</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">init</span><span class="params">()</span></span>;</span><br><span class="line">        <span class="function"><span class="type">bool</span> <span class="title">isError</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_error; &#125;</span><br><span class="line">        <span class="function"><span class="type">const</span> std::string <span class="title">getPattern</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_pattern; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="keyword">class</span> <span class="title class_">FormatItem</span></span><br><span class="line">        &#123;</span><br><span class="line">        <span class="keyword">public</span>:</span><br><span class="line">            <span class="keyword">typedef</span> std::shared_ptr&lt;FormatItem&gt; ptr;</span><br><span class="line">            <span class="keyword">virtual</span> ~<span class="built_in">FormatItem</span>() &#123;&#125;</span><br><span class="line">            <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">format</span><span class="params">(std::ostream &amp;os, std::shared_ptr&lt;Logger&gt; logger, LogLevel::Level level, LogEvent::ptr event)</span> </span>= <span class="number">0</span>;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        std::string m_pattern;</span><br><span class="line">        std::vector&lt;FormatItem::ptr&gt; m_items;</span><br><span class="line">        <span class="type">bool</span> m_error = <span class="literal">false</span>;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="3-1-FormatItem"><a href="#3-1-FormatItem" class="headerlink" title="3.1 FormatItem"></a>3.1 FormatItem</h2><p>格式器项：根据自身要求输出对应的信息，如<code>MessageFormatItem</code>类负责输出<code>LogEvent</code>中的字节流，他只获取<code>LogEvent</code>中的<code>Content</code>对象，并输出到对应的<code>ostream</code></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MessageFormatItem</span> : <span class="keyword">public</span> LogFormatter::FormatItem</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MessageFormatItem</span>(<span class="type">const</span> std::string&amp; str = <span class="string">&quot;&quot;</span>) &#123;&#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">format</span><span class="params">(std::ostream&amp; os, Logger::ptr logger, LogLevel::Level level, LogEvent::ptr event)</span> <span class="keyword">override</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        os &lt;&lt; event-&gt;<span class="built_in">getContent</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="4-LogAppender"><a href="#4-LogAppender" class="headerlink" title="4. LogAppender"></a>4. LogAppender</h1><p>输出：日志输出器，用于输出<code>LogFormatter</code>返回的格式化文本，其中保存了<code>LogFormatter</code>格式器对象，<code>LogLevel</code>日志等级</p>
+<ul>
+<li>成员函数<code>log()</code>：通过传入<code>Logger</code>日志器、<code>LogLevel</code>日志级别、<code>LogEvent</code>日志事件，调用<code>LogFormatter</code>，得到格式化文本并输出到指定位置</li>
+<li>成员对象<code>m_formatter</code>：每个输出器都有自己的格式器</li>
+<li>成员对象<code>m_level</code>：配置<code>LogLevel</code>，<code>LogAppender</code>根据自己的<code>LogLevel</code>判断传入的日志事件是否进行输出操作<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LogAppender</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">friend</span> <span class="keyword">class</span> <span class="title class_">Logger</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="keyword">typedef</span> std::shared_ptr&lt;LogAppender&gt; ptr;</span><br><span class="line">        <span class="keyword">typedef</span> Spinlock MutexType; 锁</span><br><span class="line">        <span class="keyword">virtual</span> ~<span class="built_in">LogAppender</span>() &#123;&#125;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">log</span><span class="params">(std::shared_ptr&lt;Logger&gt; logger, LogLevel::Level level, LogEvent::ptr event)</span> </span>= <span class="number">0</span>;</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">setFormatter</span><span class="params">(LogFormatter::ptr val)</span></span>;</span><br><span class="line">        <span class="function">LogFormatter::ptr <span class="title">getFormatter</span><span class="params">()</span></span>;</span><br><span class="line">        <span class="function">LogLevel::Level <span class="title">getLevel</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_level; &#125;</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">setLevel</span><span class="params">(LogLevel::Level val)</span> </span>&#123; m_level = val; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span>:</span><br><span class="line">        LogLevel::Level m_level = LogLevel::DEBUG;</span><br><span class="line">        <span class="type">bool</span> m_hasFormatter = <span class="literal">false</span>;</span><br><span class="line">        MutexType m_mutex;</span><br><span class="line">        LogFormatter::ptr m_formatter;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="4-1-StdoutLogAppender"><a href="#4-1-StdoutLogAppender" class="headerlink" title="4.1 StdoutLogAppender"></a>4.1 StdoutLogAppender</h2><p>控制台输出：日志输出器<code>LogAppender</code>的具体类，通过调用<code>log</code>函数实现输出</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">StdoutLogAppender</span> : <span class="keyword">public</span> LogAppender &#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="keyword">typedef</span> std::shared_ptr&lt;StdoutLogAppender&gt; ptr;</span><br><span class="line">        <span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(Logger::ptr logger, LogLevel::Level level, LogEvent::ptr event)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (level &gt;= m_level) &#123;</span><br><span class="line">                <span class="function">MutexType::Lock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">                m_formatter-&gt;format(std::cout, logger, level, event);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function">std::string <span class="title">toYamlString</span><span class="params">()</span> <span class="keyword">override</span></span>;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="5-Logger"><a href="#5-Logger" class="headerlink" title="5. Logger"></a>5. Logger</h1><p>日志器类：保存有字段：LogLevel日志级别，LogAppender日志输出地，LogFormatter日志格式器</p>
+<ul>
+<li>成员对象<code>LogLevel</code></li>
+<li>成员对象<code>list&lt;LogAppender::ptr&gt;</code></li>
+<li>成员对象<code>LogFormatter</code>：默认给<code>LogAppender</code>内的<code>Logformatter</code>做配置</li>
+<li>成员函数<code>debug/info/warn/error/fatal</code>：输出该日志等级的日志事件</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Logger</span> : <span class="keyword">public</span> std::enable_shared_from_this&lt;Logger&gt;</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">friend</span> <span class="keyword">class</span> <span class="title class_">LoggerManager</span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">public</span>:</span><br><span class="line">       <span class="keyword">typedef</span> std::shared_ptr&lt;Logger&gt; ptr;</span><br><span class="line">       <span class="keyword">typedef</span> Spinlock MutexType; </span><br><span class="line"></span><br><span class="line">       <span class="built_in">Logger</span>(<span class="type">const</span> std::string &amp;name = <span class="string">&quot;root&quot;</span>);</span><br><span class="line"></span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">log</span><span class="params">(LogLevel::Level level, LogEvent::ptr event)</span></span>;</span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">debug</span><span class="params">(LogEvent::ptr event)</span></span>;</span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">info</span><span class="params">(LogEvent::ptr event)</span></span>;</span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">warn</span><span class="params">(LogEvent::ptr event)</span></span>;</span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">error</span><span class="params">(LogEvent::ptr event)</span></span>;</span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">fatal</span><span class="params">(LogEvent::ptr event)</span></span>;</span><br><span class="line"></span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">addAppender</span><span class="params">(LogAppender::ptr appender)</span></span>;</span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">delAppender</span><span class="params">(LogAppender::ptr appender)</span></span>;</span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">clearAppenders</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">       <span class="function">LogLevel::Level <span class="title">getLevel</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_level; &#125;</span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">setLevel</span><span class="params">(LogLevel::Level val)</span> </span>&#123; m_level = val; &#125;</span><br><span class="line">       <span class="function"><span class="type">const</span> std::string &amp;<span class="title">getName</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_name; &#125;</span><br><span class="line"></span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">setFormatter</span><span class="params">(LogFormatter::ptr val)</span></span>;</span><br><span class="line">       <span class="function"><span class="type">void</span> <span class="title">setFormatter</span><span class="params">(<span class="type">const</span> std::string &amp;val)</span></span>;</span><br><span class="line">       <span class="function">LogFormatter::ptr <span class="title">getFormatter</span><span class="params">()</span></span>;</span><br><span class="line">       </span><br><span class="line">       <span class="function">std::string <span class="title">toYamlString</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span>:</span><br><span class="line">       std::string m_name;</span><br><span class="line">       LogLevel::Level m_level;</span><br><span class="line">       MutexType m_mutex;</span><br><span class="line">       std::list&lt;LogAppender::ptr&gt; m_appenders;</span><br><span class="line">       LogFormatter::ptr m_formatter;</span><br><span class="line">       Logger::ptr m_root;</span><br><span class="line">   &#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="6-LogEventWrap"><a href="#6-LogEventWrap" class="headerlink" title="6. LogEventWrap"></a>6. LogEventWrap</h1><p>日志包装器：可以把<code>LogEventWrap</code>当作临时的右值，创建时直接传入在构造函数中传入<code>LogEvent</code>，本行结束后自动析构，调用<code>log</code>，不会产生额外的指针。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">LogEventWrap</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">LogEventWrap</span>(LogEvent::ptr e);</span><br><span class="line">    ~<span class="built_in">LogEventWrap</span>() &#123;</span><br><span class="line">        m_event-&gt;<span class="built_in">getLogger</span>()-&gt;<span class="built_in">log</span>(m_event-&gt;<span class="built_in">getLevel</span>(), m_event);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">LogEvent::ptr <span class="title">getEvent</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_event; &#125;</span><br><span class="line">    <span class="function">std::stringstream&amp; <span class="title">getSS</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    LogEvent::ptr m_event;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="7-调用过程"><a href="#7-调用过程" class="headerlink" title="7. 调用过程"></a>7. 调用过程</h1><h2 id="7-1-Logger-log"><a href="#7-1-Logger-log" class="headerlink" title="7.1 Logger::log"></a>7.1 Logger::log</h2><ul>
+<li><code>Logger::log</code>函数被调用，根据<code>Logger</code>日志器的日志等级判断本次<code>log</code>是否有效<ul>
+<li>有效则遍历<code>Logger</code>中的所有<code>LogAppender</code><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Logger::log</span><span class="params">(LogLevel::Level level, LogEvent::ptr event)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (level &gt;= m_level)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">auto</span> self = <span class="built_in">shared_from_this</span>();</span><br><span class="line">        <span class="comment">// 锁 MutexType::Lock lock(m_mutex);</span></span><br><span class="line">        <span class="keyword">if</span> (!m_appenders.<span class="built_in">empty</span>())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">auto</span> &amp;i : m_appenders)</span><br><span class="line">                &#123;</span><br><span class="line">                    i-&gt;<span class="built_in">log</span>(self, level, event);</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (m_root)</span><br><span class="line">        &#123;</span><br><span class="line">            m_root-&gt;<span class="built_in">log</span>(level, event);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="7-2-LogAppender-log"><a href="#7-2-LogAppender-log" class="headerlink" title="7.2 LogAppender::log"></a>7.2 LogAppender::log</h2><ul>
+<li>被<code>Logger::log</code>调用</li>
+<li>每个<code>LogAppender</code>都保存有自己的<code>LogLevel</code>日志等级<ul>
+<li>如果本次日志有效，则调用<code>LogFormatter</code>，并且传入<code>std::cout</code>作为输出端口<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">StdoutLogAppender::log</span><span class="params">(std::shared_ptr&lt;Logger&gt; logger, LogLevel::Level level, LogEvent::ptr event)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (level &gt;= m_level)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 锁 MutexType::Lock lock(m_mutex);</span></span><br><span class="line">        m_formatter-&gt;format(std::cout, logger, level, event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="7-3-LogFormatter-format"><a href="#7-3-LogFormatter-format" class="headerlink" title="7.3 LogFormatter::format"></a>7.3 LogFormatter::format</h2><ul>
+<li>被<code>LogAppender::log</code>调用</li>
+<li>遍历内部保存的每个<code>FormatItem</code>，有两个重载<ul>
+<li>方法一将所有的内容存储到字节流中，并返回字符串</li>
+<li>方法二传入输出流，并直接通过<code>format</code>将流输出到对应位置<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">std::string <span class="title">LogFormatter::format</span><span class="params">(std::shared_ptr&lt;Logger&gt; logger, LogLevel::Level level, LogEvent::ptr event)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::stringstream ss;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> &amp;i : m_items)</span><br><span class="line">        &#123;</span><br><span class="line">            i-&gt;format(ss, logger, level, event);</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">return</span> ss.<span class="built_in">str</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">std::ostream &amp;<span class="title">LogFormatter::format</span><span class="params">(std::ostream &amp;ofs, std::shared_ptr&lt;Logger&gt; logger, LogLevel::Level level, LogEvent::ptr event)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> &amp;i : m_items)</span><br><span class="line">        &#123;</span><br><span class="line">            i-&gt;format(ofs, logger, level, event);</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">return</span> ofs;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="7-4-FormatItem-format"><a href="#7-4-FormatItem-format" class="headerlink" title="7.4 FormatItem::format"></a>7.4 FormatItem::format</h2><ul>
+<li>以线程格式化器<code>ThreadIdFormatItem</code>为例</li>
+<li>该方法对应了<code>LogFormatter::format</code>中的重载方法二<ul>
+<li>可以传入<code>std::cout</code>，直接将对应的数据输出到<code>std::cout</code>中<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ThreadIdFormatItem</span> : <span class="keyword">public</span> LogFormatter::FormatItem</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="built_in">ThreadIdFormatItem</span>(<span class="type">const</span> std::string &amp;str = <span class="string">&quot;&quot;</span>) &#123;&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">format</span><span class="params">(std::ostream &amp;os, Logger::ptr logger, LogLevel::Level level, LogEvent::ptr event)</span> <span class="keyword">override</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    os &lt;&lt; event-&gt;<span class="built_in">getThreadId</span>();</span><br><span class="line">&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h1 id="8-Logger使用示例"><a href="#8-Logger使用示例" class="headerlink" title="8. Logger使用示例"></a>8. Logger使用示例</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">testLog</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 声明 logger</span></span><br><span class="line">    sylar::<span class="function">Logger::ptr <span class="title">logger</span><span class="params">(<span class="keyword">new</span> sylar::Logger())</span></span>;</span><br><span class="line">    <span class="comment">// 给 logger 添加两种 appender</span></span><br><span class="line">    logger-&gt;<span class="built_in">addAppender</span>(sylar::StdoutLogAppender::<span class="built_in">ptr</span>(<span class="keyword">new</span> sylar::<span class="built_in">StdoutLogAppender</span>()));</span><br><span class="line">    logger-&gt;<span class="built_in">addAppender</span>(sylar::FileLogAppender::<span class="built_in">ptr</span>(<span class="keyword">new</span> sylar::<span class="built_in">FileLogAppender</span>(<span class="string">&quot;/home/oracle/projects/Sylar/bin/x64/Debug/log.txt&quot;</span>)));</span><br><span class="line">    <span class="built_in">SYLAR_LOG_DEBUG</span>(logger) &lt;&lt; <span class="string">&quot;输出DEBUG级别的日志信息&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/06/30/202406301010/">https://mingxuanwu.com/2024/06/30/202406301010/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CPP%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/"># CPP高性能服务器</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/07/01/202407011705/">2.Config 配置系统</a>
+            
+            
+            <a class="next" rel="next" href="/2024/05/09/202405091009/">【工具】读取数据并插入到数据库中</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

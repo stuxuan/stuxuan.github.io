@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>Hololens2 开发问题存档 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Hololens2 开发问题存档</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">September 7, 2023&nbsp;&nbsp;10:54:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-安装环境"><a href="#1-安装环境" class="headerlink" title="1.安装环境"></a>1.安装环境</h1><ol>
+<li>下载Visual Studio Installer，然后安装2022版本的vs社区版，然后点击修改。</li>
+</ol>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907103535890-626792015.png" heigh="50%"></img></p>
+<ol start="2">
+<li>下载Visual Studio Installer，然后安装2022版本的vs社区版，几个必要的库必须要安装，不然有报错，下面那个SDK文件要根据自己的版本选。</li>
+</ol>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907103601124-1644005935.png" heigh="50%"></img></p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907103640828-1909476635.png" heigh="50%"></img></p>
+<ol start="3">
+<li>安装完Hololens找到安装的文件夹，如果没有装到C盘，需要手动拷贝安装的文件夹里的Extension SDKs文件拷贝到这个位置，然后这个文件夹10需要自己创建</li>
+</ol>
+<p>C:\Program Files (x86)\Windows Kits\10\Extension SDKs</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907103806617-261566727.png" heigh="50%"></img></p>
+<ol start="4">
+<li>unity生成设置里，平台应该选择x64，SDK版本号要选择电脑上装的模拟器的版本，对应的vs版本必须是一会打开文件用的vs版本，比如用2019生成的，在2022里打开会报错。</li>
+</ol>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907103824728-950204769.png" heigh="50%"></img>]</p>
+<h1 id="2-导入MRTK工具包"><a href="#2-导入MRTK工具包" class="headerlink" title="2.导入MRTK工具包"></a><strong>2.导入MRTK工具包</strong></h1><p><strong>这里我把之前整理的包上传了，需要可以自己去下载</strong></p>
+<p>链接：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1t2OTnOVZhlnyDzi41kaNog?pwd=xuan">https://pan.baidu.com/s/1t2OTnOVZhlnyDzi41kaNog?pwd=xuan</a></p>
+<ol>
+<li><p>首先在unity新建一个3D项目，随便起个英文名字</p>
+</li>
+<li><p>安装Foundation这个包，双击然后点击import就可以</p>
+</li>
+</ol>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104032858-1195951065.png" heigh="50%"></img></p>
+<ol start="3">
+<li>他会报错不要怕，不用关闭弹出来的MRTK的页面，然后打开这个工具安装，选择刚刚创建的项目的路径，然后安装我框选的这几个文件。</li>
+</ol>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104113390-862463448.png" heigh="50%"></img></p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104118016-1120170688.png" heigh="50%"></img></p>
+<ol start="4">
+<li>报错更多了，无所谓，先点这个recommend设置</li>
+</ol>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104141749-318545612.png" heigh="50%"></img></p>
+<ol start="5">
+<li>build setting（设置成跟我一样），yes重启</li>
+</ol>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104154170-881397986.png" heigh="50%"></img></p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104158302-1823606692.png" heigh="50%"></img></p>
+<ol start="6">
+<li>现在应该没有报错了，在编辑，项目设置中，找到最后面XR Plug-in，然后勾选OpenXR和HoloLens，点黄箭头修复全部，然后发现这里有一个错误修复不了，点击那个Edit编辑</li>
+</ol>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104225428-1014783918.png" heigh="50%"></img></p>
+<p>7.点击编辑以后会跳出来一个页面，修改成16bit，点击加号把这三个添加进来，然后点感叹号修复</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104238174-1415847911.png" heigh="50%"></img></p>
+<ol start="8">
+<li>点apply settings</li>
+</ol>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104247628-2141012991.png" heigh="50%"></img></p>
+<p>9.点next，然后再点apply，之后他会自动重启。</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104301272-609561296.png" heigh="50%"></img></p>
+<p>10.导入Extension这个包</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104408513-1621856970.png" heigh="50%"></img></p>
+<p>11.导入GettingStarted.2.5.0.1这个包</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104425339-1764335052.png" heigh="50%"></img></p>
+<p>12.导入XRplugginManagement.2.5.3这个包</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104453572-172400207.png" heigh="50%"></img></p>
+<p>13.导入MultiUserCapabilities.2.7.2这个包，然后出现了一大堆报错，不要慌</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104509299-1183590052.png" heigh="50%"></img></p>
+<p>14.在unity资源商店，搜索PUN 2 - FREE，登陆以后添加到自己的资源，然后在unity中import进来，报错没了，结束</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907104539454-1983110582.png" heigh="50%"></img></p>
+<h1 id="3-常见问题"><a href="#3-常见问题" class="headerlink" title="3.常见问题"></a>3.常见问题</h1><p><strong>1. 连接问题:</strong> 必须在设置 - 更新和安全 - 开发者选项中打开“开发人员模式”和“设备门户”</p>
+<p><strong>2. 进入控制页面</strong>: 设置 - 网络和Internet - WLAN页面拉到最下面有硬件属性 - 找到IPV4地址在Windows上输入可以进行远程连接</p>
+<p>这里可能会提示输入账号密码，如果忘了直接进入这个网址重置就行重置就行<a target="_blank" rel="noopener" href="https://172.20.10.3/devicepair.htm%EF%BC%8CIP%E9%9C%80%E8%A6%81%E6%8D%A2%E6%88%90HoloLens%E6%9C%AC%E6%9C%BA%E7%9A%84IPV4%E5%9C%B0%E5%9D%80">https://172.20.10.3/devicepair.htm，IP需要换成HoloLens本机的IPV4地址</a></p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907103338620-544238869.png" heigh="50%"></img></p>
+<p><strong>3. 打包:</strong> 这里有几个问题，第一个是打包后发现没有权限的问题，需要在下图位置把需要的权限打开，简单点全开了就完事了</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907105009867-219571567.png" heigh="50%"></img></p>
+<p> 第二个问题是这里应该选择Master ARM，并且在远程计算机调试里配置计算机名为HoloLens的IPV4地址，第一次连接会要求输入PIN码，在HoloLens的开发者选项里可以找到，然后就是选择MASTER可以避免软件左下角显示Development Console控制台里的报错信息，选择Release会自动显示</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907105128739-535183727.png" heigh="50%"></img></p>
+<p> <strong>最后，这个远程调试非常垃圾，非常非常垃圾，强烈建议直接usb插在电脑上，等他自动识别HoloLens以后，本地调试</strong></p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907112600015-764560204.png" heigh="50%"></img>]</p>
+<p><img src="/images/其他/hololens2开发问题存档/3219843-20230907112713277-1715531207.png" heigh="50%"></img></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/09/07/202309071054/">https://mingxuanwu.com/2023/09/07/202309071054/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/09/10/202309101731/">【操作系统】3.内存管理</a>
+            
+            
+            <a class="next" rel="next" href="/2023/09/01/202309011802/">【操作系统】2.进程和线程</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

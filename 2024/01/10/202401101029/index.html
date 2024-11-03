@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【计算机网络：自顶向下方法】6.链路层和局域网 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【计算机网络：自顶向下方法】6.链路层和局域网</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">January 10, 2024&nbsp;&nbsp;10:29:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-导论"><a href="#1-导论" class="headerlink" title="1 导论"></a>1 导论</h1><ul>
+<li>节点（nodes）：主机和路由器（网桥和交换机也是）</li>
+<li>链路（links）：沿着通信路径，连接相邻节点通信信道（有线链路、无线链路、局域网共享性链路）</li>
+<li>帧（frame）：第二层协议数据单元，封装数据报</li>
+</ul>
+<p>IP数据报分组在不同的链路上以不同的链路协议传送，路由器根据要打出的端口确定封装的协议，例如从以太网接收的数据报转发到WLan打出</p>
+<h2 id="1-1-链路层服务"><a href="#1-1-链路层服务" class="headerlink" title="1.1 链路层服务"></a>1.1 链路层服务</h2><ul>
+<li>成帧，链路接入<ul>
+<li>将数据报封装到帧中，加上帧头帧尾</li>
+<li>共享性介质需要首先获得信道访问权再进行传输</li>
+<li>帧头使用MAC物理地址来标示源和目标地址</li>
+</ul>
+</li>
+<li>相邻两个节点完成可靠数据传递<ul>
+<li>传输层完成该工作</li>
+<li>在光纤这类低出错率的线路上很少使用（每一帧都来回确认是否有错误，但出错率本身很低，代价太大）</li>
+<li>无线链路上链路层和传输层都实现了可靠性（无线链路出错率很高，不做确认上层的代价就会非常大）</li>
+</ul>
+</li>
+<li>流量控制：相邻节点发送和接收方节点的速度匹配</li>
+<li>错误检测：信号衰减和噪声引起</li>
+<li>差错纠正：接收端不通过重传检查和纠正bit级错误</li>
+<li>全双工和半双工：链路可以双向传输，但一次只能传输一个方向</li>
+</ul>
+<h2 id="1-2-适配器通信"><a href="#1-2-适配器通信" class="headerlink" title="1.2 适配器通信"></a>1.2 适配器通信</h2><p>　　每个主机上都有以太网卡或802.11网卡等，实现了链路层和相应的物理层的功能。网络适配器接到主机的总线上</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240109105723075-49722448.png" width="70%"/></div>
+
+<h1 id="2-CRC循环冗余校验"><a href="#2-CRC循环冗余校验" class="headerlink" title="2 CRC循环冗余校验"></a>2 CRC循环冗余校验</h1><h1 id="3-多点访问协议"><a href="#3-多点访问协议" class="headerlink" title="3 多点访问协议"></a>3 多点访问协议</h1><ul>
+<li>两种类型的链路<ul>
+<li>点对点连接的网络：拨号访问PPP，以太网交换机和主机之间的点对点链路</li>
+</ul>
+</li>
+<li>广播式的链路<ul>
+<li>传统以太网</li>
+<li>HFC上行链路</li>
+<li>802.11无线局域网</li>
+</ul>
+</li>
+</ul>
+<p>多个站点使用同一个信道，如果多个站点同时发送信息会导致冲突，会收到多个信号的叠加，信息将会是错误的</p>
+<p>理想的多路访问协议：如果广播信道速率为Rbps，有M个节点发送时，每个节点以R&#x2F;M的平均速率发送</p>
+<h2 id="3-1-媒体访问控制协议"><a href="#3-1-媒体访问控制协议" class="headerlink" title="3.1 媒体访问控制协议"></a>3.1 媒体访问控制协议</h2><p>MAC（媒体访问控制协议）不是mac物理地址，基本有3类方式</p>
+<ul>
+<li>信道划分：把信道划分成小片（时间、频率、编码）</li>
+<li>随机访问：信道不划分，允许冲突，检测冲突后恢复</li>
+<li>依次轮流：节点依次轮流，但数据量大的节点使用较长的时间</li>
+</ul>
+<p><strong>随机访问 纯ALOHA</strong>：有帧立刻发送，冲突就冲突了，信道利用率17.5%，很垃圾</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240109113641631-1097315262.png" width="70%"/></div>
+
+<p><strong>随机访问 CSMA</strong>（载波侦听多路访问）：侦听到信道空闲就发送整个帧，如果信道忙就推迟发送，也有问题，可能对方已经发了，还没传到我这，我以为没人发我就发了，这也能冲突</p>
+<p><strong>随机访问 CSMA&#x2F;CD</strong>（冲突检测，以太网）：</p>
+<ul>
+<li>发送前侦听信道，如果信道空闲则发送，忙则等待到空闲再发送</li>
+<li>发送过程中若没有检测到冲突则成果，检测到冲突放弃发送并尝试重新发送</li>
+<li>发生冲突的节点必须发送<strong>强化冲突</strong>信号，通知所有站点信道发生了冲突</li>
+<li>如果放弃，适配器进入<strong>指数避退</strong>状态，第m次失败，适配器随机选择{0,1,2,…,2m-1}中一个值K，等待K*512位时后再开始侦听并准备发送</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240109114352858-677957506.png" width="40%"/></div>
+
+<p>随机访问 CAMA&#x2F;CA（冲突避免，无线局域网）：不冲突不一定代表发送成功，例如A和B同时给C发送数据，但A和B有格挡，导致A不知道有冲突，B也不知道有冲突，但C接受失败</p>
+<ul>
+<li>发送方侦听信道，如果信道空闲则直接发送，如果收到一个返回值ACK则说明发送成功</li>
+<li>发送方侦听信道，如果信道忙，则随机选择一个值，并在信道空闲时递减该值，递减到0后如果信道空闲则发送整个帧，如果没有收到ACK则增加回退值并重新进行递减</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240109162245585-438408639.png" width="30%"/></div>
+
+<h1 id="4-LANs-局域网"><a href="#4-LANs-局域网" class="headerlink" title="4 LANs 局域网"></a>4 LANs 局域网</h1><ul>
+<li>32 bit IP地址<ul>
+<li>网络层地址</li>
+<li>前n-1跳：用于使数据报到达目的IP子网</li>
+<li>最后一跳：到达子网中的目标节点</li>
+</ul>
+</li>
+<li>LAN（MAC&#x2F;物理&#x2F;以太网）地址：<ul>
+<li>用于帧从一个网卡传递到另一个网卡（物理网络）</li>
+<li>48bit MAC地址固化在适配器的ROM，有时也可以通过软件设置</li>
+<li>理论上MAC地址全球唯一</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-1-网络地址和mac地址"><a href="#4-1-网络地址和mac地址" class="headerlink" title="4.1 网络地址和mac地址"></a>4.1 网络地址和mac地址</h2><ul>
+<li>IP地址和MAC地址的作用不同<ul>
+<li>IP地址是分层的，实现路由聚集，减少路由表；IP地址完成网络到网络的交付</li>
+<li>mac地址是平面的，网卡生产时只给网卡一个唯一标识，用于区分网络内部不同的网卡，可以完成物理网络内部的节点到节点的数据交付</li>
+</ul>
+</li>
+<li>IP和MAC分离的好处<ul>
+<li>网卡坏了IP不变，只需要绑定到另一个网卡的MAC地址</li>
+<li>物理网络还可以使用其他上层的网络协议，如IPX</li>
+</ul>
+</li>
+<li>MAC地址由IEEE管理和分配，制造商从IEEE购入MAC地址</li>
+</ul>
+<h2 id="4-2-LAN和ARP"><a href="#4-2-LAN和ARP" class="headerlink" title="4.2 LAN和ARP"></a>4.2 LAN和ARP</h2><ul>
+<li>在LAN上的每个IP节点都有一个ARP（Address Resolution Protocol）表</li>
+<li>ARP表：包括LAN节点IP&#x2F;MAC地址的映射 &lt;IP address; MAC address; TTL&gt;</li>
+</ul>
+<p>从一个LAN路由到另一个LAN的例子</p>
+<ul>
+<li>R为网络上的路由器，R上有两个ARP表，分别对应两个LAN的地址映射关系</li>
+<li>源主机A发送数据报到目标主机B，网络层：源IP111.111.111.111，目标IP222.222.222.222</li>
+<li>A-&gt;R：第一跳时它的源mac为74-29-9C-E8-FF-55，查ARP目标MAC为E6-E9-00-17-BB-4B</li>
+<li>R-&gt;B：第二跳时它的源mac为1A-23-F9-CD-06-9B，查ARP目标MAC为49-BD-D2-C7-56-2A</li>
+<li>每一跳网络层源IP和目标IP都不变，但每一跳mac都在通过查ARP表变化</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240109170705365-1554645656.png" width="70%"/></div>
+
+<h2 id="4-3-以太网"><a href="#4-3-以太网" class="headerlink" title="4.3 以太网"></a>4.3 以太网</h2><ul>
+<li>以太网帧的结构<ul>
+<li><strong>前导码</strong>：用来同步接收方和发送方的时钟频率，使接收方调到发送端的时钟，按照发送端的时钟接收发来的帧</li>
+<li><strong>地址：</strong>6字节源MAC地址，目标MAC地址</li>
+<li><strong>类型：</strong>指出高层协议（大多数情况下是IP协议）</li>
+<li><strong>CRC：</strong>在接收方校验</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240109172418506-1059172221.png" width="70%"/></div>
+
+<ul>
+<li>以太网：无连接、不可靠的服务，使用二进制退避的CSMA&#x2F;CD介质访问控制形式</li>
+</ul>
+<h2 id="4-4-交换机"><a href="#4-4-交换机" class="headerlink" title="4.4 交换机"></a>4.4 交换机</h2><ul>
+<li>链路层设备：扮演主动角色（端口执行以太网协议）<ul>
+<li>对帧进行存储和转发</li>
+<li>对于到来的帧，检查帧头，根据目标MAC地址进行选择性转发</li>
+<li>当帧需要向某个网段转发时，使用CSMA&#x2F;CD进行接入控制</li>
+<li>通常一个交换机需要一个独立网段</li>
+</ul>
+</li>
+<li>透明：主机对交换机的存在可以不关心<ul>
+<li>通过交换机相联的各节点如同直接连接</li>
+<li>有MAC地址，无IP地址</li>
+</ul>
+</li>
+<li>交换机（switch）实现多路同时传输，A到A’传输数据，则瞬时开关打开端口1和4<ul>
+<li>主机有一个专用和直接到交换机的连接</li>
+<li>交换机缓存到来的帧</li>
+<li>对每个帧进入的链路使用以太网协议，没有碰撞，全双工<ul>
+<li>每条链路都是独立的碰撞域</li>
+<li>MAC协议在其中的作用弱化了</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240109174923247-2121826334.png" width="25%"/></div>
+
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240109175437528-556248257.png" width="50%"/></div>
+
+<h2 id="4-5-路由器和交换机"><a href="#4-5-路由器和交换机" class="headerlink" title="4.5 路由器和交换机"></a>4.5 路由器和交换机</h2><ul>
+<li>都是存储转发设备<ul>
+<li>交换机：链路层设备（检查链路层头部）</li>
+<li>路由器：网络层设备（检查网络层头部）</li>
+</ul>
+</li>
+<li>都有转发表：<ul>
+<li>交换机：维持交换表，按照MAC地址转发，2层设备</li>
+<li>路由器：维护路由表，执行路由算法<ul>
+<li>拓扑构建网络</li>
+<li>对广播分组做限制</li>
+<li>需要配置网络地址（子网前缀）</li>
+<li>三层设备，速率低</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240109175912656-75042066.png" width="50%"/></div>
+
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/01/10/202401101029/">https://mingxuanwu.com/2024/01/10/202401101029/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"># 计算机网络</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/02/28/202402281556/">【STL和泛型编程】1. STL基础和容器名称</a>
+            
+            
+            <a class="next" rel="next" href="/2024/01/08/202401081748/">【计算机网络：自顶向下方法】5.网络层：控制平面</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

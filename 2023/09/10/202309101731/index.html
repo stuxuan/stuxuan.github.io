@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【操作系统】3.内存管理 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【操作系统】3.内存管理</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">September 10, 2023&nbsp;&nbsp;17:31:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-程序分段和内存分区"><a href="#1-程序分段和内存分区" class="headerlink" title="1.程序分段和内存分区"></a>1.程序分段和内存分区</h1><p>程序执行需要首先加载到内存中，但完完整整的把一个很大的程序加载进去需要一块完整的地址空间，并且也不符合我们的直观感受，程序员眼中的内存是一个逻辑空间，这里面包括了一段程序、变量、栈等等，我们将一个<strong>程序</strong>进行<strong>分段</strong>，然后再存储到内存中</p>
+ <div align=center><img src="/images/操作系统/内存管理/3219843-20230908154649604-1387602643.png" width = "80%"  /></div>
+
+<p>这里很容易想到对<strong>内存</strong>的处理方法就是<strong>分区</strong>，我们把内存分成很多区域，根据进程需要空间的大小去申请一块内存分区，在这个分区中存入我们程序已经分开好的段。但这里也会存在一个问题，就是内存碎片，我们可以看到假设进程2内存被释放后，内存中一共有200K长度的空闲空间，但是这时如果我们想把一个需要160K内存的进程加载进入内存，就无法实现了，因为没有一块完整的区域来给这个进程使用</p>
+ <div align=center><img src="/images/操作系统/内存管理/3219843-20230908153632260-940300934.png" width = "50%"></div>
+
+<h1 id="2-页表、多级页表和块表"><a href="#2-页表、多级页表和块表" class="headerlink" title="2.页表、多级页表和块表"></a>2.页表、多级页表和块表</h1><p><strong>页表：</strong>为了解决内存分区带来的内存浪费问题，我们引入页表的概念，下面是一个16位地址机器，我们将内存分为4K大小的页，页中的地址仍然是逻辑地址，例如<strong>页号0x2240</strong>表示的逻辑页号是2240左移3位<strong>0x02</strong>，通过查找页表可以找到它对应的<strong>页框号（物理地址）为3</strong>，这样我们实现了通过页表来访问内存。这种方案下每个进程最多浪费一个页表的空间，比分区的利用率要高得多。</p>
+<div align=center><img src="/images/操作系统/内存管理/3219843-20230908155251109-961999616.png" width = "50%"  /></div>
+
+<p><strong>单级页表的问题：</strong>我们实际使用中，如果有32位地址，分页大小为4K(212)，则我们每个程序需要220次个4字节地址的页表来将自己的逻辑地址和物理地址对应起来，需要4M内存，因为每个进程的页表中只能包含自己的内存地址，不能影响其他程序的运行，那么如果有100个进程运行就需要100个页表400M空间来对应它们的物理地址，但实际上大部分的逻辑地址都不会用到。</p>
+<p><strong>多级页表：</strong>我们引入多级页表的概念，多级页表就类似于<strong>章和节的关系</strong>，我们将前20位地址分为两部分，10位表示<strong>页目录号</strong>，10位表示<strong>页号</strong>。我们在内存中构建完整的页目录，这可以保证内存物理地址查找过程的连续性。</p>
+<p>通过PCB查找该进程<strong>页目录指针</strong>；接下来通过页目录号查找该段物理内存所在的页目录，因为我们在内存中构建了完整的章目录，所以这段地址是连续的，可以一次定位完成；然后根据页号来定位对应的节目录，这里也是连续的，所以也可以一次定位；最后就找到了该段逻辑地址对应的物理地址，本次访存完成。</p>
+<p>这种方式之所以可以<strong>节省内存</strong>，最大的原因是我们<strong>只载入完整的章目录</strong>，以及<strong>有内容的节目录</strong>。以下图为例，如果使用单级页表需要4M内存完整保存一个顺序页表；但是使用多级目录，我们只需要保存章目录4K，节目录3*4K也就是16K就可以完整表示该进程所需的物理地址了。</p>
+<div align=center><img src="/images/操作系统/内存管理/3219843-20230908160448145-975969970.png" width = "50%"  /></div>
+
+<p><strong>多级页表的问题：</strong>64位地址已经普及，这将会大大增加多级页表的层数，也会影响内存访问的速度</p>
+<p><strong>块表：</strong> Translation Lookaside Buffer 地址转换后援缓冲器。TLB就是页表的Cache，属于MMU的一部分，由于地址翻译开销很大，所以引入高速缓存来尝试直接获取物理地址绕过虚拟内存向物理内存转换，TLB中存储了一小部分内存映射关系。</p>
+<p>由于TLB成本高所以一般容量都比较小，但是由于计算机程序的访问模式通常表现出局部性原理，即近期访问的地址往往在未来会再次访问。因此，较小的TLB可以容纳大部分频繁访问的映射关系，从而提供高命中率。这是因为相对较小的TLB更适合捕获短期局部性。</p>
+<div align=center><img src="/images/操作系统/内存管理/3219843-20230908163113500-1369841767.png" width = "50%"  /></div>
+
+<h1 id="3-段页结合的内存管理"><a href="#3-段页结合的内存管理" class="headerlink" title="3.段页结合的内存管理"></a>3.段页结合的内存管理</h1><p>程序员希望可以使用分段的方式编写程序，内存需要通过分页的方式增加使用率，所以引出<strong>段页结合的内存管理方式</strong>。程序员看到的是程序的<strong>逻辑地址</strong> 段号+偏移，例如0x00345008，经过内存分页映射表后操作系统找到<strong>实际的页框号物理内存</strong>0x7008</p>
+ <div align=center><img src="/images/操作系统/内存管理/3219843-20230908210002133-1074519766.png" width = "50%"  /></div>
+
+<h1 id="4-内存换页"><a href="#4-内存换页" class="headerlink" title="4.内存换页"></a>4.内存换页</h1><p>在程序员眼中的内存是一段完整的4G空间内存，并且程序被分成多个段加载到内存中，但内存不可能把自己完整交给一个程序，为了实现程序分段的思想，并且满足内存分页的内存管理方式，这里就引出了内存换页的思想，即我们4G的虚拟内存实际上只对应了一小部分物理内存。我们访问虚拟内存0G-1G时，将这部分映射到物理内存，访问虚拟内存3G-4G时，再把这部分映射到物理内存</p>
+ <div align=center><img src="/images/操作系统/内存管理/3219843-20230909134800390-854158823.png" width = "50%"  /></div>
+
+<ul>
+<li>load [addr] 程序读到逻辑地址<strong>段号</strong>通过查表找到基址，加上<strong>偏移量</strong>就是内存的<strong>虚拟地址</strong></li>
+<li>MMU通过虚拟地址基值计算出虚拟地址的逻辑页号并查找对应的页框号</li>
+<li>页表项中没有记录该段虚拟地址对应的物理地址页框号说明缺页（Page Fault），发出0x14中断请求</li>
+<li>cpu处理中断请求，在磁盘中找到需要的页，加载到物理内存并且在页表项中修改映射关系</li>
+<li>再次执行 load [addr]</li>
+</ul>
+ <div align=center><img src="/images/操作系统/内存管理/3219843-20230909135003053-525193179.png" width = "50%"  /></div>
+
+<h1 id="5-内存换出"><a href="#5-内存换出" class="headerlink" title="5.内存换出"></a>5.内存换出</h1><p>当主存空间不足，并且要读取的内存在磁盘中而非物理内存中，或者主存中某个片段长时间没有被使用的时候，操作系统会把主存中该页换出到磁盘上，以释放主存的空间给其他进程使用，更好利用主存资源</p>
+<p>下面介绍FIFO和MIN页面置换，假设我们的物理内存有3个页，其他内容保存在磁盘上，按照ABCABDADBCB的顺序读取内容</p>
+<p><strong>FIFO</strong>是先进先出的思想读到D的时候由于物理内存没有D的映射，所以把最先进入的A换出，但是可以看到接下来马上又要使用A，这里不太合适</p>
+<p><strong>MIN</strong>是最远使用的最先被淘汰，我们看到在需要读取D的时候，接下来又使用了ABD，而C是最远使用的，所以我们让C换出给D，这种方式最优，但没办法知道之后要读取的物理内存是哪些</p>
+ <div align=center><img src="/images/操作系统/内存管理/3219843-20230909141534199-1147690071.png" width = "70%"  /></div>
+
+<p><strong>LRU</strong>是将最长时间没有使用的页换出，下面给出一个通过维护页码栈来实现内存换出的方式，可以发现它与MIN的顺序竟然完全相同，但是这种实现方式开销较大，需要大量修改指针</p>
+<div align=center><img src="/images/操作系统/内存管理/3219843-20230909142320738-924645481.png" width = "50%"  /></div>
+
+<p><strong>LRU的近似实现</strong>，由于准确实现最长时间页换出开销较大，所以提出一种近似实现方案，使用循环队列来记录当前的引用情况，近似实现长时间未使用的淘汰</p>
+<ul>
+<li>访问一个页的时候，将这个页的引用设置为1</li>
+<li>换出页的时候，如果是1就将其清0并继续向下扫描，如果是0就淘汰该页</li>
+</ul>
+<p>该方案存在一个问题，在缺页很少的情况下</p>
+<ul>
+<li>所有引用设置都是1，假设换页指针指向位置1，此时需要换出页时换出页指针开始工作，它需要把所有的页引用都先减1，此时所有页引用都为0；然后进行第二轮换出页，位置1的引用是0，所以淘汰位置1的页</li>
+<li>因为换页很少所以所有引用又会被设置为1，此时如果再进行换页，他一定会从位置2开始扫描一轮，然后把位置2换页</li>
+<li>这意味着它退化成了FIFO先入先出，它失去了LRU的特性</li>
+</ul>
+ <div align=center><img src="/images/操作系统/内存管理/3219843-20230909142700928-307963923.png" width = "70%"  /></div>
+
+<p>LRU的核心思想是近似的找到最长时间未使用的页，引出<strong>Clock算法</strong>，我们可以用两个指针来实现这个思想</p>
+<ul>
+<li>清除R位的1：这个指针速度很快，快速的把R位清除来保证所有是1的描述一定在最近一段时间使用过</li>
+<li>如果是0就换页：这个指针负责淘汰，如果该位置是0则表示在清楚R位指针旋转一周的周期内该内存页未被使用过</li>
+</ul>
+<div align=center><img src="/images/操作系统/内存管理/3219843-20230909144020758-9630100.png" width = "60%"/></div>
+
+<p>最后完整的内存管理应该是如下图所示的样子，cpu读取一条指令，根据CS:IP确定该指令在虚拟内存中的位置，MMU根据逻辑页号找到查找对应页框号，MMU发现缺页触发0x14中断，进行中断处理在磁盘中找到需要的内容并加载到物理内存中，修改页表项，接下来cpu重新读取该指令进行CS:IP - 虚拟内存 - 物理内存的访存，本次访存完成</p>
+ <div align=center><img src="/images/操作系统/内存管理/3219843-20230909145022469-1597640899.png" width = "50%"  /></div>
+
+ 
+
+<h1 id="6-内存页框的分配"><a href="#6-内存页框的分配" class="headerlink" title="6.内存页框的分配"></a>6.内存页框的分配</h1><p>随着程序数量增加CPU利用率会上升，但程序数量过多的时候每个进程分配到的页就会太少，进程的缺页率增大到一定程度就会导致进程总会需要等待调页完成，最后导致CPU一直在等待系统IO，利用率降低，这会导致<strong>颠簸（thrashing）</strong>，所以内存页框的分配也是一个需要考虑的问题，但一个简单的操作系统可以暂时不考虑这些。结合第1.2.3章内容，一个基本的操作系统已经完成了</p>
+<div align=center><img src="/images/操作系统/内存管理/3219843-20230909144700884-831934421.png" width = "40%"  /></div>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/09/10/202309101731/">https://mingxuanwu.com/2023/09/10/202309101731/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"># 操作系统</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/09/30/202309300943/">【数据结构】1.线性表的数组描述和链式描述</a>
+            
+            
+            <a class="next" rel="next" href="/2023/09/07/202309071054/">Hololens2 开发问题存档</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【STL和泛型编程】2. 分配器、萃取器、迭代器、仿函数和适配器源码精读 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【STL和泛型编程】2. 分配器、萃取器、迭代器、仿函数和适配器源码精读</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">February 28, 2024&nbsp;&nbsp;16:08:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-OOP和GP"><a href="#1-OOP和GP" class="headerlink" title="1. OOP和GP"></a>1. OOP和GP</h1><p>OOP（Object-Oriented programming）和GP（Generic Programming）面向对象编程和通用编程</p>
+<ul>
+<li>OOP的目标是将数据和方法整合到一个类中</li>
+<li>GP的目标是将数据和方法分开，容器包含了数据，算法包括排序方法等，而他们通过迭代器连接<ul>
+<li>例：<code>sort()</code>函数需要传入支持随机访问的迭代器，所以<code>sort()</code>不能对<code>list</code>的迭代器进行排序（但list自身有sort函数）</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240228101854359-320848181.png" width="50%"/></div>
+
+<h1 id="2-模板"><a href="#2-模板" class="headerlink" title="2. 模板"></a>2. 模板</h1><ul>
+<li>模板（泛化、全特化、偏特化）广泛存在于STL中<ul>
+<li>全特化：<code>template&lt;&gt;</code>来表示模板的特化版本</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> __STL_TEMPLATE_NULL template<span class="string">&lt;&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Key</span>&gt; <span class="keyword">struct</span> <span class="title class_">hash</span> &#123;&#125;;    <span class="comment">// 泛化</span></span><br><span class="line"></span><br><span class="line">__STL_TEMPLATE_NULL <span class="keyword">struct</span> <span class="title class_">hash</span>&lt;<span class="type">char</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="type">size_t</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">char</span> x)</span> <span class="type">const</span> </span>&#123;<span class="keyword">return</span> x;&#125;    <span class="comment">// 全特化</span></span><br><span class="line">__STL_TEMPLATE_NULL <span class="keyword">struct</span> <span class="title class_">hash</span>&lt;<span class="type">short</span>&gt; &#123;</span><br><span class="line">    <span class="function"><span class="type">size_t</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">char</span> <span class="type">short</span>)</span> <span class="type">const</span> </span>&#123;<span class="keyword">return</span> x;&#125;    <span class="comment">// 全特化...</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><ul>
+<li>偏特化：个数上的偏特化和范围上的偏特化</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Alloc</span> = alloc&gt;    <span class="comment">// 全特化</span></span><br><span class="line"><span class="keyword">class</span> vector &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Alloc</span>&gt;    <span class="comment">// 偏特化（数量上的局部，原本有2个模板参数，现在只有1个）</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">vector</span>&lt;<span class="type">bool</span>, Alloc&gt; &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Iterator</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">iterator_traits</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;    <span class="comment">// 偏特化（范围上的局部，如果传入的是指针）</span></span><br><span class="line">sturct iterator_traits&lt;T*&gt; &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;    <span class="comment">// 偏特化（范围上的局部，如果传入的是指针）</span></span><br><span class="line">sturct iterator_traits&lt;<span class="type">const</span> T*&gt; &#123;&#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-分配器"><a href="#3-分配器" class="headerlink" title="3. 分配器"></a>3. 分配器</h1><p><code>operator new()</code>操作符根据类对象进行<code>malloc()</code>操作，申请一块内存，结构如图所示，它会包含必须的内存空间以及一些额外的空间存储数据</p>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240228104941531-283662688.png" width="20%"/></div>
+
+<p>　　在VC6中，<code>allocator</code>只是调用了<code>operator new</code>和<code>operator delete</code>这两个操作符来完成<code>allocate</code>和<code>deallocate</code>这两个函数，没有任何特殊设计。<strong>这里存在一个问题，如果每次申请的都是1个int变量，因为调用operator new会申请额外空间存储一些必要数据，这会导致存储的额外开销非常大。</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">allocator</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">typedef</span> _SIZT size_type;</span><br><span class="line">    <span class="keyword">typedef</span> _PDEF difference_type;</span><br><span class="line">    <span class="keyword">typedef</span> _Ty _FARQ *pointer;</span><br><span class="line">    <span class="keyword">typedef</span> _Ty value_type;</span><br><span class="line">    <span class="function">pointer <span class="title">allocate</span><span class="params">(size_type _N, <span class="type">const</span> <span class="type">void</span>*)</span></span></span><br><span class="line"><span class="function">        </span>&#123;<span class="keyword">return</span> (_Allocate((difference_type) _N, (pointer)<span class="number">0</span>)); &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">deallocate</span><span class="params">(<span class="type">void</span> _FARQ *_P, size_type)</span></span></span><br><span class="line"><span class="function">        </span>&#123; <span class="function"><span class="keyword">operator</span> <span class="title">delete</span><span class="params">(_P)</span></span>; &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>　　直接使用 allocator 非常反人性，需要传入需要的类型以及数量，清除内存的时候也需要传入对应正确的数量</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 分配 512 个 int</span></span><br><span class="line"><span class="type">int</span> *p = <span class="built_in">allocator</span>&lt;<span class="type">int</span>&gt;().<span class="built_in">allocate</span>(<span class="number">512</span>, (<span class="type">int</span>*)<span class="number">0</span>);</span><br><span class="line"><span class="built_in">allocate</span>&lt;<span class="type">int</span>&gt;().<span class="built_in">deallocate</span>(p, <span class="number">512</span>);</span><br></pre></td></tr></table></figure>
+
+<p>　　在 G2.9 中也实现了<code>allocator</code>分配器，但实际实际上没有使用，而是使用了<code>alloc</code>分配器。<code>allocator</code>分配器每次申请一个元素时，在该块内存空间还有额外的内存记录该元素的大小等信息。但在容器中，这些信息实际上是非必要的。例如vector<int>容器中所有的元素都是8个字节，不需要为每个元素单独开辟内存空间来记录。<code>alloc</code>从这一点着手进行了优化</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// STL源码中默认的分配器都使用了alloc</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Alloc</span> = alloc&gt;</span><br><span class="line"><span class="keyword">class</span> vector &#123;&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Alloc</span> = alloc&gt;</span><br><span class="line"><span class="keyword">class</span> list &#123;&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>　　<code>alloc</code>实现在<code>&lt;stl_alloc.h&gt;</code>中，有16条链，每个链负责8字节。例如8字节的int全部放到第0条链中，而alloc每次申请一大块内存来存储这些数据，减少了额外内存空间的使用</p>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240228111149509-120213144.png" width="70%"/></div>
+
+<p> 　在新版的 G4.9 中默认的alloc又恢复成了基本的<code>allocator</code>，而alloc这个分配器被移动到了<code>extension allocators</code>，并且名字修改为了<code>__pool_alloc</code>，所以如果想要使用这个分配器，需要额外进行显示的说明</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;string, __gnu_cxx::__pool_alloc&lt;string&gt;&gt; myVec;</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-迭代器作用与设计"><a href="#4-迭代器作用与设计" class="headerlink" title="4. 迭代器作用与设计"></a>4. 迭代器作用与设计</h1><h2 id="4-1-Iterator"><a href="#4-1-Iterator" class="headerlink" title="4.1 Iterator"></a>4.1 Iterator</h2><p>　　<code>iterator</code>是算法和容器间的桥梁，它让算法知道元素处理的范围，同时也需要满足算法需要的性质（如随机访问，++操作等）。即算法向迭代器提问，迭代器需要有回答的能力，标准规定迭代器必须有下面5种必须的能力</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">_List_iterator</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">typedef</span> std::bidirectional_iterator_tag iterator_category;    <span class="comment">// 迭代器类别（输入、输出、正向、双向、随机访问迭代器）</span></span><br><span class="line">    <span class="keyword">typedef</span> _Tp  value_type;    <span class="comment">// 值的类型</span></span><br><span class="line">    <span class="keyword">typedef</span> _Tp* pointer;    </span><br><span class="line">    <span class="keyword">typedef</span> _Tp&amp; reference;    </span><br><span class="line">    <span class="keyword">typedef</span> <span class="type">ptrdiff_t</span> difference_type;    <span class="comment">// 容器种两个元素的距离，比如unsigned long</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>五种迭代器（使用struct进行分类，而非编号）</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">input_iterator</span> tag &#123;&#125;;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">output_iterator</span> tag &#123;&#125;;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">forward_iterator</span> tag : <span class="keyword">public</span> input_iterator_tag &#123;&#125;;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">bidirectional_iterator</span> tag : <span class="function"><span class="keyword">public</span> <span class="title">forward_iterator_tag</span> <span class="params">(&#125;;</span></span></span><br><span class="line"><span class="params"><span class="function"><span class="keyword">struct</span> random_access_iterator tag : <span class="keyword">public</span> bidirectional_iterator_tag &#123;&#125;;</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>注意迭代器begin()指向第一个元素，end()指向最后一个元素。迭代器rbegin()和rend()实现比较巧妙</li>
+</ul>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240312144613243-1286106063.png" width="60%"/></div>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">reverse_iterator <span class="title">rbegin</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">reverse_iterator</span>(<span class="built_in">end</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">reverse_iterator <span class="title">rend</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">reverse_iterator</span>(<span class="built_in">begin</span>());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-2-Iterator-Traits"><a href="#4-2-Iterator-Traits" class="headerlink" title="4.2 Iterator Traits"></a>4.2 Iterator Traits</h2><p>　　理想情况下iterator应该具备以上5种能力，实际应用中，最基本的指针也是一种退化的迭代器，他不是一个类，没办法描述自己的能力，所以有必要提出一种概念：<code>**Iterator Traits**</code>迭代器的萃取器，来描述该指针具有的迭代器的特征。</p>
+<p>　　在初始的情况下，算法直接调用传入的类来询问它具有哪些能力，但如果传入的是一个普通的指针就会失效。这里引入一个中间层来解决该问题，该中间层就是<code>Iterator Traits</code>。算法通过询问中间层来获取这些信息，这也是一种编程思想。</p>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240228143606543-2012620649.png" width="70%"/></div>
+
+<p> 　具体实现中非常巧妙的利用了偏特化的特性。首先看下图最下方的代码，算法调用<code>iterator_traits</code>并传入<code>I</code>来询问该迭代器对应的变量类型是什么。</p>
+<ul>
+<li>如果<code>I</code>是一个<code>iterator</code>类，则会调用第1种全泛化的方法，并且返回该<code>iterator</code>中的类型</li>
+<li>如果<code>I</code>是一个指针，则会进入第2种偏特化的方法，然后返回这个指针的类型</li>
+<li>如果<code>I</code>是一个const指针，则进入第3种偏特化方法，这样算法中拿到的类型才不会是一个 const T 类型，否则就没办法操作这些值了</li>
+</ul>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240228143842887-1565237318.png" width="70%"/></div>
+
+<p> 　下图展现了完整的 iterator traits</p>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240228144828863-1319096439.png" width="70%"/></div>
+
+<h2 id="4-3-iterator-category-分类对算法的影响"><a href="#4-3-iterator-category-分类对算法的影响" class="headerlink" title="4.3 iterator_category 分类对算法的影响"></a>4.3 iterator_category 分类对算法的影响</h2><h3 id="4-3-1-distance"><a href="#4-3-1-distance" class="headerlink" title="4.3.1 distance"></a>4.3.1 distance</h3><p>　　STL中计算<code>distance</code>利用了函数重载的特性。<code>__distance</code>返回两个指针间的距离，通过第三个参数可以实现函数重载</p>
+<ul>
+<li>如果该迭代器支持随机访问，则第三个参数<code>category()</code>会实例化一个右值，并且是<code>random_access_iterator_tag</code>类型，此时编译器会调用第二个重载方法</li>
+<li>如果该迭代器不支持随机访问，则第三个参数是普通的<code>input_iterator_tag</code>类型，此时调用第一个重载方法，一点一点移动指针计算距离</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">InputIterator</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> iterator_traits&lt;InputIterator&gt;::difference_type</span><br><span class="line">__distance(InputIterator first, InputIterator last, input_iterator_tag)&#123;</span><br><span class="line">    iterator_traits&lt;InputIterator&gt;::difference_type n=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(first!=last)</span><br><span class="line">    &#123;    ++first; ++n;&#125;</span><br><span class="line">    <span class="keyword">return</span> n;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">RandomAccessIterator</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> iterator_traits&lt;RandomAccessIterator&gt;::difference_type</span><br><span class="line">__distance(RandomAccessIterator first, RandomAccessIterator last, random_access_iterator_tag)&#123;</span><br><span class="line">    <span class="keyword">return</span> last-first;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">InputIterator</span>&gt;</span><br><span class="line"><span class="keyword">inline</span> iterator_traits&lt;InputIterator&gt;::<span class="function">difference_type</span></span><br><span class="line"><span class="function"><span class="title">distance</span><span class="params">(InputIterator first, InputIterator last)</span></span>&#123;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">typename</span> iterator_traits&lt;InputIterator&gt;::iterator_category category;</span><br><span class="line">    <span class="keyword">return</span> __distance(first, last, <span class="built_in">category</span>()):</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-2-copy"><a href="#4-3-2-copy" class="headerlink" title="4.3.2 copy"></a>4.3.2 copy</h3><p>　　copy函数，给定来源的起点和终点，并给定目标就可以实现复制，但实际上内部实现非常复杂</p>
+<ul>
+<li>如果传入的迭代器类型是字符指针，则执行memmove()函数进行拷贝，速度很快</li>
+<li>否则进入泛化的函数__copy_dispatch()<ul>
+<li>如果是指针类型的迭代器，则执行__copy_t()<ul>
+<li>如果拷贝指针时需要调用拷贝构造器单独处理（重写了复制构造函数）</li>
+<li>如果不需要调用拷贝构造器则直接调用memmove()</li>
+</ul>
+</li>
+<li>否则进入泛化的函数__copy()<ul>
+<li>如果是普通的迭代器，则以iterator是否相等来判断是否到迭代器终点，速度较慢</li>
+<li>如果是随机访问迭代器，则用循环次数判断是否循环结束，速度快一些</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator, <span class="keyword">class</span> OutputIterator&gt;</span></span><br><span class="line"><span class="function">OutputIterator <span class="title">copy</span><span class="params">(InputIterator first, InputIterator last, OutputIterator result)</span></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(first!=last)&#123;</span><br><span class="line">        *result = *first;</span><br><span class="line">        ++result; ++first;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240311193828853-2136953646.png" width="70%"/></div>
+
+<h3 id="4-3-3-源码对迭代器的暗示"><a href="#4-3-3-源码对迭代器的暗示" class="headerlink" title="4.3.3 源码对迭代器的暗示"></a>4.3.3 源码对迭代器的暗示</h3><p>　　在算法中，由于是模板函数，所以写代码的时候编译器不会报错，但是编译中因为底层需要某种迭代器的功能来完成这个函数，所以编译到这一步时会出现问题。算法源码中会对这些迭代器用命名的方式进行暗示。例如下面暗示了需要容器有随机访问迭代器或前向迭代器</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> RandomAccessIterator&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">sort</span><span class="params">(RandomAccessIterator first, RandomAccessIterator last)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(first!=last)&#123;</span><br><span class="line">        __Introsort_loop(first, last, <span class="built_in">value_type</span>(first), __lg(last - first)*<span class="number">2</span>);</span><br><span class="line">        __final_insertion_sort(first, last);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> ForwardIterator&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">rotate</span><span class="params">(ForwardIterator first, ForwardIterator middle, ForwardIterator last)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(first == middle || middle == last) <span class="keyword">return</span>;</span><br><span class="line">    __rotate(first, middle, last, <span class="built_in">distance_type</span>(first), <span class="built_in">iterator_category</span>(first));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-4-STL中的算法"><a href="#4-3-4-STL中的算法" class="headerlink" title="4.3.4 STL中的算法"></a>4.3.4 STL中的算法</h3><p>　　STL中所有的算法都是如下类型，前两个参数提供迭代器</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Iterator&gt;</span></span><br><span class="line"><span class="function"><span class="title">std::Algorithm</span><span class="params">(Iterator itr1, Iterator itr2, ...)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>　　STL中提供的算法一般都有两种重载，一种是普通的调用，另一种提供给用户自定义的处理方式。可以自定一个函数或者函数对象传入</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator, <span class="keyword">class</span> T&gt;</span></span><br><span class="line"><span class="function">T <span class="title">accumulate</span><span class="params">(InputIterator first, InputIterator last, T init)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(; first!=last; ++first)</span><br><span class="line">        init = init + *first;</span><br><span class="line">    <span class="keyword">return</span> init;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator, <span class="keyword">class</span> T, <span class="keyword">class</span> BinaryOperation&gt;</span></span><br><span class="line"><span class="function">T <span class="title">accumulate</span><span class="params">(InputIterator first, InputIterator last, T init, BinaryOperation binary_op)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(; first!=last; ++first)</span><br><span class="line">        init = <span class="built_in">binary_op</span>(init, *first);    <span class="comment">// 普通的函数或者函数对象都可以被调用</span></span><br><span class="line">    <span class="keyword">return</span> init;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-仿函数和适配器"><a href="#5-仿函数和适配器" class="headerlink" title="5.仿函数和适配器"></a>5.仿函数和适配器</h1><h2 id="5-1-仿函数functors"><a href="#5-1-仿函数functors" class="headerlink" title="5.1 仿函数functors"></a>5.1 仿函数functors</h2><p>　　4.3.4小节中提到了算法允许用户自定义处理方式，自定义函数或函数对象（仿函数）传入</p>
+<p>　　注意标准库提供的仿函数都继承了一个父类，而我们自己写的仿函数没有继承，没有继承实际上就没有融入STL的体系结构</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">T</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">plus</span> : <span class="keyword">public</span> binary_function&lt;T, T, T&gt; &#123;</span><br><span class="line">    <span class="function">T <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> T&amp;x, cont T&amp;y)</span> <span class="type">const</span></span></span><br><span class="line"><span class="function">        </span>&#123;<span class="keyword">return</span> x+y;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">equal_to</span> : <span class="keyword">public</span> binary_function&lt;T, T, <span class="type">bool</span>&gt;&#123;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="type">const</span> T&amp;x, <span class="type">const</span> T&amp;y)</span> <span class="type">const</span></span></span><br><span class="line"><span class="function">        </span>&#123;<span class="keyword">return</span> x==y;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>　　标准库提供了两个仿函数的可适配（adaptable）条件，STL规定所有的可适配函数都应该继承其中之一。下面一节介绍了为什么适配器必须能够回答这些问题，因为有些函数会向仿函数提出问题，这和萃取器非常类似</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 一个操作数</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">Arg</span>, <span class="keyword">class</span> <span class="title class_">Result</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">unary_function</span> &#123;</span><br><span class="line">    <span class="keyword">typedef</span> Arg argument_type;</span><br><span class="line">    <span class="keyword">typedef</span> Result result_type;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 两个操作数</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">Arg1</span>, <span class="keyword">class</span> <span class="title class_">Arg2</span>, <span class="keyword">class</span> <span class="title class_">Result</span>&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">binary_function</span>&#123;</span><br><span class="line">    <span class="keyword">typedef</span> Arg1 first_argument_type;</span><br><span class="line">    <span class="keyword">typedef</span> Arg2 second_argument_type;</span><br><span class="line">    <span class="keyword">typedef</span> Result result_type;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-2-适配器Adapters"><a href="#5-2-适配器Adapters" class="headerlink" title="5.2 适配器Adapters"></a>5.2 适配器Adapters</h2><p>　　仿函数适配器的例子。<code>count_if</code>函数会调用第三个仿函数并传入迭代器当前指针的位置，但是<code>less</code>函数需要传入两个值并返回<code>bool</code>值，在这里<code>count_if</code>的调用只能传入一个值，可以使用函数适配器<code>bind2nd</code>来完成这个想法，<code>bind2nd</code>函数对象实际上包装了<code>less</code>函数对象，它需要传入一个函数对象（包含括号重载的处理逻辑），以及第二个值。</p>
+<p>　　它将<code>less</code>函数对象保存到自己的字段中，并在每次调用<code>bind2nd</code>函数对象时，第一个参数是<code>count_if</code>传入的当前迭代器位置，而第二个位置是<code>bind2nd</code>初始化时传入的第二个参数，这样实现了在<code>count_if</code>中调用两个参数的函数对象</p>
+<p>　　这期间，都是通过适配器完成的这一系列操作。<code>bind2nd</code>需要去问函数对象它的第二个参数类型是什么，<code>binder2nd</code>需要去问函数对象它的第返回值类型是什么，这些都是需要适配器完成的。并且在<code>bind2nd</code>函数对象创建<code>binder2nd</code>函数对象时，由于存在强制类型转换，实际上编译器会进行一些检查，如果这里不能转换就会编译失败。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; vi = &#123; <span class="number">40</span>, <span class="number">50</span>, <span class="number">20</span>, <span class="number">11</span>, <span class="number">23</span>, <span class="number">88</span>, <span class="number">99</span> &#125;;</span><br><span class="line">    cout &lt;&lt; <span class="built_in">count_if</span>(vi.<span class="built_in">begin</span>(), vi.<span class="built_in">end</span>(), <span class="built_in">bind2nd</span>(<span class="built_in">less</span>&lt;<span class="type">int</span>&gt;(), <span class="number">40</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// count_if 中调用第三个仿函数 _Pred, 仅传入当前迭代器的位置</span></span><br><span class="line"><span class="keyword">for</span> (; _UFirst != _ULast; ++_UFirst) &#123;</span><br><span class="line">    <span class="keyword">if</span> (_Pred(*_UFirst)) &#123;</span><br><span class="line">        ++_Count;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// bind2nd 辅助函数, 方便用户调用 binder2nd&lt;Op&gt;</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Operation, <span class="keyword">class</span> T&gt;</span><br><span class="line"><span class="keyword">inline</span> binder2nd&lt;Operation&gt; <span class="built_in">bind2nd</span>(<span class="type">const</span> Operation&amp; op, <span class="type">const</span> T&amp;x) &#123;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">typename</span> Operation::second_argument_type arg2_type;    <span class="comment">// 问适配器函数对象的第二个参数是什么类型</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">binder2nd</span>&lt;Operation&gt;(op, <span class="built_in">arg2_type</span>(x));    <span class="comment">// 将函数对象和强制类型转换的第二个参数构造出 binder2nd 对象</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// binder2nd</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Operation&gt;</span><br><span class="line"><span class="keyword">class</span> binder2nd : <span class="keyword">public</span> unary_function&lt;<span class="keyword">typename</span> Operation::first_argument, <span class="keyword">typename</span> Operation::result_tpye&gt; &#123; ·</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Operation op;    <span class="comment">// 函数对象本身, 实际上的操作逻辑</span></span><br><span class="line">    <span class="keyword">typename</span> Operation::second_argument_type value;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 构造函数, 将函数对象和第二参数传入</span></span><br><span class="line">    <span class="built_in">binder2nd</span>(<span class="type">const</span> Operation&amp; x, <span class="type">const</span> <span class="keyword">typename</span> Operation::second_argument_type&amp; y) : <span class="built_in">op</span>(x), <span class="built_in">value</span>(y) &#123;&#125;</span><br><span class="line">    <span class="comment">// 返回值类型是函数对象的返回值类型, 第二参数是绑定的参数, 然后调用函数对象的括号重载</span></span><br><span class="line">    <span class="keyword">typename</span> Operation::result_type <span class="built_in">operator</span>() (<span class="type">const</span> <span class="keyword">typename</span> OPeration::first_argument_type &amp;x) <span class="type">const</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">op</span>(x, value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>　　接下来我们仍可以继续使用<code>not1</code>函数将他返回的<code>bool</code>值取反，原理也是类似的，实现很巧妙</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> Predicate&gt;</span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> unary_negate&lt;Predicate&gt; <span class="title">not1</span><span class="params">(<span class="type">const</span> Predicate&amp; pred)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">unary_negate</span>&lt;Predicate&gt;(pred);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">Predicate</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">unary_negate</span> : unary_function&lt;<span class="keyword">typename</span> Predicate::argument_type, <span class="type">bool</span>&gt; &#123;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Predicate pred;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">explicit</span> <span class="title">unary_negate</span><span class="params">(<span class="type">const</span> Predicate&amp; x)</span> : pred(x) &#123;</span>&#125;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">operator</span><span class="params">()</span> <span class="params">(<span class="type">const</span> <span class="keyword">typename</span> Predicate::argument_type&amp;x)</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> !<span class="built_in">pred</span>(x);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-3-C-11-bind"><a href="#5-3-C-11-bind" class="headerlink" title="5.3 C++11 bind"></a>5.3 C++11 bind</h2><p>　　在新版本的C++11中，有新的适配器<code>bind</code>，比之前的更高级。可以绑定函数</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std::placeholders;    <span class="comment">// 占位符 _1, _2, _3, ...</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">double</span> <span class="title">my_divide</span><span class="params">(<span class="type">double</span> x, <span class="type">double</span> y)</span></span></span><br><span class="line"><span class="function">    </span>&#123; <span class="keyword">return</span> x/y; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fn_five = <span class="built_in">bind</span>(my_divide, <span class="number">10</span>, <span class="number">2</span>);</span><br><span class="line">cout&lt;&lt; <span class="built_in">fn_five</span>() &lt;&lt; endl;    <span class="comment">// 5</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fn_five = <span class="built_in">bind</span>(my_divide, _1, <span class="number">2</span>);</span><br><span class="line">cout&lt;&lt; <span class="built_in">fn_five</span>(<span class="number">10</span>) &lt;&lt; endl;    <span class="comment">// 5</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fn_five = <span class="built_in">bind</span>(my_divide, _2, _1);</span><br><span class="line">cout&lt;&lt; <span class="built_in">fn_five</span>(<span class="number">10</span>, <span class="number">2</span>) &lt;&lt; endl;    <span class="comment">// 2/10 = 0.2 它交换了位置</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> fn_five = <span class="built_in">bind</span>&lt;<span class="type">int</span>&gt;(my_divide, _1, _2);</span><br><span class="line">cout&lt;&lt; <span class="built_in">fn_five</span>(<span class="number">10</span>, <span class="number">3</span>)&lt;&lt; endl;    <span class="comment">// 3（返回值类型为int）</span></span><br></pre></td></tr></table></figure>
+
+<p>　　同时也可以绑定函数对象、成员函数甚至成员变量</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">MyPair</span> &#123;</span><br><span class="line">    <span class="type">double</span> a,b;</span><br><span class="line">    <span class="function"><span class="type">double</span> <span class="title">multiply</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> a*b; &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">MyPair ten_two &#123;<span class="number">10</span>, <span class="number">2</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> bound_menfn = <span class="built_in">bind</span>(&amp;MyPair::multiply, _1);</span><br><span class="line">cout &lt;&lt; <span class="built_in">bound_memfn</span>(ten_two) &lt;&lt; endl;    <span class="comment">// 绑定成员函数, 输出20</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">auto</span> bound_memdata = <span class="built_in">bind</span>(&amp;MyPair::a, ten_two);</span><br><span class="line">cout &lt;&lt; <span class="built_in">bound_memdata</span>() &lt;&lt;endl;    <span class="comment">// 绑定成员变量a, 输出 10</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="5-4-inserter-迭代器适配器"><a href="#5-4-inserter-迭代器适配器" class="headerlink" title="5.4 inserter 迭代器适配器"></a>5.4 inserter 迭代器适配器</h2><p>　　<code>copy</code>在算法中已经写死了，他的复制方式就是给定源的开始和终止目标，然后用覆盖的方式复制到目标位置</p>
+<p>　　但是如果我们希望用插入的方式呢？<code>copy</code>函数不能修改，他就是不断移动指针和赋值的操作</p>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240312151608612-480254143.png" width="70%"/></div>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">list&lt;<span class="type">int</span>&gt; foo = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line">list&lt;<span class="type">int</span>&gt; bar = &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">40</span>, <span class="number">50</span>&#125;;</span><br><span class="line"></span><br><span class="line">list&lt;<span class="type">int</span>&gt;iterator it = foo.<span class="built_in">begin</span>();</span><br><span class="line"><span class="built_in">advance</span>(it, <span class="number">3</span>);    <span class="comment">// 很底层的代码, 让迭代器移动3个位置</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">copy</span>(bar.<span class="built_in">begin</span>(), bar.<span class="built_in">end</span>(), <span class="built_in">inserter</span>(foo, it));</span><br></pre></td></tr></table></figure>
+
+<p>　　下面给出了<code>copy</code>中的核心代码部分</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// copy中的核心代码</span></span><br><span class="line"><span class="keyword">while</span>(first!=last) &#123;</span><br><span class="line">    *result = *first;</span><br><span class="line">    ++result; ++first;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>　　开发人员非常巧妙的利用了运算符重载，将<code>=</code>运算符重载为<code>insert</code>插入函数，解决了这个问题</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 辅助函数, 帮助用户使用</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">Container</span>, <span class="keyword">class</span> <span class="title class_">Iterator</span>&gt;</span><br><span class="line"><span class="function"><span class="keyword">inline</span> insert_iterator&lt;Container&gt; <span class="title">insert</span><span class="params">(Container&amp; x, Iterator i)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">typedef</span> <span class="keyword">typename</span> Container::iterator iter;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">insert_iterator</span>&lt;Container&gt;(i);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 实际函数, 重载运算符在调用insert函数</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> <span class="title class_">Container</span>&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">insert_iterator</span> &#123;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    Container* container;</span><br><span class="line">    <span class="keyword">typename</span> Container::iterator iter;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">typedef</span> output_iterator_tag iterator_category;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">insert_iterator</span>(Container&amp; x, <span class="keyword">typename</span> Container::iterator i):<span class="built_in">container</span>(&amp;x), <span class="built_in">iter</span>(i) &#123;&#125;</span><br><span class="line">    insert_iterator&lt;Container&gt;&amp; <span class="keyword">operator</span>=(<span class="type">const</span> <span class="keyword">typename</span> Container::value_type&amp; value) &#123;</span><br><span class="line">    iter = container-&gt;<span class="built_in">insert</span>(iter, value);</span><br><span class="line">    ++iter;</span><br><span class="line">    <span class="keyword">return</span> *<span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="6-array和deque例子"><a href="#6-array和deque例子" class="headerlink" title="6 array和deque例子"></a>6 array和deque例子</h1><ul>
+<li>以array作为例子（GNU2.9），该容器的实现中，迭代器 iterator 就是一个普通的指针，接下来进入针对指针的萃取机中</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> _Tp, std::<span class="type">size_t</span> _Nm&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">array</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">typedef</span> _Tp    value_type;</span><br><span class="line">    <span class="keyword">typedef</span> _Tp*   pointer;</span><br><span class="line">    <span class="keyword">typedef</span> value_type* iterator;    <span class="comment">// 直接将指针定义成迭代器, 接下来算法中的萃取器会通过偏泛化获取其能力</span></span><br><span class="line">    </span><br><span class="line">    value_type _M_instance[_Nm ? _Nm : <span class="number">1</span>];</span><br><span class="line">    </span><br><span class="line">    <span class="function">iterator <span class="title">begin</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123; <span class="keyword">return</span> <span class="built_in">iterator</span>(&amp;_M_instance[<span class="number">0</span>]); &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function">iterator <span class="title">end</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123; <span class="keyword">return</span> <span class="built_in">iterator</span>(&amp;_M_instance[_Nm]); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>以deque双端队列为例子（GNU2.9），这里的 iterator 有很多复杂的动作，所以需要额外的定义该迭代器类来完成这些动作</li>
+<li>deque底层维护了一个map数组，这个数组指向了几个分段数组。deque的迭代器类重写了++、–、*等运算符，并且自动从一个分段数组进入另一个分段数组，制造连续假象</li>
+<li>cur：当前遍历的元素</li>
+<li>first：当前片段的首地址</li>
+<li>last：当前片段的尾地址</li>
+<li>node：二级指针，指向map中的指针，该指针指向当前内存地址</li>
+<li>map数组扩充时，如从8扩充到16的时候，会把map复制到新的map的中间部分，让左右都有冗余</li>
+</ul>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240228153525811-648003186.png" width="50%"/></div>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> <span class="title class_">T</span>, <span class="keyword">class</span> <span class="title class_">Alloc</span>=alloc, <span class="type">size_t</span> BufSiz=<span class="number">0</span>&gt;    <span class="comment">// 每一段buffer的大小, 新版本不能自己设置了</span></span><br><span class="line"><span class="keyword">class</span> deque &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">typedef</span> T value_type;</span><br><span class="line">    <span class="keyword">typedef</span> __deque_iterator&lt;T, T&amp;, T*, BufSiz&gt; iterator;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="keyword">typedef</span> pointer* map_pointer;    <span class="comment">// T** 指向指针的指针</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    iterator start;</span><br><span class="line">    iterator finish;</span><br><span class="line">    map_pointer map;</span><br><span class="line">    size_type map_size;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function">iterator <span class="title">begin</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> start;&#125;</span><br><span class="line">    <span class="function">iterator <span class="title">end</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> finish; &#125;</span><br><span class="line">    <span class="function">size_type <span class="title">size</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> finish - start; &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>stack 栈后进先出和 queue 先进先出都是 deque 的部分功能。但注意，stack 和 queue 都是特殊的容器，他们有特殊的性质，所以没有迭代器，也不允许遍历<ul>
+<li><code>queue&lt;typename _Tp, typename _Container = deque&gt;</code> 队列可以人为配置第二个部分容器是什么，也就是内存片段使用什么存储</li>
+<li>因为要调用pop函数，这里如果使用deque或者stack都是可以的，但是如果使用vector、map、set都会有问题（编译可能通过，但是pop()会error，它们没有这种功能）</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/STL和泛型编程/3219843-20240228155400522-1007792888.png" width="40%"/></div>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/02/28/202402281608/">https://mingxuanwu.com/2024/02/28/202402281608/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/STL%E5%92%8C%E6%B3%9B%E5%9E%8B%E7%BC%96%E7%A8%8B/"># STL和泛型编程</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/02/29/202402290956/">【STL和泛型编程】3. set、map分析（及typename起源）</a>
+            
+            
+            <a class="next" rel="next" href="/2024/02/28/202402281556/">【STL和泛型编程】1. STL基础和容器名称</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

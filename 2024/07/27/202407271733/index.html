@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>6.Scheduler 协程调度器 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">6.Scheduler 协程调度器</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 27, 2024&nbsp;&nbsp;17:33:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="整体思路"><a href="#整体思路" class="headerlink" title="整体思路"></a>整体思路</h1><p>创建N个线程，有M个协程，<code>scheduler</code>会调度N个线程执行M个协程的任务</p>
+<div align="center"><img src="/images/Sylar/Schedule1.jpeg" width="40%"></img></div>
+
+<ol>
+<li>创建<code>Schedule</code>类，传入需要的线程数量，是否使用当前线程作为主线程，线程名</li>
+<li>调用<code>Schedule::start()</code>方法，根据线程数量创建线程，加入线程队列<code>vector&lt;Thread::ptr&gt;</code><ol>
+<li>线程执行<code>bind(&amp;Scheduler::run, this)</code>方法</li>
+<li>该方法循环查找协程队列中待执行的协程或方法</li>
+</ol>
+</li>
+<li>调用<code>Schedule::schdule()</code>方法，传入函数或协程，加入调度队列<code>list&lt;FiberAndThread&gt;</code></li>
+<li>调用<code>Schedule::stop()</code>方法结束</li>
+</ol>
+<div align="center"><img src="/images/Sylar/Schedule2.jpeg" width="100%"></img></div>
+
+<h1 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Scheduler</span> &#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    MutexType m_mutex;</span><br><span class="line">    std::vector&lt;Thread::ptr&gt; m_threads;     <span class="comment">// 线程池</span></span><br><span class="line">    std::list&lt;FiberAndThread&gt; m_fibers;     <span class="comment">// 待执行的协程队列</span></span><br><span class="line">    Fiber::ptr m_rootFiber;                 <span class="comment">// use_caller为true时有效, 调度协程</span></span><br><span class="line">    std::string m_name;                     <span class="comment">// 协程调度器名称</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    std::vector&lt;<span class="type">int</span>&gt; m_threadIds;           <span class="comment">// 协程下的线程id数组</span></span><br><span class="line">    <span class="type">size_t</span> m_threadCount = <span class="number">0</span>;               <span class="comment">// 线程数量</span></span><br><span class="line">    std::atomic&lt;<span class="type">size_t</span>&gt; m_activeThreadCount = &#123; <span class="number">0</span> &#125;;    <span class="comment">// 工作线程数量</span></span><br><span class="line">    std::atomic&lt;<span class="type">size_t</span>&gt; m_idleThreadCount = &#123; <span class="number">0</span> &#125;;      <span class="comment">// 空闲线程数量</span></span><br><span class="line">    <span class="type">bool</span> m_stopping = <span class="literal">true</span>;                             <span class="comment">// 是否正在停止</span></span><br><span class="line">    <span class="type">bool</span> m_autoStop = <span class="literal">false</span>;                            <span class="comment">// 是否自动停止</span></span><br><span class="line">    <span class="type">int</span> m_rootThread = <span class="number">0</span>;                               <span class="comment">// 主线程id(use_caller)</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h1 id="成员函数"><a href="#成员函数" class="headerlink" title="成员函数"></a>成员函数</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Scheduler</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">Scheduler</span>(<span class="type">size_t</span> threads = <span class="number">1</span>, <span class="type">bool</span> use_caller = <span class="literal">true</span>, <span class="type">const</span> std::string&amp; name = <span class="string">&quot;&quot;</span>);</span><br><span class="line">    <span class="keyword">virtual</span> ~<span class="built_in">Scheduler</span>();</span><br><span class="line">    <span class="function"><span class="type">const</span> std::string&amp; <span class="title">getName</span><span class="params">()</span> <span class="type">const</span> </span>&#123; <span class="keyword">return</span> m_name; &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">start</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">stop</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> FiberOrCb&gt;</span></span><br><span class="line"><span class="function">    <span class="type">void</span> <span class="title">schedule</span><span class="params">(FiberOrCb fc, <span class="type">int</span> thread = <span class="number">-1</span>)</span> </span>&#123;</span><br><span class="line">        <span class="type">bool</span> need_tickle = <span class="literal">false</span>;</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="function">MutexType::Lock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">            need_tickle = <span class="built_in">scheduleNoLock</span>(fc, thread);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (need_tickle) &#123;</span><br><span class="line">            <span class="built_in">tickle</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator&gt;</span></span><br><span class="line"><span class="function">    <span class="type">void</span> <span class="title">schedule</span><span class="params">(InputIterator begin, InputIterator end)</span> </span>&#123;</span><br><span class="line">        <span class="type">bool</span> need_tickle = <span class="literal">false</span>;</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="function">MutexType::Lock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">            <span class="keyword">while</span> (begin != end) &#123;</span><br><span class="line">                need_tickle = <span class="built_in">scheduleNoLock</span>(&amp;*begin, <span class="number">-1</span>) || need_tickle;</span><br><span class="line">                ++begin;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (need_tickle) &#123;</span><br><span class="line">            <span class="built_in">tickle</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">switchTo</span><span class="params">(<span class="type">int</span> thread = <span class="number">-1</span>)</span></span>;</span><br><span class="line">    <span class="function">std::ostream&amp; <span class="title">dump</span><span class="params">(std::ostream&amp; os)</span></span>;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">tickle</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">run</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">bool</span> <span class="title">stopping</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">idle</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">setThis</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">hasIdleThreads</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> m_idleThreadCount &gt; <span class="number">0</span>; &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> FiberOrCb&gt;</span></span><br><span class="line"><span class="function">    <span class="type">bool</span> <span class="title">scheduleNoLock</span><span class="params">(FiberOrCb fc, <span class="type">int</span> thread)</span> </span>&#123;</span><br><span class="line">        <span class="type">bool</span> need_tickle = m_fibers.<span class="built_in">empty</span>();</span><br><span class="line">        <span class="function">FiberAndThread <span class="title">ft</span><span class="params">(fc, thread)</span></span>;</span><br><span class="line">        <span class="keyword">if</span> (ft.fiber || ft.cb) &#123;</span><br><span class="line">            m_fibers.<span class="built_in">push_back</span>(ft);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> need_tickle;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="start、stop"><a href="#start、stop" class="headerlink" title="start、stop"></a>start、stop</h2><ul>
+<li><code>start</code>创建线程，指定执行函数<code>run</code>，将线程加入到线程池<code>vector&lt;Thread::ptr&gt;</code>中</li>
+<li><code>stop</code>结束线程，设置自动停止<code>m_autoStop</code>为<code>true</code>，设置正在停止<code>m_stopping</code>为<code>true</code>，结束线程<code>join()</code><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Scheduler::start</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">MutexType::Lock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">    <span class="keyword">if</span> (!m_stopping) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    m_stopping = <span class="literal">false</span>;</span><br><span class="line">    <span class="built_in">SYLAR_ASSERT</span>(m_threads.<span class="built_in">empty</span>());</span><br><span class="line"></span><br><span class="line">    m_threads.<span class="built_in">resize</span>(m_threadCount);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; m_threadCount; ++i) &#123;</span><br><span class="line">        m_threads[i].<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">Thread</span>(std::<span class="built_in">bind</span>(&amp;Scheduler::run, <span class="keyword">this</span>)</span><br><span class="line">            , m_name + <span class="string">&quot;_&quot;</span> + std::<span class="built_in">to_string</span>(i)));</span><br><span class="line">        m_threadIds.<span class="built_in">push_back</span>(m_threads[i]-&gt;<span class="built_in">getId</span>());</span><br><span class="line">    &#125;</span><br><span class="line">    lock.<span class="built_in">unlock</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Scheduler::stop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    m_autoStop = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">if</span> (m_rootFiber</span><br><span class="line">        &amp;&amp; m_threadCount == <span class="number">0</span></span><br><span class="line">        &amp;&amp; (m_rootFiber-&gt;<span class="built_in">getState</span>() == Fiber::TERM</span><br><span class="line">        || m_rootFiber-&gt;<span class="built_in">getState</span>() == Fiber::INIT)) &#123;</span><br><span class="line">        <span class="built_in">SYLAR_LOG_INFO</span>(g_logger) &lt;&lt; <span class="keyword">this</span> &lt;&lt; <span class="string">&quot; stopped&quot;</span>;</span><br><span class="line">        m_stopping = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">stopping</span>()) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (m_rootThread != <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">SYLAR_ASSERT</span>(<span class="built_in">GetThis</span>() == <span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">SYLAR_ASSERT</span>(<span class="built_in">GetThis</span>() != <span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    m_stopping = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> i = <span class="number">0</span>; i &lt; m_threadCount; ++i) &#123;</span><br><span class="line">        <span class="built_in">tickle</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (m_rootFiber) &#123;</span><br><span class="line">        <span class="built_in">tickle</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (m_rootFiber) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="built_in">stopping</span>()) &#123;</span><br><span class="line">            m_rootFiber-&gt;<span class="built_in">call</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::vector&lt;Thread::ptr&gt; thrs;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">MutexType::Lock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">        thrs.<span class="built_in">swap</span>(m_threads);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span>&amp; i : thrs) &#123;</span><br><span class="line">        i-&gt;<span class="built_in">join</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="schedule"><a href="#schedule" class="headerlink" title="schedule"></a>schedule</h2><p><code>schedule</code>需要传入<code>Fiber::ptr</code>或<code>std::function&lt;void()&gt; cb</code>或迭代器，将其加入到待执行的队列中</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> FiberOrCb&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">schedule</span><span class="params">(FiberOrCb fc, <span class="type">int</span> thread = <span class="number">-1</span>)</span> </span>&#123;</span><br><span class="line">    <span class="type">bool</span> need_tickle = <span class="literal">false</span>;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">MutexType::Lock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">        need_tickle = <span class="built_in">scheduleNoLock</span>(fc, thread);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (need_tickle) &#123;</span><br><span class="line">        <span class="built_in">tickle</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">template</span>&lt;<span class="keyword">class</span> InputIterator&gt;</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">schedule</span><span class="params">(InputIterator begin, InputIterator end)</span> </span>&#123;</span><br><span class="line">    <span class="type">bool</span> need_tickle = <span class="literal">false</span>;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">MutexType::Lock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">        <span class="keyword">while</span> (begin != end) &#123;</span><br><span class="line">            need_tickle = <span class="built_in">scheduleNoLock</span>(&amp;*begin, <span class="number">-1</span>) || need_tickle;</span><br><span class="line">            ++begin;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (need_tickle) &#123;</span><br><span class="line">        <span class="built_in">tickle</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="run"><a href="#run" class="headerlink" title="run"></a>run</h2><p><code>run</code>函数是核心代码，线程真正执行的函数。具体运行参见第一节整体思路。该函数实现了循环获取待执行的协程函数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">Scheduler::run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">SYLAR_LOG_DEBUG</span>(g_logger) &lt;&lt; m_name &lt;&lt; <span class="string">&quot; run&quot;</span>;</span><br><span class="line">    <span class="built_in">setThis</span>();</span><br><span class="line">    <span class="keyword">if</span> (sylar::<span class="built_in">GetThreadId</span>() != m_rootThread) &#123;</span><br><span class="line">        t_scheduler_fiber = Fiber::<span class="built_in">GetThis</span>().<span class="built_in">get</span>();     <span class="comment">// 创建当前线程的主协程</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">Fiber::ptr <span class="title">idle_fiber</span><span class="params">(<span class="keyword">new</span> Fiber(std::bind(&amp;Scheduler::idle, <span class="keyword">this</span>)))</span></span>;    <span class="comment">// 创建空闲空转协程</span></span><br><span class="line">    Fiber::ptr cb_fiber;    <span class="comment">// 回调函数协程</span></span><br><span class="line"></span><br><span class="line">    FiberAndThread ft;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        ft.<span class="built_in">reset</span>();</span><br><span class="line">        <span class="type">bool</span> tickle_me = <span class="literal">false</span>;     <span class="comment">// 用于标记是否需要唤醒其他线程</span></span><br><span class="line">        <span class="type">bool</span> is_active = <span class="literal">false</span>;     <span class="comment">// 标记是否有活跃的协程</span></span><br><span class="line">        &#123;   <span class="comment">// 上锁, 保护共享资源m_fibers, 在队列中寻找一个协程or函数跑起来</span></span><br><span class="line">            <span class="function">MutexType::Lock <span class="title">lock</span><span class="params">(m_mutex)</span></span>;</span><br><span class="line">            <span class="keyword">auto</span> it = m_fibers.<span class="built_in">begin</span>();</span><br><span class="line">            <span class="keyword">while</span> (it != m_fibers.<span class="built_in">end</span>()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (it-&gt;thread != <span class="number">-1</span> &amp;&amp; it-&gt;thread != sylar::<span class="built_in">GetThreadId</span>()) &#123;</span><br><span class="line">                    ++it;</span><br><span class="line">                    tickle_me = <span class="literal">true</span>;   <span class="comment">// 需要唤醒其他线程</span></span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="built_in">SYLAR_ASSERT</span>(it-&gt;fiber || it-&gt;cb);</span><br><span class="line">                <span class="keyword">if</span> (it-&gt;fiber &amp;&amp; it-&gt;fiber-&gt;<span class="built_in">getState</span>() == Fiber::EXEC) &#123;</span><br><span class="line">                    ++it;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                ft = *it;</span><br><span class="line">                m_fibers.<span class="built_in">erase</span>(it++);</span><br><span class="line">                ++m_activeThreadCount;  <span class="comment">// 该线程准备执行*it中的回调, 活跃线程+1</span></span><br><span class="line">                is_active = <span class="literal">true</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            tickle_me |= it != m_fibers.<span class="built_in">end</span>();  <span class="comment">// 如果队列未遍历完, 则需要唤醒其他线程</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (tickle_me) &#123;</span><br><span class="line">            <span class="built_in">tickle</span>();   <span class="comment">// 唤醒其他线程</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果是协程</span></span><br><span class="line">        <span class="keyword">if</span> (ft.fiber &amp;&amp; (ft.fiber-&gt;<span class="built_in">getState</span>() != Fiber::TERM</span><br><span class="line">            &amp;&amp;  ft.fiber-&gt;<span class="built_in">getState</span>() != Fiber::EXCEPT)) &#123;</span><br><span class="line">            ft.fiber-&gt;<span class="built_in">swapIn</span>();     <span class="comment">// 切入协程执行, 执行完成后自动返回</span></span><br><span class="line">            --m_activeThreadCount;  <span class="comment">// 执行结束, 活跃线程-1</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (ft.fiber-&gt;<span class="built_in">getState</span>() == Fiber::READY) &#123;</span><br><span class="line">                <span class="built_in">schedule</span>(ft.fiber); <span class="comment">// 外部函数可能手动切换YieldToReady, 需要重新加入队列</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (ft.fiber-&gt;<span class="built_in">getState</span>() != Fiber::TERM</span><br><span class="line">                &amp;&amp; ft.fiber-&gt;<span class="built_in">getState</span>() != Fiber::EXCEPT) &#123;</span><br><span class="line">                ft.fiber-&gt;m_state = Fiber::HOLD;</span><br><span class="line">            &#125;</span><br><span class="line">            ft.<span class="built_in">reset</span>();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (ft.cb) &#123;</span><br><span class="line">            <span class="keyword">if</span> (cb_fiber) &#123;     <span class="comment">// 回调协程已经存在时, 只需要调用协程类的重置回调函数</span></span><br><span class="line">                cb_fiber-&gt;<span class="built_in">reset</span>(ft.cb);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;              <span class="comment">// 回调协程不存在时, 创建一个回调携程, 并赋值回调函数</span></span><br><span class="line">                cb_fiber.<span class="built_in">reset</span>(<span class="keyword">new</span> <span class="built_in">Fiber</span>(ft.cb));</span><br><span class="line">            &#125;</span><br><span class="line">            ft.<span class="built_in">reset</span>();         <span class="comment">// 已经获取需要的数据, 重置 ft</span></span><br><span class="line">            cb_fiber-&gt;<span class="built_in">swapIn</span>(); <span class="comment">// 切换到该协程运行 与当前线程主线程完成切换 swapcontext(&amp;Scheduler::GetMainFiber()-&gt;m_ctx, &amp;m_ctx)</span></span><br><span class="line">            <span class="built_in">SYLAR_LOG_INFO</span>(g_logger) &lt;&lt; cb_fiber-&gt;<span class="built_in">getState</span>();</span><br><span class="line">            --m_activeThreadCount;</span><br><span class="line">            <span class="keyword">if</span> (cb_fiber-&gt;<span class="built_in">getState</span>() == Fiber::READY) &#123;</span><br><span class="line">                <span class="built_in">schedule</span>(cb_fiber);     <span class="comment">// 通过YieldToReady()切换出来, 所以Ready状态需要重新加入队列</span></span><br><span class="line">                cb_fiber.<span class="built_in">reset</span>();       <span class="comment">// 释放 cb_fiber</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (cb_fiber-&gt;<span class="built_in">getState</span>() == Fiber::EXCEPT</span><br><span class="line">                || cb_fiber-&gt;<span class="built_in">getState</span>() == Fiber::TERM) &#123;</span><br><span class="line">                cb_fiber-&gt;<span class="built_in">reset</span>(<span class="literal">nullptr</span>);  <span class="comment">// 协程出错或执行结束, 将该线程执行的函数设置为空, 下次进入时再reset新的函数即可</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                cb_fiber-&gt;m_state = Fiber::HOLD;    <span class="comment">// 其他情况从协程出来就设置为HOLD状态</span></span><br><span class="line">                cb_fiber.<span class="built_in">reset</span>();                   <span class="comment">// 释放 cb_fiber</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (is_active) &#123;    <span class="comment">// 如果前面拿到了一个新的ft, 会对活跃线程+1, 但ft实际上是空的, 活跃线程-1</span></span><br><span class="line">                --m_activeThreadCount;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (idle_fiber-&gt;<span class="built_in">getState</span>() == Fiber::TERM) &#123;    <span class="comment">// idle协程为终止时结束</span></span><br><span class="line">                <span class="built_in">SYLAR_LOG_INFO</span>(g_logger) &lt;&lt; <span class="string">&quot;idle fiber term&quot;</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            ++m_idleThreadCount;    <span class="comment">// 空闲线程+1</span></span><br><span class="line">            idle_fiber-&gt;<span class="built_in">swapIn</span>();   <span class="comment">// 切换入空闲协程执行</span></span><br><span class="line">            --m_idleThreadCount;    <span class="comment">// 空闲线程-1</span></span><br><span class="line">            <span class="keyword">if</span> (idle_fiber-&gt;<span class="built_in">getState</span>() != Fiber::TERM</span><br><span class="line">                &amp;&amp; idle_fiber-&gt;<span class="built_in">getState</span>() != Fiber::EXCEPT) &#123;</span><br><span class="line">                idle_fiber-&gt;m_state = Fiber::HOLD;  <span class="comment">// 空闲协程设置为暂停而非EXEC执行状态, 线程进入下一次循环</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="静态函数"><a href="#静态函数" class="headerlink" title="静态函数"></a>静态函数</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Scheduler</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="type">static</span> Scheduler* <span class="title">GetThis</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">static</span> Fiber* <span class="title">GetMainFiber</span><span class="params">()</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/07/27/202407271733/">https://mingxuanwu.com/2024/07/27/202407271733/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/CPP%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%8D%E5%8A%A1%E5%99%A8/"># CPP高性能服务器</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/07/29/202407291329/">7.timer&TimerManager 计时器和计时器管理器</a>
+            
+            
+            <a class="next" rel="next" href="/2024/07/24/202407242052/">5.fiber 线程</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

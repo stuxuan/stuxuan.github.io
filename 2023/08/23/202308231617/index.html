@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【操作系统】1.操作系统启动 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【操作系统】1.操作系统启动</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">August 23, 2023&nbsp;&nbsp;16:17:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <p><img src="/images/操作系统/操作系统启动/3219843-20230824174403745-1875616554.png" width="50%"></img></p>
+<p><img src="/images/操作系统/操作系统启动/3219843-20230824174321487-345443432.png" width="50%"></img></p>
+<h1 id="1-打开电源"><a href="#1-打开电源" class="headerlink" title="1.打开电源"></a>1.打开电源</h1><p>（1）x86 PC开机时CPU处于实模式，实模式的寻址方式是CS:IP (CS左移4位+IP)</p>
+<p>（2）开机时段寄存器CS&#x3D;0xFFFF，偏移量IP&#x3D;0x0000，段寄存器左移4位加上偏移量是实际地址，也就是寻址地址为0xFFFF0 (ROM BIOS映射区)</p>
+<p>（3）检查RAM，键盘，显示器，磁盘</p>
+<p>（4）将0磁道0扇区512个字节读入0x7c00处（操作系统的引导扇区）</p>
+<p>（5）设置cs&#x3D;0x7c0，ip&#x3D;0x0000</p>
+<h1 id="2-引导扇区代码bootsect-s"><a href="#2-引导扇区代码bootsect-s" class="headerlink" title="2.引导扇区代码bootsect.s"></a>2.引导扇区代码bootsect.s</h1><p><a target="_blank" rel="noopener" href="https://blog-static.cnblogs.com/files/blogs/795722/bootsect.js">实验bootsect.s代码</a></p>
+<p>（1）将bootsect从0x7c00处移动到0x90000处</p>
+<p>（2）将setup读入到0x90200处</p>
+<p>（3）将system读入0x10000处</p>
+<p>（4）将PC移动到0x90200处，bootsect结束</p>
+<ol>
+<li>移动bootsect.s。读取0x7c00处的内存，首先设置源地址和目标地址，并且将0x7c00内存处的256个字（512字节）移动到了0x90000</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">start:</span><br><span class="line">	mov ax, #BOOTSEG mov ds, ax ! 将 ds 段寄存器设置为0x07C0（16位汇编，后面的放入前面）</span><br><span class="line">	mov ax, #INITSEG mov es, ax ! 将 es 段寄存器设置为0x9000</span><br><span class="line">	sub si, si　　　　　　　　　　 ! 源地址</span><br><span class="line">	ds:si 0x7c00</span><br><span class="line">	sub di, di　　　　　　　　　　 ! 目标地址 es:di 0x90000</span><br><span class="line">	mov cx, #256　　　　　　　　　 ! 设置移动计数值256字（512字节）</span><br><span class="line">	rep movw 　　　　　　　　　　　 ! 重复移动直到cx为0，将bootsect移动到了0x90000处</span><br><span class="line">	jmpi go, INITSEG            ! 跳转到0x9000:go处，将设置es、ss、sp都为0x9000（相当于是初始化）</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>0x13读磁盘中断，读取setup代码。在磁盘第2个扇区开始，读取4个扇区的内容，并将这4个扇区的内容写入到0x90200内存处。因为bootsect占用512字节，所以需要写在0x90000的512个字节之后，16位表示就是在0x90200处写入。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">go: mov ax, cs                ! 0x9000</span><br><span class="line">	! 将ds、es、ss都置成移动后代码所在段处0x9000、栈顶地址设置为0x9fff00，来远离代码位置</span><br><span class="line">	mov ds, ax</span><br><span class="line">	mov es, ax</span><br><span class="line">	mov ss, ax</span><br><span class="line">	mov sp, #0xFF00  </span><br><span class="line">load_setup:            // 载入setup模块, 从磁盘第2个扇区开始读4个扇区, 写入0x90200处</span><br><span class="line">	mov dx, #0x0000          ! 数据寄存器</span><br><span class="line">	mov cx, #0x0002          ! 计数寄存器 ch:cx高8位, 0x00(柱面号0); cl:低8位, 0x02(开始扇区为2)</span><br><span class="line">	mov bx, #0x0200          ! 基址寄存器 写到es:bx 0x90200处</span><br><span class="line">	mov ax, #0x0200+SETUPLEN ! 累加器 ah: ax高8位, 0x20(读磁盘); al:ax低8位, 0x04(读取4个扇区)</span><br><span class="line">	int 0x13               ! BIOS读磁盘扇区中断</span><br><span class="line">	jnc ok_load_setup      ! 跳转指令, CF=0则跳转。如果没有读错，则跳转到加载setup执行；如果读错，则复位驱动器重新读。</span><br><span class="line">	mov dx, #0x0000        ! 对驱动器0进行操作</span><br><span class="line">    mov ax, # 0x0000  ! 复位 </span><br><span class="line">    int 0x13          ! 执行0x13中断（BIOS读磁盘扇区的中断）</span><br><span class="line">    j    load_setup   ! 重读</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>0x10显示字符中断，显示字符在显示器上。ok_load_setup，显示欢迎页面，调用read_it读入system，最后将控制权交接给setup模块，也就是将PC移动到0x90200处，开始执行setup。bootsect正式结束。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">ok_load_setup:    ! 载入setup，显示开机文字，读取system</span><br><span class="line">	! 读取setup，显示开机文字</span><br><span class="line">	mov dl, #0x00</span><br><span class="line">	mov ax, #0x0800        ! ah=8，获得磁盘驱动器的参数</span><br><span class="line">	int 0x13</span><br><span class="line">	mov ch, #0x00</span><br><span class="line">	mov sectors, cx</span><br><span class="line">	mov ah, #0x03</span><br><span class="line">	xor bh, bh</span><br><span class="line">	int 0x00 ! 读光标</span><br><span class="line">	mov cx, #24</span><br><span class="line">	mov bx, #0x0007    ! 7是显示属性</span><br><span class="line">	mov bp, #msg1</span><br><span class="line">	mov ax, #1301</span><br><span class="line">	int 0x10 !显示字符</span><br><span class="line">	! 读取system模块到0x10000处</span><br><span class="line">	mov ax, #SYSSEG        ! SYSSEG=0X1000</span><br><span class="line">	mov es, ax</span><br><span class="line">	call read_it          ! 读入system</span><br><span class="line">	jmpi 0, SETUPSEG      ! 转入0x9020:0X0000执行setup.s</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-引导扇区代码setup-s"><a href="#3-引导扇区代码setup-s" class="headerlink" title="3.引导扇区代码setup.s"></a>3.引导扇区代码setup.s</h1><p><a target="_blank" rel="noopener" href="https://blog-static.cnblogs.com/files/blogs/795722/setup.js">实验setup.s代码</a></p>
+<p>读取硬件参数，将操作系统移动到0地址处，进入保护模式，初始化一个很简单的gdt表，跳转到system模块</p>
+<ol>
+<li>setup主要任务是读取硬件参数，初始化一个数据结构来管理这些硬件设备，并移动操作系统到内存0地址处。其中0x15中断是读取扩展内存大小（Intel原先内存只有1m，我们把1m以外的内存称为扩展内存）放在ax寄存器里，之后放到内存0x90002处。接下来do_move将0x90000处开始的数据移动到内存绝对地址0x00000处。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">! 取光标位置，包括其他硬件参数，放到0x90000处</span><br><span class="line">start : mov ax, #INITSEG</span><br><span class="line">		mov ds, ax</span><br><span class="line">		mov ah, #0x03</span><br><span class="line">		xor bh, bh</span><br><span class="line">		int 0x10</span><br><span class="line">		mov [0], dx　　　　　! 光标位置设置为0x90000</span><br><span class="line">		mov ah, #0x88</span><br><span class="line">		int 0x15</span><br><span class="line">		mov [2], ax ...    ! 读取扩展内存的大小(1m以外的内存称为扩展内存), 放在0x90002处</span><br><span class="line">		cli					！ 不允许中断</span><br><span class="line">        mov ax, #0x0000, cld        ! 设置读取目标位置和递增读取方式 </span><br><span class="line">! 将system模块从0x10000动到0x00000处</span><br><span class="line">do_mov: mov es, ax</span><br><span class="line">		add ax, #0x1000</span><br><span class="line">		cmp ax, #0x9000</span><br><span class="line">		jz end_mov 　　　　　　　　　　　　 ! 若ax=0x9000，表示移动完成，则跳出</span><br><span class="line">		mov ds, ax</span><br><span class="line">		sub di, di</span><br><span class="line">		sub si, si        ! 设置源地址0x90000和目标地址0x00000</span><br><span class="line">		mov cx, #0x8000   ! 设置移动数据的长度</span><br><span class="line">		rep movsw         ! 将system模块移动到0地址</span><br><span class="line">		jmp do_move</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>进入保护模式。cs左移4位+ip最大有20位地址，也就是最大内存空间只有1M。setup最后一步要从16位机切换到32寻址方式。</li>
+</ol>
+<p>　　实模式：CS:IP，CS &lt;&lt; 4 + IP，共20位寻址空间</p>
+<p>　　保护模式：CS实际上是查表GDT（Global Descriptor Table），地址为CS查表 + IP</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov ax,#0x0001　 ! 将0x0001放入ax寄存器</span><br><span class="line">mov cr0,ax　　　　! 将ax放入cr0寄存器，这一步非常重要</span><br><span class="line">				! cr0寄存器最后一位是0的时候是CS:IP实模式</span><br><span class="line">				! cr0寄存器最后一位是1的时候是保护模式，需要走另外一条解释指令的电路</span><br><span class="line">jmpi 0,8　　　　　! cs:8, ip:0; 这里实际上跳转的地址就是0地址</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-head-s"><a href="#4-head-s" class="headerlink" title="4.head.s"></a>4.head.s</h1><p>head.s是system中的第一个模块，负责重新加载各个数据段寄存器，重新设置中断描述符表，重新设置全局描述符表，设置分页处理机制（一个页目录表和4个页表），打开20号地址线访问4G内存，并且将main函数压栈，head执行完后弹出main，转到main函数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">startup_32:</span><br><span class="line">	movl $0x10, %eax　　! 现在开始是32位汇编，前面的放入后面</span><br><span class="line">	mov %ax, %ds</span><br><span class="line">	mov %ax, %es</span><br><span class="line">	mov %as, %fs</span><br><span class="line">	mov %as, %gs　　　　　　　 ! 指向gdt的0x10数据项</span><br><span class="line">	lss _stact_start, %esp　　! 设置系统栈</span><br><span class="line">	call setup_idt　　　　　　 ! 设置中断描述符表子程序</span><br><span class="line">	call setup_gdt　　　　　　 ! 设置全局描述符表子程序</span><br><span class="line">	mov $0x10, %eax　　　　　　! 重载所有的段寄存器 ...</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-main函数"><a href="#5-main函数" class="headerlink" title="5.main函数"></a>5.main函数</h1><p>main函数中有大量初始化函数，例如初始化硬盘，初始化内存，将每4K内存作为一个页等等</p>
+<h1 id="6-系统调用"><a href="#6-系统调用" class="headerlink" title="6.系统调用"></a>6.系统调用</h1><p><strong>普通函数调用</strong>是通过call跳转对应函数的地址继续执行</p>
+<p><strong>系统调用</strong>是调用系统库中为该系统调用编写的一个接口函数，叫 API（Application Programming Interface）。API 并不能完成系统调用的真正功能，它要做的是去调用真正的系统调用，过程是：</p>
+<ul>
+<li>把系统调用的编号存入 <code>%eax</code> ，把函数参数存入其它通用寄存器</li>
+<li>触发 <code>int 0x80</code> 号中断（<code>0x80</code> 中断描述符在系统初始化时设置了自动调用<code>system_call</code>）</li>
+<li>最后 <code>system_call</code> 中根据 <code>%eax</code> 的编号调用对应的函数</li>
+</ul>
+<p>这里研究 <code>close()</code> 中的API，以宏 <code>_syscall1(int, close, int, fd)</code> 为例子，它在 <code>include/unistd.h</code> 中定义了展开的形式</p>
+<p><img src="/images/操作系统/操作系统启动/3219843-20230826173214975-2046285158.png" width="80%"></img></p>
+<p><code>__NR_close</code> 在 <code>include/unistd.h</code> 中定义为 6</p>
+<p>下面是 API 的定义。它先将宏 <code>__NR_close</code> 存入 EAX，将参数 fd 存入 EBX，然后进行 0x80 中断调用。调用返回后，从 EAX 取出返回值，存入 <code>__res</code>，再通过对 <code>__res</code> 的判断决定传给 API 的调用者什么样的返回值</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 定义了一个返回值 long 型变量 __res</span></span><br><span class="line"><span class="comment"> * __asm__ 表示内嵌汇编代码</span></span><br><span class="line"><span class="comment"> * volatile 表示编译器不优化该段代码</span></span><br><span class="line"><span class="comment"> * =a中 = 表示只写，a表示先将结果输出到 %eax 中，再由 %eax 输出到__res</span></span><br><span class="line"><span class="comment"> * 0表示和输出寄存器是同一个寄存器，也就是将 __NR_close 放入 %eax</span></span><br><span class="line"><span class="comment"> * b表示将 fd 放入 %ebx</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">close</span><span class="params">(<span class="type">int</span> fd)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">long</span> __res;</span><br><span class="line">    __asm__ <span class="title function_">volatile</span> <span class="params">(<span class="string">&quot;int $0x80&quot;</span></span></span><br><span class="line"><span class="params">        : <span class="string">&quot;=a&quot;</span> (__res)</span></span><br><span class="line"><span class="params">        : <span class="string">&quot;0&quot;</span> (__NR_close),<span class="string">&quot;b&quot;</span> ((<span class="type">long</span>)(fd)))</span>;</span><br><span class="line">    <span class="keyword">if</span> (__res &gt;= <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> (<span class="type">int</span>) __res;</span><br><span class="line">    errno = -__res;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在内核初始化时，主函数调用了 <code>sched_init()</code> 初始化函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="comment">//    ……</span></span><br><span class="line">    time_init();</span><br><span class="line">    sched_init();</span><br><span class="line">    buffer_init(buffer_memory_end);</span><br><span class="line"><span class="comment">//    ……</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>sched_init()</code> 在 <code>kernel/sched.c</code> 中定义为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">sched_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123; </span><br><span class="line">    <span class="comment">//    ……     set_system_gate(0x80,&amp;system_call);</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>set_system_gate</code> 是个宏，在 <code>include/asm/system.h</code>有定义。这段宏就是填写 IDT（中断描述符表），将 <code>system_call</code> 函数地址写到 <code>0x80</code> 对应的中断描述符中，也就是在中断 <code>0x80</code> 发生后，自动调用函数 <code>system_call</code></p>
+<p><img src="/images/操作系统/操作系统启动/3219843-20230826175526941-109795679.png" width="80%"></img></p>
+<p>下面是 <code>system_call</code>。该函数纯汇编编写，是真正的中断处理程序，定义在 <code>kernel/system_call.s</code> 中。</p>
+<p><code>call sys_call_table(,%eax,4)</code> 之前是一些压栈保护，修改段选择子为内核段，之后是看看是否需要重新调度。</p>
+<p>根据汇编寻址方法它实际上是：<code>call sys_call_table + 4 * %eax</code>，其中 eax 中放的是系统调用号，即 <code>__NR_xxxxxx</code>。</p>
+<p><code>sys_call_table</code> 一定是一个函数指针数组的起始地址，它定义在 <code>include/linux/sys.h</code> 中：</p>
+<p><code>fn_ptr sys_call_table[] = &#123; sys_setup, sys_exit, sys_fork, sys_read,...&#125;</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">!…… </span><br><span class="line">! # system_call部分代码 </span><br><span class="line">! # 这是系统调用总数。如果增删了系统调用，必须做相应修改 nr_system_calls = 72 </span><br><span class="line">!……  </span><br><span class="line"></span><br><span class="line">! # system_call 用 .globl 修饰为其他函数可见</span><br><span class="line">.globl system_call</span><br><span class="line">.align 2 </span><br><span class="line">system_call:</span><br><span class="line"></span><br><span class="line">! # 检查系统调用编号是否在合法范围内</span><br><span class="line">	cmpl \$nr_system_calls-1,%eax</span><br><span class="line">	ja bad_sys_call</span><br><span class="line">	push %ds</span><br><span class="line">	push %es</span><br><span class="line">	push %fs</span><br><span class="line">	pushl %edx</span><br><span class="line">	pushl %ecx</span><br><span class="line"></span><br><span class="line">! # push %ebx,%ecx,%edx，是传递给系统调用的参数</span><br><span class="line">	pushl %ebx  </span><br><span class="line"></span><br><span class="line">! # 让ds, es指向GDT，内核地址空间</span><br><span class="line">	movl $0x10,%edx</span><br><span class="line">	mov %dx,%ds</span><br><span class="line">	mov %dx,%es</span><br><span class="line">	movl $0x17,%edx </span><br><span class="line">! # 让fs指向LDT，用户地址空间</span><br><span class="line">	mov %dx,%fs</span><br><span class="line">	call sys_call_table(,%eax,4)  ! # 关键代码</span><br><span class="line">	pushl %eax</span><br><span class="line">	movl current,%eax</span><br><span class="line">	cmpl $0,state(%eax)</span><br><span class="line">	jne reschedule</span><br><span class="line">	cmpl $0,counter(%eax)</span><br><span class="line">	je reschedule</span><br></pre></td></tr></table></figure>
+
+<h1 id="7-实验"><a href="#7-实验" class="headerlink" title="7.实验"></a>7.实验</h1><p>增加系统调用whoami和iam，首先在 <code>include/linux/sys.h</code> 中添加我们的系统调用函数</p>
+<p><img src="/images/操作系统/操作系统启动/3219843-20230829160618309-735505037.png" width="70%"></img></p>
+<p>在 <code>include/unistd.h</code> 中增加我们的宏定义编号，这里需要去系统里修改，使用 <code>sudo ./mount-hdc</code> 可以挂载Linux的系统盘，然后在这里修改它的系统调用号，不然打包以后这里不会修改到系统里 </p>
+<p><img src="/images/操作系统/操作系统启动/3219843-20230829161051138-1140909822.png" width="70%"></img></p>
+<p> 在 <code>kernel/system_call.s</code> 中修改调用的总数</p>
+<p><img src="/images/操作系统/操作系统启动/3219843-20230829161300051-735417643.png" width="70%"></img></p>
+<p> 修改 <code>kernel/Makefile</code> 中对程序源文件的编译和链接规则，Make指令完全按照Makefile文件工作</p>
+<p><img src="/images/操作系统/操作系统启动/3219843-20230829161300051-7322222.png" width="70%"></img></p>
+<p> 编写who.c文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;asm/segment.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;errno.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> _myname[<span class="number">24</span>];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sys_iam</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *name)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> str[<span class="number">25</span>];</span><br><span class="line">    <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">do</span> </span><br><span class="line">    &#123;<span class="comment">// get char from user input</span></span><br><span class="line">        str[i] = get_fs_byte(name + i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (i &lt;= <span class="number">25</span> &amp;&amp; str[i++] != <span class="string">&#x27;\0&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (i &gt; <span class="number">24</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        errno = EINVAL;</span><br><span class="line">        i = <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;<span class="comment">// copy from user mode to kernel mode</span></span><br><span class="line">        <span class="built_in">strcpy</span>(_myname, str);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> i;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">sys_whoami</span><span class="params">(<span class="type">char</span> *name, <span class="type">unsigned</span> <span class="type">int</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> length = <span class="built_in">strlen</span>(_myname);</span><br><span class="line">    printk(<span class="string">&quot;%s\n&quot;</span>, _myname);</span><br><span class="line">    <span class="keyword">if</span> (size &lt; length)</span><br><span class="line">    &#123;</span><br><span class="line">        errno = EINVAL; length = <span class="number">-1</span>;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; length; i++)</span><br><span class="line">        &#123; <span class="comment">// copy from kernel mode to user mode</span></span><br><span class="line">            put_fs_byte(_myname[i], name + i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> length;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 编写我们的系统调用代码iam.c和whoami.c，接下来就完成了一个系统调用</p>
+<p><img src="/images/操作系统/操作系统启动/3219843-20230830192138077-2009966762.png" width="70%"></img></p>
+<p> 测试我们编写的系统调用是否可以运行</p>
+<p><img src="/images/操作系统/操作系统启动/3219843-20230830193609824-807384651.png" width="70%"></img></p>
+<p>完整的流程是在 iam.c 中通过 _syscall1 进行宏展开并调用，展开后会根据传入的函数名组成对应的 __NR_iam 调用号并存入 %eax，然后触发 int0x80 中断，进入 system_call 汇编函数，该函数中通过 call sys_call_table(,%eax,4) 调用真正的处理函数 sys_iam 进行处理</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2023/08/23/202308231617/">https://mingxuanwu.com/2023/08/23/202308231617/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/"># 操作系统</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2023/09/01/202309011802/">【操作系统】2.进程和线程</a>
+            
+            
+            <a class="next" rel="next" href="/2023/07/22/202307221901/">【深入理解计算机系统】3.程序的机器级表示</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

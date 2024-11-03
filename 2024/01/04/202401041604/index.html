@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="mxwu">
+
+
+
+
+
+<title>【计算机网络：自顶向下方法】2.应用层 | xuan&#39;s Blogs</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">xuan&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">xuan&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">【计算机网络：自顶向下方法】2.应用层</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">mxwu</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">January 4, 2024&nbsp;&nbsp;16:04:00</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-应用层协议原理"><a href="#1-应用层协议原理" class="headerlink" title="1 应用层协议原理"></a>1 应用层协议原理</h1><ul>
+<li>客户端-服务器（C&#x2F;S）体系架构<ul>
+<li>服务器一直运行，有固定的IP和端口</li>
+<li>需要服务器场，可扩展性较差</li>
+<li>客户端主动与服务器通信，不直接与其他客户端连接</li>
+</ul>
+</li>
+<li>对等体（P2P）体系架构<ul>
+<li>几乎没有一直运行的服务器</li>
+<li>任意端到端系统之间可以进行通信</li>
+<li>每个节点既是客户端又是服务器</li>
+<li>具有自扩展性</li>
+</ul>
+</li>
+<li>C&#x2F;S和P2P混合体<ul>
+<li>用户上线时向中心服务器注册其IP地址</li>
+<li>用于与中心联系获取好友的IP地址</li>
+<li>两个用户间聊天使用P2P协议</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-1-进程通信"><a href="#1-1-进程通信" class="headerlink" title="1.1 进程通信"></a>1.1 进程通信</h2><p>　　客户端进程和服务器进程需要通过交换<strong>报文（Message）</strong>来通信，这里涉及到如下问题</p>
+<ol>
+<li>进程标识和寻址问题<ul>
+<li>IP、端口、传输层协议（TCP、UDP）</li>
+</ul>
+</li>
+<li>传输层-应用层提供服务如何（下层提供的服务）<ul>
+<li>要传输的报文；源主机（IP、端口、协议）；目标主机（对方IP、端口、协议）</li>
+<li>传输层实体根据这些信息进行TCP报文段（UDP数据报）的封装</li>
+<li>完成连接后使用socket代替4元组（源IP、Port，目标IP、Port），使得穿过层间的信息量最少，不必每次都将4元组从应用层传入传输层，socket由操作系统进行管理</li>
+</ul>
+</li>
+<li>如何使用传输层提供的服务实现进程间报文交换（本层定义的协议）<ul>
+<li>定义应用层的协议：报文格式，解释，时序等（HTTP、SMTP等）应用层协议根据数据丢失率、吞吐、延迟、安全性等设计。例如TCP更可靠，但UDP无需建立连接速度更快。</li>
+<li>编制程序，通过API调用网络基础设施提供的服务传输和解析报文</li>
+</ul>
+</li>
+</ol>
+<h1 id="2-HTTP"><a href="#2-HTTP" class="headerlink" title="2 HTTP"></a>2 HTTP</h1><h2 id="2-1-HTTP连接"><a href="#2-1-HTTP连接" class="headerlink" title="2.1 HTTP连接"></a>2.1 HTTP连接</h2><p>　　HTTP基于TCP协议。客户端发起与服务器的TCP连接建立套接字；服务器接受TCP连接并建立对应的套接字（服务器多个套接字<strong>共享端口号80</strong>，客户端发来数据时操作系统根据<strong>源IP和端口</strong>不同来<strong>区分</strong>它对应的<strong>套接字</strong>），接下来客户端和服务器交换HTTP报文传输数据（应用层协议报文），最后TCP连接关闭。HTTP是无状态的，服务器不维护客户端的任何信息。</p>
+<ul>
+<li>非持久HTTP：最多只有一个对象在TCP连接上发送，下载多个对象需要多个TCP连接（HTTP&#x2F;1.0）</li>
+<li>持久HTTP：多个对象可以在一个TCP连接上传输（HTTP&#x2F;1.1）</li>
+</ul>
+<h2 id="2-2-响应时间模型"><a href="#2-2-响应时间模型" class="headerlink" title="2.2 响应时间模型"></a>2.2 响应时间模型</h2><p>往返时间RTT（round-trip time）：一个小的分组从客户端到服务器再回到客户端的时间（忽略传播时间）</p>
+<ul>
+<li>非持久HTTP每个对象都需要 2RTT+ 传输时间</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231227202522359-620958600.png" width="35%"/></div>
+
+<h2 id="2-3-HTTP请求报文"><a href="#2-3-HTTP请求报文" class="headerlink" title="2.3 HTTP请求报文"></a>2.3 HTTP请求报文</h2><p>两种类型的HTTP报文：请求、响应</p>
+<ul>
+<li>HTTP请求报文</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">GET /somedir/page.html HTTP/<span class="number">1.1</span>    <span class="comment">// 请求行（GET、POST、HEAD）</span></span><br><span class="line">Host: www.xidian.edu.cn</span><br><span class="line">User-agent: Mozilla/<span class="number">4.0</span></span><br><span class="line">Conection: close</span><br><span class="line">Accept-language:cn</span><br><span class="line"></span><br><span class="line"><span class="comment">// 换行回车符表示保温结束（一个额外的换行回车符）</span></span><br></pre></td></tr></table></figure>
+
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231227203326315-863288783.png" width="55%"/></div>
+
+<ul>
+<li>HTTP相应报文</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">HTTP/<span class="number">1.1</span> <span class="number">200</span> OK\r\n</span><br><span class="line">Connection close\r\n</span><br><span class="line">Date: Thu, <span class="number">06</span> Aug <span class="number">1998</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">15</span> GMT\r\n</span><br><span class="line">Server: Apache/<span class="number">1.3</span><span class="number">.0</span> (Unix) \r\n</span><br><span class="line">Last-Modified: Mon, <span class="number">22</span> Jun <span class="number">1998.</span>.. \r\n</span><br><span class="line">Content-Length: <span class="number">6821</span>\r\n</span><br><span class="line">Content-Type: text/html\r\n</span><br><span class="line">\r\n</span><br><span class="line">\r\n</span><br><span class="line">data</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4-Cookies"><a href="#2-4-Cookies" class="headerlink" title="2.4 Cookies"></a>2.4 Cookies</h2><p>　　cookies可以用于用户验证、推荐、用户状态等维持用户-服务器状态，cookies 4个组成部分</p>
+<ol>
+<li>HTTP响应报文中有一个cookie的首部行</li>
+<li>HTTP请求报文含有一个cookie的首部行</li>
+<li>客户端中保留一个cookie文件由浏览器管理</li>
+<li>Web站点有一个后台数据库</li>
+</ol>
+<h2 id="2-5-Web缓存"><a href="#2-5-Web缓存" class="headerlink" title="2.5 Web缓存"></a>2.5 Web缓存</h2><p>目标：不访问原始服务器，就满足客户的请求</p>
+<p>用户设置浏览器，通过缓存访问Web，浏览器将所有的HTTP请求发给缓存，如果对象在缓存中则返回对象，不在缓存再访问原始服务器</p>
+<p>缓存通常是ISP安装（大学、公司、居民区ISP），可以减少服务器载荷，降低机构内部与Internet接入链路上的流量</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231227204603029-169279492.png" width="40%"/></div>
+
+<p>解决方案：条件GET方法，HTTP请求报文 If-modified-since:<data> 如果对象是最新的，就不要发送对象，服务器返回 304 Not Modified；如果对象被修改则返回 200 OK</p>
+<h1 id="3-FTP"><a href="#3-FTP" class="headerlink" title="3 FTP"></a>3 FTP</h1><p>FTP基于TCP协议，客户端是发起传输的一方，完成用户认证后可以与服务器进行文件传输。FTP服务器维护用户的状态信息，是有状态的。</p>
+<p>FTP使用21号端口进行控制连接，使用20号端口进行数据连接。而HTTP通过80号端口完成控制连接和数据连接</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231227210932392-1932665652.png" width="80%"/></div>
+
+<h1 id="4-Email"><a href="#4-Email" class="headerlink" title="4 Email"></a>4 Email</h1><p>使用TCP协议在客户端和服务器之间发送报文，端口号为25（握手、传输报文、关闭），使用ASCII码文本传输数据（所有报文都必须是7位ASCII编码）</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231228103530572-2007653173.png" width="60%"/></div>
+
+<ul>
+<li>SMTP：推送到接收方的邮件服务器</li>
+<li>邮件访问协议：从服务器访问邮件<ul>
+<li>POP（Post Office Protocol）邮局访问协议</li>
+<li>IMAP（Internet Mail Access Protocol）网络邮件访问协议，有更多特性，在服务器上处理存储的报文，在服务器中有目录</li>
+<li>HTTP：Hotmail，Yahoo等，方便</li>
+<li>POP3，无状态，不允许在服务器建目录，可以设置下载并删除或下载并保留</li>
+</ul>
+</li>
+</ul>
+<h1 id="5-DNS"><a href="#5-DNS" class="headerlink" title="5 DNS"></a>5 DNS</h1><ul>
+<li>域名系统（Domain Name System，DNS）的必要性<ul>
+<li>IP地址标志主机、路由器但IP地址不好记忆</li>
+<li>字符串 - IP地址 转换存在必要性</li>
+<li>DNS负责将字符串转换为二进制的网络地址（分布式的数据库维护和相应）</li>
+</ul>
+</li>
+<li>DNS主要思路<ul>
+<li><strong>分层</strong>的、基于域的命名机制</li>
+<li>若干<strong>分布式</strong>的数据库完成名字到IP的转换</li>
+<li>运行在UDP上端口号53的<strong>应用</strong>服务</li>
+<li>核心的Internet功能，但是在应用层协议实现（网络边缘处理复杂性）</li>
+<li>DNS还可以解决负载均衡（Load Distribution）的问题</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-1-域名服务器维护资源记录"><a href="#5-1-域名服务器维护资源记录" class="headerlink" title="5.1 域名服务器维护资源记录"></a>5.1 域名服务器维护资源记录</h2><p>资源记录（resource records）：维护域名-IP地址的映射关系</p>
+<ul>
+<li>RR格式：（domain_name，ttl，type，class，Value）<ul>
+<li>domain_name：域名</li>
+<li>TTL：time to live 生存时间（这个缓冲记录的有效时间）</li>
+<li>Class：类别（互联网中这个值记录为Internet的缩写IN）</li>
+<li>Value：值，域名对应的IP地址，也可以是ASCII码</li>
+<li>Type：类别<ul>
+<li>Type&#x3D;A：Name为主机，Value为IP</li>
+<li>Type&#x3D;CNAME：Name为规范名字的别名，Value为规范名字</li>
+<li>Type&#x3D;NS：Name域名，Value为该域名的权威服务器的域名（i.cnblogs.com应该能在cnblogs.com中找到自己的地址）</li>
+<li>Type&#x3D;MX：Value为name对应的邮件服务器的名字</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-2-DNS工作过程"><a href="#5-2-DNS工作过程" class="headerlink" title="5.2 DNS工作过程"></a>5.2 DNS工作过程</h2><ul>
+<li>应用调用解析器（resolver）</li>
+<li>解析器作为客户向Name Serer发出查询报文（UDP数据报）</li>
+<li>Name Server返回响应报文（name&#x2F;ip）</li>
+</ul>
+<p>举例某公司访问<a target="_blank" rel="noopener" href="http://www.xidian.edu.cn,主机首先查询本地服务器,如果本地服务器缓存没有地址,则首先查询cn找到edu.cn的地址,之后在edu.cn中找到xidian.edu.cn的地址,本地dns服务器不断根据这些地址去做查询(迭代查询).本地缓存一般ttl为2天./">www.xidian.edu.cn，主机首先查询本地服务器，如果本地服务器缓存没有地址，则首先查询cn找到edu.cn的地址，之后在edu.cn中找到xidian.edu.cn的地址，本地DNS服务器不断根据这些地址去做查询（迭代查询）。本地缓存一般TTL为2天。</a></p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20231228111756550-1927074758.png" width="30%"/></div>
+
+<h1 id="6-P2P"><a href="#6-P2P" class="headerlink" title="6 P2P"></a>6 P2P</h1><h2 id="6-1-CS和P2P模式"><a href="#6-1-CS和P2P模式" class="headerlink" title="6.1 CS和P2P模式"></a>6.1 CS和P2P模式</h2><p>CS模式：服务器传输给peer节点，服务器必须顺序传输N个文件拷贝，客户端必须下载一个文件拷贝。随着客户端数量增多，下载速度会越来越慢</p>
+<p>P2P模式：服务器至少需要上载一份拷贝，客户端必须下载一个文件拷贝，但所有peer节点都可以上载使得最大上载带宽随peer增加</p>
+<h2 id="6-2-P2P文件分发：BitTorrent"><a href="#6-2-P2P文件分发：BitTorrent" class="headerlink" title="6.2 P2P文件分发：BitTorrent"></a>6.2 P2P文件分发：BitTorrent</h2><p>将文件分为256KB的块，网络中的peers发送和接收文件快，相互服务</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104101035031-1049076219.png" width="80%"/></div>
+
+<ul>
+<li>Napster 集中式目录的设计（集中式）：上线通知服务器我有的资源，下线删除资源，客户端向服务器目录请求其他资源并与其他节点建立连接<ul>
+<li>服务器故障资源目录就会下线</li>
+<li>所有人请求目录资源也会有性能问题</li>
+<li>侵犯版权</li>
+</ul>
+</li>
+<li>Gnutella 查询泛洪的设计（完全分布式）：没有中心服务器，通过图网络进行泛洪查询<ul>
+<li>建立连接：下载软件后有一个常驻节点的表，通过该标向网络泛洪发起上线通知，然后挑选几个返回的节点进行连接加入网络</li>
+<li>断开连接：告知与自己连接的节点下线</li>
+</ul>
+</li>
+<li>KaZaA 利用不对称性（组合体）：设计其中几个对等体为小组长，小组长之间有TCP连接<ul>
+<li>每个文件有一个散列标识码和描述符</li>
+<li>客户端向组长发送关键字查询</li>
+<li>组长匹配元数据、散列标识码、IP地址，向其他组长发起查询，其他组长进行匹配</li>
+<li>客户端想拥有文件的对等体发送带散列标识码的HTTP请求</li>
+</ul>
+</li>
+</ul>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104102338439-1575648075.png" width="30%"/></div>
+
+<h1 id="7-CDN"><a href="#7-CDN" class="headerlink" title="7 CDN"></a>7 CDN</h1><p>内容分发网络（Content Distribution Networks，CDN）：通过CDN在全网部署缓存节点，存储服务内容，就近为用户提供服务，用户从CDN请求内容（用户重定向到最近的拷贝来请求内容）</p>
+<div align="center"><img src="/images/计算机网络/自顶向下方法/3219843-20240104113654026-1908793101.png" width="60%"/></div>
+
+<ul>
+<li>CDN节点选择<ol>
+<li>用户向原始网站请求数据，原始网站中包含一个视频的链接</li>
+<li>浏览器解析视频地址，向本地DNS服务器请求地址</li>
+<li>本地服务器向权威名字服务器请求视频地址，权威名字服务器返回给本地服务器重定向地址</li>
+<li>本地服务器向重定向地址的DNS服务器请求，返回距离用户最近的视频服务器地址</li>
+<li>本地DNS服务器返回给用户视频的地址</li>
+</ol>
+</li>
+<li>网络拥塞时CDN节点切换</li>
+<li>CDN节点存储内容选择</li>
+</ul>
+<h1 id="8-socket"><a href="#8-socket" class="headerlink" title="8 socket"></a>8 socket</h1><p>TCP：可靠地、字节流的服务</p>
+<p>UDP：不可靠（数据UDP数据包）服务</p>
+<h2 id="8-1-TCP-socket"><a href="#8-1-TCP-socket" class="headerlink" title="8.1 TCP socket"></a>8.1 TCP socket</h2><ul>
+<li>服务器处于运行状态<ul>
+<li><strong>创建</strong>欢迎socket</li>
+<li>和本地端口<strong>绑定</strong></li>
+<li>在欢迎socket上阻塞式<strong>等待</strong>接收用户的连接</li>
+</ul>
+</li>
+<li>客户端主动和服务器建立连接<ul>
+<li>创建客户端本地套接字（隐式捆绑到本地端口）</li>
+<li>指定服务器IP和端口，与服务器进程连接</li>
+</ul>
+</li>
+<li>客户端连接请求到来时<ul>
+<li>服务器接收来自客户端的请求，接触阻塞式等待</li>
+<li>返回一个新的socket（该socket绑定服务器守候的IP和端口以及客户端的IP和端口，系统通过收到字节流的IP和端口区分应该发送给哪个socket）</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span>&#123;</span></span><br><span class="line">    <span class="type">short</span> sin_family;    <span class="comment">// AF_INET</span></span><br><span class="line">    u_short sin_port;    <span class="comment">// port</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span>    <span class="comment">// IP address, unsigned long</span></span><br><span class="line">    <span class="type">char</span> sin_zero[<span class="number">8</span>];    <span class="comment">// align</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">hostent</span>&#123;</span></span><br><span class="line">    <span class="type">char</span> *h_name;</span><br><span class="line">    <span class="type">char</span> **h_aliases;</span><br><span class="line">    <span class="type">int</span> h_addrtype;</span><br><span class="line">    <span class="type">int</span> h_length; <span class="comment">/*地址长度*/</span></span><br><span class="line">    <span class="type">char</span> **h_addr_list;</span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> h_addr h_addr_list[0];</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://www.mxwu.me/2023/11/13/202311131630/">Linux TCP&#x2F;UDP socket 通信和IO多路复用</a></p>
+<h2 id="8-2-UDP-socket"><a href="#8-2-UDP-socket" class="headerlink" title="8.2 UDP socket"></a>8.2 UDP socket</h2><p><a target="_blank" rel="noopener" href="https://www.mxwu.me/2023/11/13/202311131630/">Linux TCP&#x2F;UDP socket 通信和IO多路复用</a>（3.2UDP）</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>mxwu</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://mingxuanwu.com/2024/01/04/202401041604/">https://mingxuanwu.com/2024/01/04/202401041604/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2023 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"># 计算机网络</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2024/01/05/202401052013/">【计算机网络：自顶向下方法】3.传输层</a>
+            
+            
+            <a class="next" rel="next" href="/2023/12/27/202312271638/">【计算机网络：自顶向下方法】1.计算机网络概述</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© mxwu | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
